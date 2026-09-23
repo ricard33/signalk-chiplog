@@ -63,6 +63,9 @@
       "prettier --write"
     ]
   },
+  "dependencies": {
+    "@js-temporal/polyfill": "^0.5.1"
+  },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "esbuild": "0.28.2",

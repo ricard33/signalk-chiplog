@@ -410,7 +410,7 @@ export const MESSAGES = {
 
     'replay.title': 'Retrospective analysis',
     'replay.intro':
-      'Reconstruct past passages for a date range from a signalk-to-influxdb history, using the same detection Chiplog runs live — for passages made before the plugin was installed or running.',
+      'Reconstruct past passages for a date range from the history the boat already records, using the same detection Chiplog runs live — for passages made before the plugin was installed or running.',
     'replay.start': 'Reconstruct',
     'replay.cancel': 'Cancel',
     'replay.progress': '{percent}% — at {time}',
@@ -418,7 +418,8 @@ export const MESSAGES = {
     'replay.done': 'Reconstruction finished at {time}.',
     'replay.cancelled': 'Reconstruction cancelled at {time}.',
     'replay.failed': 'Reconstruction failed at {time}: {message}',
-    'replay.notConfigured': 'No InfluxDB connection is set.',
+    'replay.notConfigured':
+      'No history source is available. Check the retrospective analysis settings.',
     'replay.navigationActive': 'A passage is under way. Stop or close it before reconstructing.',
     'replay.summaryEmpty': 'No passage was found in this range.',
     'replay.summaryPassages': 'Passages',
@@ -926,7 +927,7 @@ export const MESSAGES = {
 
     'replay.title': 'Analyse rétrospective',
     'replay.intro':
-      'Reconstruit les navigations passées sur une plage de dates à partir d’un historique signalk-to-influxdb, avec la même détection que celle utilisée en temps réel — pour les navigations faites avant l’installation ou le démarrage du plugin.',
+      'Reconstruit les navigations passées sur une plage de dates à partir de l’historique déjà enregistré par le bateau, avec la même détection que celle utilisée en temps réel — pour les navigations faites avant l’installation ou le démarrage du plugin.',
     'replay.start': 'Reconstruire',
     'replay.cancel': 'Annuler',
     'replay.progress': '{percent} % — à {time}',
@@ -935,7 +936,8 @@ export const MESSAGES = {
     'replay.done': 'Reconstruction terminée à {time}.',
     'replay.cancelled': 'Reconstruction annulée à {time}.',
     'replay.failed': 'Échec de la reconstruction à {time} : {message}',
-    'replay.notConfigured': 'Aucune connexion InfluxDB n’est configurée.',
+    'replay.notConfigured':
+      'Aucune source d’historique n’est disponible. Vérifiez les réglages de l’analyse rétrospective.',
     'replay.navigationActive':
       'Une navigation est en cours. Arrêtez-la ou clôturez-la avant de reconstruire.',
     'replay.summaryEmpty': 'Aucune navigation trouvée sur cette période.',

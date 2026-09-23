@@ -472,8 +472,18 @@ the name it recorded.
 ### 4.10 Retrospective analysis
 
 Reconstructs passages Chiplog never saw live — installed after the fact, or stopped for a while — from a history the
-boat already has in InfluxDB 1.x, written there by [signalk-to-influxdb](https://github.com/tkurki/signalk-to-influxdb)
-(a recommended companion plugin, not a dependency).
+boat already keeps. Two sources, picked in the configuration (`retrospectiveHistorySource`):
+
+- **The Signal K History API** (`lib/history-api.js`), reading whichever provider the server has registered —
+  signalk-to-influxdb2, QuestDB, TimescaleDB. It asks for Signal K paths and gets Signal K values back, so it needs no
+  database credentials and knows no storage schema. The better choice on a new installation.
+- **InfluxDB 1.x read directly** (`lib/influx-history.js`), from a database
+  [signalk-to-influxdb](https://github.com/tkurki/signalk-to-influxdb) wrote (a recommended companion plugin, not a
+  dependency). Kept as the default so installations already set up this way go on working untouched.
+
+Everything below holds for both: only fetching differs, and what the two share — holding a window in memory, answering
+it back as `app.getSelfPath` would have, working out when the vessel was moving — lives in `lib/history-series.js`, so a
+reconstruction is the same passage whichever source it came from.
 
 - **Same pipeline as live, not a re-implementation.** `lib/replay.js` drives the exact detection, propulsion,
   observation, track recording and event watching modules used every 15 seconds live (§4.2, §4.5.1), but by a virtual
@@ -505,22 +515,28 @@ boat already has in InfluxDB 1.x, written there by [signalk-to-influxdb](https:/
   `GET /replay`'s `progress.summary`, and attaches the same totals to `lastError` on a failure — an InfluxDB query
   timing out partway through a long range leaves the passages already committed on record either way (only the slice in
   flight is lost), so the webapp shows what was saved instead of a bare error with no way to tell.
-- **Reads InfluxDB directly, in bounded requests.** `lib/influx-history.js` knows signalk-to-influxdb's schema: one
-  measurement per Signal K path, tagged with context (self) and source (for a path more than one source publishes,
-  `navigation.state` chief among them — resolved the same way the server itself would). The motion scan asks for a week
-  at a time; a window's history is fetched two hours at a time, with a short pause between requests, then answered from
-  memory as fast as the replay loop asks, and dropped once the window is done — a boat's InfluxDB often shares its
-  Raspberry Pi with Signal K itself, and a fixed-size request keeps each query's result small and gives the database
-  room to recover between them.
+- **Bounded requests, whichever source.** The motion scan asks for a week at a time; a window's history is fetched two
+  hours at a time, with a short pause between requests, then answered from memory as fast as the replay loop asks, and
+  dropped once the window is done — a boat's history often shares its Raspberry Pi with Signal K itself, and a
+  fixed-size request keeps each answer small and gives the database room to recover between them. Reading a window is
+  what a replay does thousands of times over, so the store answers a path by binary search rather than by scanning.
+  `lib/influx-history.js` additionally knows signalk-to-influxdb's schema: one measurement per Signal K path, tagged
+  with context (self) and source, `navigation.state` resolved the same way the server itself would (§4.2). The History
+  API reader asks for `last` over each bucket, and for the scan's speed the `max` of each minute — a mean would average
+  a minute of motion away and lose the departure with it. It asks for `navigation.position` in a request of its own: the
+  InfluxDB 2 provider collates positions separately and refuses a result set of a different length.
 - **Filtered to one vessel context** — the server's own by default, overridable (`influxSelfContext`) for running the
   replay from a different Signal K server than the one that wrote the history, e.g. development against a production
-  database. Before fetching anything, the actual context values found in the database are checked against it: none
-  matching fails with what was found instead of a replay that runs to completion and reconstructs nothing, silently.
-- **Every InfluxDB query is bounded, 30 s by default (`influxQueryTimeoutSeconds`).** Node's `fetch` has no timeout of
-  its own, so an unreachable or overloaded database would otherwise hang far longer than that for an error no clearer
-  once it arrived — a bare "fetch failed" instead of the actual connection problem.
+  database. Before fetching anything, the actual context values the history holds are checked against it —
+  `SHOW TAG VALUES` for InfluxDB 1.x, `getContexts` for the History API: none matching fails with what was found instead
+  of a replay that runs to completion and reconstructs nothing, silently.
+- **Every query is bounded, 30 s by default (`influxQueryTimeoutSeconds`).** Node's `fetch` has no timeout of its own,
+  so an unreachable or overloaded database would otherwise hang far longer than that for an error no clearer once it
+  arrived — a bare "fetch failed" instead of the actual connection problem. The History API takes neither a timeout nor
+  an abort signal, so its reader races every call against both: without that, a provider that never answers would hang
+  the run with nothing to show for it, and cancelling would only take effect at the end of the chunk in flight.
 - **A query that times out is retried up to 3 times, 5 seconds apart**, rather than failing the whole run on what is
-  often just a Raspberry Pi momentarily busy sharing its InfluxDB with Signal K itself. The timeout covers the whole
+  often just a Raspberry Pi momentarily busy sharing its history with Signal K itself. The timeout covers the whole
   round trip, reading the response body included, not just getting the connection to answer — a chunk's JSON can be slow
   to stream even once InfluxDB has accepted the request, and that counts the same as never answering at all. Each
   attempt gets the full timeout again, not whatever was left of a shared one. `GET /replay`'s `progress.retry` names the
@@ -802,6 +818,7 @@ _(This MVP breakdown is a proposal — to be validated with you before committin
 | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Storage                                            | SQLite (single database: entries, events, track, annotations)                                                                                                                                                                                                                                                                      |
 | SQLite driver                                      | Node's built-in `node:sqlite` — no native compilation, which matters on Raspberry Pi. Raises the floor to Node >= 22.13                                                                                                                                                                                                            |
+| Runtime dependencies                               | One: `@js-temporal/polyfill`, which the Signal K History API types its time range with (§4.10). Node ships `Temporal` unflagged only from Node 26, and signalk-server itself asks for Node >= 22, so the floor is not raised to shed it; it goes when `@signalk/server-api` stops needing it                                       |
 | Handwritten annotation format                      | Vector (timestamped strokes/points + pressure, canvas size); implemented in V1 in the tablet PWA                                                                                                                                                                                                                                   |
 | Author / crew list                                 | No per-event author in V1; a per-passage crew list is, picked from an editable global roster, carried over from the preceding passage (§4.11). Per-event authorship deferred to V2 if confirmed                                                                                                                                    |
 | signalk-autostate dependency                       | Optional, with internal fallback (SOG threshold) if absent                                                                                                                                                                                                                                                                         |

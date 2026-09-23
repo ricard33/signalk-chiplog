@@ -758,8 +758,9 @@ running.
 
 ## Retrospective analysis
 
-Reconstructs passages for a past date range from a signalk-to-influxdb history (InfluxDB 1.x), through the same
-detection pipeline used live (SPEC §4.10). One reconstruction runs at a time, in the background.
+Reconstructs passages for a past date range from the boat's recorded history — the server's own History API provider, or
+a signalk-to-influxdb database (InfluxDB 1.x) read directly — through the same detection pipeline used live (SPEC
+§4.10). One reconstruction runs at a time, in the background.
 
 ### `GET /replay` — `readonly`
 
@@ -787,8 +788,10 @@ detection pipeline used live (SPEC §4.10). One reconstruction runs at a time, i
 }
 ```
 
-- `configured` says whether an InfluxDB connection is set in the plugin configuration. `progress` is `null` while
-  nothing runs.
+- `configured` says whether a history source is usable: with the History API selected, that the server exposes one at
+  all; with InfluxDB 1.x, that a host and database are set in the plugin configuration. A server that exposes the API
+  but has no provider registered still reports `true`, and the run fails with that as its `lastError`. `progress` is
+  `null` while nothing runs.
 - `progress.phase` is `"scanning"` while a light pass over the whole range looks for when the vessel moved, then
   `"replaying"` while each window of motion is fetched and run through the detection pipeline (SPEC §4.10);
   `progress.now` tracks whichever phase is in flight — during `"scanning"` it is how far through the range the scan has
@@ -796,19 +799,20 @@ detection pipeline used live (SPEC §4.10). One reconstruction runs at a time, i
 - `progress.summary` is recomputed after every committed slice (SPEC §4.10) with the same shape as `lastResult.summary`
   below, `null` while still scanning — so the webapp can show what has actually been saved so far rather than only the
   clock position, and a run that then times out still leaves something on screen instead of a bare error.
-- `progress.retry` — `{ attempt, of, message }`, `null` outside a retry — appears while an individual InfluxDB query is
+- `progress.retry` — `{ attempt, of, message }`, `null` outside a retry — appears while an individual history query is
   being retried after timing out (SPEC §4.10), `attempt` counting from 1 up to `of` (3); it disappears again as soon as
-  a query gets through.
+  a query gets through. Either history source is bounded and retried the same way.
 - The scan reads a week at a time and a window's history two hours at a time, with a short pause between requests, so
-  one query cannot overwhelm a resource-constrained host running both Signal K and InfluxDB (SPEC §4.10).
+  one query cannot overwhelm a resource-constrained host running both Signal K and its history (SPEC §4.10).
 - `lastResult` — `{ at, from, to, cancelled?, summary }` — and `lastError` — `{ at, from, to, message, summary }` —
   describe the latest attempt. `summary` — `{ passages, distance, engineDuration, sailDuration, trackPoints, events }`,
   metres and seconds — totals what the run added, including up to a cancellation or a failure; a passage live detection
   opened meanwhile is not counted. Both are kept in memory and start empty when the plugin starts. `lastError.message`
-  names the InfluxDB vessel contexts actually found when none match the one configured (SPEC §4.10) — the usual cause of
-  a replay that runs to completion but reconstructs nothing. A query that times out is retried up to 3 times, 5 seconds
-  apart, before `lastError` reports it; passages already committed before the failing chunk stay on record, so
-  `lastError.summary` reports them and a follow-up run starting after them does not repeat the work.
+  names the vessel contexts actually found when none match the one configured (SPEC §4.10) — the usual cause of a replay
+  that runs to completion but reconstructs nothing — whichever history source was read. A query that times out is
+  retried up to 3 times, 5 seconds apart, before `lastError` reports it; passages already committed before the failing
+  chunk stay on record, so `lastError.summary` reports them and a follow-up run starting after them does not repeat the
+  work.
 
 ### `POST /replay` — admin
 

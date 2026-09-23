@@ -181,6 +181,19 @@ describe('InfluxDB history', () => {
     assert.ok(requests.some((r) => r.q.includes('propulsion.port.revolutions')));
   });
 
+  it('answers the propulsion branch node the engines it found', async () => {
+    // The propulsion detector and the observation recorder enumerate the
+    // boat's engines through it: without the branch node, a replay
+    // reconstructs no engine segment however many RPMs the history holds.
+    const { influx } = history({
+      'propulsion.port.revolutions': [{ time: T0, value: 30 }],
+      'propulsion.starboard.revolutions': [{ time: T0, value: 28 }]
+    });
+    await influx.preload(T0, T0 + MINUTE);
+
+    assert.deepEqual(influx.readSelfPath('propulsion', T0), { port: {}, starboard: {} });
+  });
+
   it('filters by the self context and sends basic auth when a username is given', async () => {
     const { fetch, requests } = fakeInflux({});
     const influx = createInfluxHistory({

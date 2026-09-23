@@ -11,6 +11,14 @@ All notable changes to Chiplog are documented here. The format follows
 - **Heading changes are logged automatically.** A turn of 30° or more (configurable), held steady for a minute above 2
   knots, is added to the timeline as the average heading it settled on. Can be turned off in settings.
 
+- **The retrospective analysis can read the Signal K History API.** Instead of connecting to an InfluxDB 1.x database
+  itself, Chiplog can now read whichever history provider the server has registered — signalk-to-influxdb2, QuestDB,
+  TimescaleDB — with no database credentials to set. Pick it with **History source** in the settings; InfluxDB 1.x stays
+  the default, so an existing installation is untouched.
+- **Engine and sail segments are reconstructed from an InfluxDB 1.x history too.** The retrospective analysis read the
+  engine RPMs but never listed the boat's engines, so a reconstructed passage carried no propulsion segment and no
+  engine hours.
+
 ### Changed
 
 - **`navigation.state` is followed whatever its source.** Chiplog no longer prefers signalk-autostate's value over
