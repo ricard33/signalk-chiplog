@@ -6,6 +6,8 @@ All notable changes to Chiplog are documented here. The format follows
 
 ## [Unreleased]
 
+## [2.7.0] - 2026-09-22
+
 ### Added
 
 - **Heading changes are logged automatically.** A turn of 30° or more (configurable), held steady for a minute above 2
@@ -381,7 +383,8 @@ First release.
 - REST API under `/plugins/signalk-chiplog/api`, documented in [docs/API.md](docs/API.md).
 - Single SQLite database through Node's built-in `node:sqlite`: no native module to build.
 
-[Unreleased]: https://github.com/ricard33/signalk-chiplog/compare/v2.6.0...HEAD
+[Unreleased]: https://github.com/ricard33/signalk-chiplog/compare/v2.7.0...HEAD
+[2.7.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.6.0...v2.7.0
 [2.6.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.5.1...v2.6.0
 [2.5.1]: https://github.com/ricard33/signalk-chiplog/compare/v2.5.0...v2.5.1
 [2.5.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.4.0...v2.5.0

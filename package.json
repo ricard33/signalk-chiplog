@@ -1,6 +1,6 @@
 {
   "name": "signalk-chiplog",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "description": "Nautical logbook for Signal K: automatic entries, handwritten notes",
   "main": "index.js",
   "files": [
