@@ -7,12 +7,14 @@
 //
 // Add a name here when renderer3d.mjs or boat-model.mjs starts to use it.
 export {
+  BackSide,
   Box3,
   BoxGeometry,
   BufferAttribute,
   BufferGeometry,
   Color,
   CylinderGeometry,
+  DataTexture,
   DirectionalLight,
   DoubleSide,
   Float32BufferAttribute,
@@ -22,9 +24,13 @@ export {
   Mesh,
   MeshBasicMaterial,
   MeshStandardMaterial,
+  MeshToonMaterial,
+  NearestFilter,
   PerspectiveCamera,
+  RedFormat,
   Scene,
   ShaderMaterial,
+  SphereGeometry,
   SRGBColorSpace,
   Texture,
   Vector3,

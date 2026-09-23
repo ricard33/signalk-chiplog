@@ -48,10 +48,13 @@ export const BOAT_SIZES = [
   { id: 'medium', labelKey: 'animation.boatSizeMedium', factor: 0.75 },
   { id: 'large', labelKey: 'animation.boatSizeLarge', factor: 1 }
 ];
-export const DEFAULT_BOAT_SIZE_ID = 'small';
+export const DEFAULT_BOAT_SIZE_ID = 'medium';
 
 export function boatSizeById(id) {
-  return BOAT_SIZES.find((option) => option.id === id) ?? BOAT_SIZES[0];
+  return (
+    BOAT_SIZES.find((option) => option.id === id) ??
+    BOAT_SIZES.find((option) => option.id === DEFAULT_BOAT_SIZE_ID)
+  );
 }
 
 // The ground is only textured out to this many camera distances: beyond it

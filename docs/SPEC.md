@@ -643,8 +643,8 @@ reconstruction is the same passage whichever source it came from.
   does**: the camera has the map camera's target and zoom — the ground under the boat is at the same scale, worked out
   from the passage's zoom and the frame's height — and **north stays at the top**, whichever way the boat heads. It is
   simply tilted, 50° down, to look at the boat, which is a model drawn larger than life so it holds the same share of
-  the frame at every zoom, in three sizes — large, medium and small, the smallest half the largest. Three camera
-  settings: closer (half the distance), like the map (the default) and wider (twice). The ground is the same
+  the frame at every zoom, in three sizes — large, medium (the default) and small, the smallest half the largest. Three
+  camera settings: closer (half the distance), like the map (the default) and wider (twice). The ground is the same
   OpenStreetMap and OpenSeaMap tiles, from the same cache, as textures on the sea, faded into it by fog; offline it is a
   plain sea and the track, as in the map view. The track is a ribbon of constant thickness on screen, finishing exactly
   at the boat rather than at the last recorded point.
@@ -665,16 +665,18 @@ reconstruction is the same passage whichever source it came from.
   function of film time so an export comes out the same however long it took. There is no simulated water level: the
   boat is drawn in a pass of its own after the map, with a fresh depth buffer, so the map can never hide any part of the
   hull however it heels, pitches or rises — the boat is always whole. The default boat is generated in code — no asset
-  to ship or credit — and the reader may load a `.glb` of their own (bow towards +z, y up, scaled so its longest
-  horizontal extent is one boat length, its lowest point a twentieth of that below the waterline), kept in that
-  browser's IndexedDB and never sent to the logbook. **Its sails move like the default boat's** when their nodes are
-  named for them — `Mainsail` (or `Main`, `Sail_Main`, `GrandVoile`, `GV`) and `Jib` (or `Genoa`, `Headsail`,
-  `Foresail`, `Sail_Jib`, `Foc`, `Génois`), ignoring case, punctuation and a trailing copy number (`boat-parts.mjs`).
-  Each is turned about the vertical axis through the origin of its node, added to the rotation it has at rest, by the
-  wind-driven sail angle — the full angle for the mainsail, 0.8 of it for the headsail; only the outermost node of
-  nested sails turns. The cloth is rigid (no billow), and nothing else in the model is animated. After loading, the page
-  says which sails it recognised, so a misspelt name is not a silent failure. README, _Your own boat in the 3D
-  animation_, is the authors' guide.
+  to ship or credit — and **drawn as a cartoon rather than as a rendering**: flat colours in bands that follow the
+  sheer, a short ladder of toon tones in place of a smooth falloff, an inked silhouette, and proportions pushed past a
+  real hull's, since at the sizes the film uses only the silhouette and the blocks of colour read. The reader may load a
+  `.glb` of their own (bow towards +z, y up, scaled so its longest horizontal extent is one boat length, its lowest
+  point a twentieth of that below the waterline), kept in that browser's IndexedDB and never sent to the logbook. **Its
+  sails move like the default boat's** when their nodes are named for them — `Mainsail` (or `Main`, `Sail_Main`,
+  `GrandVoile`, `GV`) and `Jib` (or `Genoa`, `Headsail`, `Foresail`, `Sail_Jib`, `Foc`, `Génois`), ignoring case,
+  punctuation and a trailing copy number (`boat-parts.mjs`). Each is turned about the vertical axis through the origin
+  of its node, added to the rotation it has at rest, by the wind-driven sail angle — the full angle for the mainsail,
+  0.8 of it for the headsail; only the outermost node of nested sails turns. The cloth is rigid (no billow), and nothing
+  else in the model is animated. After loading, the page says which sails it recognised, so a misspelt name is not a
+  silent failure. README, _Your own boat in the 3D animation_, is the authors' guide.
 - **3D is loaded on demand and optional.** The engine is three.js, bundled at install time (`scripts/vendor.js`,
   esbuild) into one minified module of the few parts used and imported only when the 3D view is first asked for or
   exported. It needs WebGL 2; without it, or if the context is lost or fails to start, the page says so and returns to

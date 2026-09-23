@@ -21,6 +21,15 @@ All notable changes to Chiplog are documented here. The format follows
 
 ### Changed
 
+- **The 3D animation starts on the medium boat size.** The 3D view opened with the smallest of the three; it now opens
+  on the middle one, where the boat is large enough to be read. **Boat size** still offers all three.
+
+- **The 3D animation's boat is drawn as a cartoon.** The generated sailboat has been rebuilt: a fuller hull with a
+  proper sheer and overhangs, a planked deck with a covering board, a coachroof with portholes, a cockpit with a crew on
+  the weather rail, a roached mainsail with a stripe and a burgee at the masthead — all in flat colours with an inked
+  silhouette, so it still reads when the boat is only a hundred pixels long. Nothing changes for a crew who load their
+  own `.glb`.
+
 - **`navigation.state` is followed whatever its source.** Chiplog no longer prefers signalk-autostate's value over
   another source of the same path: it uses the one Signal K resolves the path to. On a boat where the AIS transponder
   and signalk-autostate both publish it, which one wins is settled in the server's source priorities — that is also
