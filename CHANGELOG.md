@@ -15,6 +15,15 @@ All notable changes to Chiplog are documented here. The format follows
   it, along with the instrument readings taken when the button was pressed. A time outside the passage or in the future
   is refused, and the departure manoeuvre that opened a passage is still moved through that passage's departure time.
 
+### Changed
+
+- **The tablet's confirmation banner no longer reads as a question.** Logging an entry put up two buttons the size of
+  the app's primary actions, "Add a comment" and "Undo", which looked like a dialog waiting for an answer — it was not
+  clear the entry was already in, nor that "Undo" deleted it rather than dismissing the banner. The banner now confirms
+  first (a check mark, or a clock for an entry held on the tablet), carries a close button and a bar draining over the
+  ten seconds it stays, and puts the two follow-ups below the message at a smaller size, the undo in red and labelled
+  with what it undoes.
+
 ## [2.7.0] - 2026-09-22
 
 ### Added

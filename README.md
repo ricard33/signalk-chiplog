@@ -359,9 +359,11 @@ change. One tap logs it with the time, the position and an instrument reading.
 
 - **Sail change** asks which sail went up: mainsail, genoa, jib, staysail, spinnaker, gennaker, code 0, storm jib, or
   any name you type.
-- A banner then confirms it for 10 seconds, with two big buttons:
-  - **Undo**, for a mistaken tap;
-  - **Add a comment**, e.g. "25 kn, second reef".
+- A banner then confirms it: a check mark, what was logged and at what time, and a bar along the bottom draining over
+  the 10 seconds it stays. Nothing is waiting on you — it goes on its own, or at once with the **×**. Under the message
+  sit two optional follow-ups:
+  - **Add a comment**, e.g. "25 kn, second reef";
+  - **Undo this entry**, in red, for a mistaken tap — it deletes the entry just logged.
 
 ### Departures open the passage
 

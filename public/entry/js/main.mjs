@@ -426,6 +426,7 @@ function App({ journal }) {
     </main>
     <${Toast}
       toast=${toast}
+      timeoutMs=${TOAST_MS}
       onClose=${() => setToast(null)}
       onUndo=${undo}
       onComment=${() =>

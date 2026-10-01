@@ -21,6 +21,7 @@ export const MESSAGES = {
     'common.cancel': 'Cancel',
     'common.edit': 'Edit',
     'common.delete': 'Delete',
+    'common.close': 'Close',
 
     'error.forbidden':
       'Your Signal K account is not allowed to do this. Sign in with an account that has the rights.',
@@ -460,7 +461,7 @@ export const MESSAGES = {
     'entry.logged': 'Logged at {time}',
     'entry.loggedQueued': 'Kept on this tablet, sent once connected',
     'entry.openedPassage': 'Passage opened',
-    'entry.undo': 'Undo',
+    'entry.undo': 'Undo this entry',
     'entry.undone': 'Undone',
     'entry.addComment': 'Add a comment',
     'entry.comment': 'Comment',
@@ -536,6 +537,7 @@ export const MESSAGES = {
     'common.cancel': 'Annuler',
     'common.edit': 'Modifier',
     'common.delete': 'Supprimer',
+    'common.close': 'Fermer',
 
     'error.forbidden':
       'Votre compte Signal K n’a pas les droits pour cette action. Connectez-vous avec un compte autorisé.',
@@ -984,7 +986,7 @@ export const MESSAGES = {
     'entry.logged': 'Consigné à {time}',
     'entry.loggedQueued': 'Gardé sur la tablette, envoyé au retour de la connexion',
     'entry.openedPassage': 'Navigation ouverte',
-    'entry.undo': 'Annuler',
+    'entry.undo': 'Annuler l’entrée',
     'entry.undone': 'Annulé',
     'entry.addComment': 'Ajouter un commentaire',
     'entry.comment': 'Commentaire',

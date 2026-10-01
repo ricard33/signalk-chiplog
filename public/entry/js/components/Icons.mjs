@@ -134,3 +134,36 @@ export function TrashIcon() {
     />
   </svg>`;
 }
+
+export function CheckIcon() {
+  return html`<svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false">
+    <path
+      d="M4 10.5 8 14.5 16 5.5"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2.4"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>`;
+}
+
+export function ClockIcon() {
+  return html`<svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false">
+    <circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="1.8" />
+    <path
+      d="M10 5.8V10l2.8 1.8"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>`;
+}
+
+export function CloseIcon() {
+  return html`<svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false">
+    <path d="M5.5 5.5 14.5 14.5M14.5 5.5 5.5 14.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+  </svg>`;
+}

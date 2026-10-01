@@ -631,7 +631,10 @@ input {
   align-items: center;
   gap: 0.75rem;
   width: min(46rem, calc(100% - 2rem));
-  padding: 0.75rem 1rem;
+  /* Room on the right for the close button and under for the countdown, both
+     taken out of the flow so neither wraps away from the line it belongs to. */
+  padding: 0.75rem 4rem 1rem 1rem;
+  overflow: hidden;
   background: var(--surface);
   border: 2px solid var(--accent);
   border-radius: var(--radius);
@@ -645,6 +648,79 @@ input {
 .toast-queued {
   border-color: var(--warn);
   background: var(--queued-bg);
+}
+
+/* The banner confirms; it does not ask. The mark reads before the words, the
+   follow-ups are tool-sized rather than the app's primary size, and the
+   countdown says it will go on its own. */
+.toast-mark {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 2px solid currentcolor;
+  border-radius: 50%;
+  color: var(--accent);
+}
+
+.toast-queued .toast-mark {
+  color: var(--warn);
+}
+
+.toast-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  /* Always a line of their own, under the message: a follow-up one may take,
+     rather than the answer to a question asked beside it. */
+  flex: 1 0 100%;
+}
+
+.toast-actions .tool-button {
+  gap: 0.4rem;
+}
+
+.toast-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  border-color: transparent;
+}
+
+.toast-countdown {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  background: var(--accent);
+  transform-origin: left;
+  animation: toast-countdown var(--toast-ms, 10s) linear forwards;
+}
+
+.toast-queued .toast-countdown {
+  background: var(--warn);
+}
+
+@keyframes toast-countdown {
+  from {
+    transform: scaleX(1);
+  }
+
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast-countdown {
+    animation: none;
+    opacity: 0.4;
+  }
 }
 
 .toast-error {
