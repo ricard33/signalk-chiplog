@@ -355,9 +355,9 @@ export function PassageView({ id }) {
       await request('DELETE', `/entries/${id}`);
       location.hash = '#/';
     });
-  const editComment = (event, comment) =>
+  const editEvent = (event, patch) =>
     act(async () => {
-      await request('PATCH', `/events/${event.id}`, { comment });
+      await request('PATCH', `/events/${event.id}`, patch);
       reload();
     });
   const deleteEvent = (event) =>
@@ -529,9 +529,10 @@ export function PassageView({ id }) {
         events=${data.events}
         observations=${data.observations}
         landmarks=${data.landmarks}
+        bounds=${{ start: entry.startTime, end: entry.endTime }}
         manoeuvreLabels=${data.manoeuvreLabels}
         busy=${busy}
-        onEditComment=${editComment}
+        onEditEvent=${editEvent}
         onDelete=${deleteEvent}
       />
     </section>

@@ -12,6 +12,11 @@ function toDegrees(radians) {
   return (radians * 180) / Math.PI;
 }
 
+// `Date.parse` falls back to guessing at anything it is handed, so a
+// `datetime-local` value is matched before being read. Seconds are optional:
+// a field stepped finer than a minute supplies them.
+const DATE_TIME_INPUT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/;
+
 // `timeZone` is an IANA zone for dates and times; without it, the device's own.
 export function createFormatter({ locale, units, timeZone }) {
   const number = (digits) =>
@@ -53,10 +58,24 @@ export function createFormatter({ locale, units, timeZone }) {
     day: '2-digit',
     timeZone
   });
+  // What `<input type="datetime-local">` reads and writes: `YYYY-MM-DDTHH:mm`.
+  const inputFormat = new Intl.DateTimeFormat('en-CA', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+    timeZone
+  });
   const offsetFormat = new Intl.DateTimeFormat('en-US', {
     timeZone,
     timeZoneName: 'longOffset'
   });
+
+  const localParts = (instant) => inputFormat.format(new Date(instant)).replace(', ', 'T');
+  // How far the formatter's zone runs ahead of UTC around `instant`.
+  const zoneOffsetMs = (instant) => Date.parse(`${localParts(instant)}:00Z`) - instant;
 
   function sexagesimal(value, positive, negative, width) {
     const absolute = Math.abs(value);
@@ -139,6 +158,21 @@ export function createFormatter({ locale, units, timeZone }) {
     time: (value) => timeFormat.format(new Date(value)),
     // The calendar day of an instant in the formatter's time zone.
     dayKey: (value) => dayKeyFormat.format(new Date(value)),
+    // An instant as a `datetime-local` field reads it, in the formatter's zone.
+    dateTimeInput: (value) => localParts(Date.parse(new Date(value).toISOString())),
+    // And back: the instant that wall-clock reading stands for, or null when the
+    // field holds nothing usable. Two passes, so a reading on the far side of a
+    // daylight-saving change settles on its own offset rather than the one in
+    // force at the first guess; the hour a zone repeats when it falls back is
+    // genuinely ambiguous in such a field, and reads as the later of the two.
+    fromDateTimeInput: (local) => {
+      if (!DATE_TIME_INPUT.test(local ?? '')) {
+        return null;
+      }
+      const asUtc = Date.parse(`${local.slice(0, 16)}:00Z`);
+      const guess = asUtc - zoneOffsetMs(asUtc);
+      return new Date(asUtc - zoneOffsetMs(guess)).toISOString();
+    },
     // "UTC+02:00" at that instant; daylight saving time changes it.
     utcOffset: (value) => {
       const zone = offsetFormat

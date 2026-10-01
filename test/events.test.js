@@ -191,6 +191,97 @@ describe('events', () => {
       assert.equal((await ctx.request('PATCH', `/events/${id}`, { time: at(1) })).status, 400);
     });
 
+    it('reads the position back from the track when an event is redated', async () => {
+      insert(ctx.db, 'track_points', {
+        entry_id: entryId,
+        time: at(2),
+        lat: 46.15,
+        lon: -1.17
+      });
+      const { body: note } = await ctx.request('POST', `/entries/${entryId}/events`, {
+        type: 'text_annotation',
+        comment: 'Dolphins'
+      });
+      assert.deepEqual(note.position, { lat: 46.2, lon: -1.3 }, 'logged where the vessel was');
+
+      const edited = await ctx.request('PATCH', `/events/${note.id}`, { time: at(2) });
+      assert.equal(edited.status, 200);
+      assert.equal(edited.body.time, at(2));
+      assert.deepEqual(edited.body.position, { lat: 46.15, lon: -1.17 });
+    });
+
+    it('records no position when the track says nothing about the new time', async () => {
+      insert(ctx.db, 'track_points', {
+        entry_id: entryId,
+        time: at(2),
+        lat: 46.15,
+        lon: -1.17
+      });
+      const { body: note } = await ctx.request('POST', `/entries/${entryId}/events`, {
+        type: 'text_annotation',
+        comment: 'Dolphins'
+      });
+
+      const edited = await ctx.request('PATCH', `/events/${note.id}`, { time: at(3) });
+      assert.equal(edited.status, 200);
+      assert.equal(edited.body.position, null, 'never the vessel position of the moment');
+    });
+
+    it('keeps the position when only the comment changes', async () => {
+      const { body: note } = await ctx.request('POST', `/entries/${entryId}/events`, {
+        type: 'text_annotation',
+        comment: 'Dolphins'
+      });
+
+      const edited = await ctx.request('PATCH', `/events/${note.id}`, {
+        comment: 'Dolphins, many'
+      });
+      assert.deepEqual(edited.body.position, { lat: 46.2, lon: -1.3 });
+      assert.equal(edited.body.time, note.time);
+    });
+
+    it('refuses a time the passage could not have been logged at', async () => {
+      const { body: note } = await ctx.request('POST', `/entries/${entryId}/events`, {
+        type: 'text_annotation',
+        comment: 'Dolphins'
+      });
+
+      const ahead = new Date(Date.now() + 3600 * 1000).toISOString();
+      const future = await ctx.request('PATCH', `/events/${note.id}`, { time: ahead });
+      assert.equal(future.status, 400);
+      assert.match(future.body.error.message, /future/);
+
+      const before = await ctx.request('PATCH', `/events/${note.id}`, { time: at(-1) });
+      assert.equal(before.status, 400);
+      assert.match(before.body.error.message, /within the passage/);
+
+      const closed = insertEntry(ctx.db, {});
+      const id = insert(ctx.db, 'events', {
+        entry_id: closed,
+        time: at(2),
+        type: 'manoeuvre',
+        subtype: 'tack',
+        created_at: at(2)
+      });
+      // at(4) is that passage's arrival; an hour later is past it.
+      assert.equal((await ctx.request('PATCH', `/events/${id}`, { time: at(5) })).status, 400);
+      assert.equal((await ctx.request('PATCH', `/events/${id}`, { time: at(3) })).status, 200);
+    });
+
+    it('refuses to redate the event that opened the passage', async () => {
+      const { body: event } = await ctx.request('POST', '/events', {
+        type: 'manoeuvre',
+        subtype: 'cast_off'
+      });
+      ctx.db
+        .prepare('UPDATE log_entries SET opened_by_event_id = ? WHERE id = ?')
+        .run(event.id, event.entryId);
+
+      const refused = await ctx.request('PATCH', `/events/${event.id}`, { time: at(1) });
+      assert.equal(refused.status, 400);
+      assert.match(refused.body.error.message, /departure time/);
+    });
+
     it('deletes an event', async () => {
       const created = await ctx.request('POST', `/entries/${entryId}/events`, {
         type: 'text_annotation',
@@ -286,6 +377,41 @@ describe('instrument snapshot with a manoeuvre', () => {
     assert.equal(items[0].time, event.time);
     assert.equal(items[0].tws, 8.2);
     assert.deepEqual(items[0].position, { lat: 46.2, lon: -1.3 });
+  });
+
+  it('goes with the old time when the event is redated', async () => {
+    const { body: event } = await ctx.request('POST', `/entries/${entryId}/events`, {
+      type: 'manoeuvre',
+      subtype: 'reef_in'
+    });
+    assert.equal((await observations()).total, 1, 'taken when the manoeuvre was logged');
+
+    await ctx.request('PATCH', `/events/${event.id}`, { time: at(1) });
+
+    assert.equal(
+      (await observations()).total,
+      0,
+      'the readings belong to the moment the button was pressed, not to the new time'
+    );
+  });
+
+  it('stays when another event of the passage still stands at that time', async () => {
+    const { body: event } = await ctx.request('POST', `/entries/${entryId}/events`, {
+      type: 'manoeuvre',
+      subtype: 'reef_in'
+    });
+    // A propulsion change takes a snapshot of its own at the same instant.
+    insert(ctx.db, 'events', {
+      entry_id: entryId,
+      time: event.time,
+      type: 'propulsion_change',
+      source: 'auto',
+      created_at: event.time
+    });
+
+    await ctx.request('PATCH', `/events/${event.id}`, { time: at(1) });
+
+    assert.equal((await observations()).total, 1);
   });
 
   it('is not taken for a manoeuvre logged after the fact', async () => {

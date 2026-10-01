@@ -2,6 +2,11 @@
 // reading goes on which line, and what each event says. Pure — the server
 // imports it too — so strings only, no markup.
 
+// What a client may edit beyond the comment, mirroring `CLIENT_EVENT_TYPES` in
+// lib/events.js: an event the crew logged themselves. Narrower than
+// `source: "manual"`, which also covers a `manual_correction`.
+export const EDITABLE_EVENT_TYPES = ['manoeuvre', 'text_annotation', 'handwritten_annotation'];
+
 function autopilotTarget(target, format) {
   if (typeof target === 'number') {
     return format.bearing(target);

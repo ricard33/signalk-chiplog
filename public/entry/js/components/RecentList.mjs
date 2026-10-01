@@ -2,12 +2,11 @@ import { html, useState } from '../../../vendor/preact-htm.mjs';
 import { fetchAll } from '../../../js/api.mjs';
 import { useLocale, usePolling } from '../../../js/context.mjs';
 import { EventRemark } from '../../../js/components/Timeline.mjs';
+import { EDITABLE_EVENT_TYPES } from '../../../js/log-lines.mjs';
 import { PencilIcon, TrashIcon } from './Icons.mjs';
 
 const REFRESH_MS = 30 * 1000;
 const SHOWN = 15;
-
-const CLIENT_TYPES = new Set(['manoeuvre', 'text_annotation', 'handwritten_annotation']);
 
 function queuedLabel(body, t, manoeuvreLabels) {
   if (body.type === 'manoeuvre') {
@@ -106,7 +105,7 @@ export function RecentList({
               </button>
               ${
                 event.source === 'manual' &&
-                CLIENT_TYPES.has(event.type) &&
+                EDITABLE_EVENT_TYPES.includes(event.type) &&
                 html`<button
                   type="button"
                   class="tool-button icon-button danger"

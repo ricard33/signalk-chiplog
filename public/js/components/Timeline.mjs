@@ -2,7 +2,7 @@ import { html, useEffect, useRef, useState } from '../../vendor/preact-htm.mjs';
 import { useLocale } from '../context.mjs';
 import { dayKey } from '../days.mjs';
 import { landmarkLine } from '../landmarks.mjs';
-import { buildRows, describeEvent } from '../log-lines.mjs';
+import { EDITABLE_EVENT_TYPES, buildRows, describeEvent } from '../log-lines.mjs';
 
 // A dot — the stroke of an i or a full stop — has a single point, which a
 // polyline only draws when given twice.
@@ -64,24 +64,28 @@ export function EventRemark({ event, manoeuvreLabels }) {
   return html`${label}${strokes}${detail}${comment}`;
 }
 
-// A logged event's remarks, with edit-comment and delete controls. Editing is
-// limited to the comment on anything the plugin logged itself (SPEC: "an
-// edited comment"). Deleting is offered for what the crew themselves logged
-// (`source: "manual"`) and for an alarm (`sk_alarm`) — which takes its paired
-// line, the raise or the clearing, with it (lib/events.js `pairedAlarmEvent`);
-// other automatic lines (autopilot, weather, corrections) can only be
-// annotated.
-function EventLine({ event, manoeuvreLabels, busy, onEditComment, onDelete }) {
-  const { t } = useLocale();
+// A logged event's remarks, with edit and delete controls. Editing is limited to
+// the comment on anything the plugin logged itself (SPEC: "an edited comment");
+// what the crew logged (`EDITABLE_EVENT_TYPES`) can also be redated, which makes
+// the server re-read its position from the track. Deleting is offered for what
+// the crew themselves logged (`source: "manual"`) and for an alarm (`sk_alarm`)
+// — which takes its paired line, the raise or the clearing, with it
+// (lib/events.js `pairedAlarmEvent`); other automatic lines (autopilot, weather,
+// corrections) can only be annotated.
+function EventLine({ event, bounds, manoeuvreLabels, busy, onEditEvent, onDelete }) {
+  const { t, format } = useLocale();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(event.comment ?? '');
+  const [when, setWhen] = useState(() => format.dateTimeInput(event.time));
   const field = useRef(null);
+  const retimeable = EDITABLE_EVENT_TYPES.includes(event.type);
 
   useEffect(() => {
     if (!editing) {
       setDraft(event.comment ?? '');
+      setWhen(format.dateTimeInput(event.time));
     }
-  }, [event.comment, editing]);
+  }, [event.comment, event.time, editing]);
 
   useEffect(() => {
     if (editing) {
@@ -93,11 +97,31 @@ function EventLine({ event, manoeuvreLabels, busy, onEditComment, onDelete }) {
     const submit = (submitEvent) => {
       submitEvent.preventDefault();
       const trimmed = draft.trim();
+      const patch = { comment: trimmed === '' ? null : trimmed };
+      const time = retimeable ? format.fromDateTimeInput(when) : null;
+      if (time !== null && time !== event.time) {
+        patch.time = time;
+      }
       setEditing(false);
-      onEditComment(event, trimmed === '' ? null : trimmed);
+      onEditEvent(event, patch);
     };
     return html`
       <form class="timeline-comment-form" onSubmit=${submit}>
+        ${
+          retimeable &&
+          html`<label class="timeline-time-field">
+            <span>${t('timeline.eventTime')}</span>
+            <input
+              type="datetime-local"
+              step="60"
+              value=${when}
+              min=${bounds?.start ? format.dateTimeInput(bounds.start) : undefined}
+              max=${format.dateTimeInput(bounds?.end ?? Date.now())}
+              onInput=${(inputEvent) => setWhen(inputEvent.currentTarget.value)}
+            />
+            <small class="muted">${t('timeline.timeFromTrack')}</small>
+          </label>`
+        }
         <textarea
           ref=${field}
           rows="2"
@@ -146,9 +170,10 @@ export function Timeline({
   events,
   observations,
   landmarks,
+  bounds,
   manoeuvreLabels,
   busy,
-  onEditComment,
+  onEditEvent,
   onDelete
 }) {
   const { t, format } = useLocale();
@@ -229,9 +254,10 @@ export function Timeline({
                     row.event
                       ? html`<${EventLine}
                           event=${row.event}
+                          bounds=${bounds}
                           manoeuvreLabels=${manoeuvreLabels}
                           busy=${busy}
-                          onEditComment=${onEditComment}
+                          onEditEvent=${onEditEvent}
                           onDelete=${onDelete}
                         />`
                       : html`<span class="muted">${t(`observation.${readings.reason}`)}</span>`

@@ -1,5 +1,5 @@
 // What the tablet does with an entry: send it at once when the server answers,
-// otherwise keep it in the outbox with the time it was made. Undo and comments
+// otherwise keep it in the outbox with the time it was made. Undo and edits
 // follow the entry wherever it is — still queued, or already logged.
 
 import { createOutbox, isTransient } from './outbox.mjs';
@@ -70,7 +70,10 @@ export function createJournal({ request, storage, clock, newRef, onChange = () =
     flush,
 
     // Resolves to { status: 'sent', event } | { status: 'queued', error } and
-    // rejects with the server's refusal (a 400 or 409).
+    // rejects with the server's refusal (a 400 or 409). A `time` on the body is
+    // the crew dating the entry themselves: it is sent as it stands, online as
+    // well as queued, which is also what tells the server not to take an
+    // instrument snapshot for a moment already past.
     async log(body) {
       const ref = newRef();
       const madeAt = new Date(clock.now()).toISOString();
@@ -80,7 +83,7 @@ export function createJournal({ request, storage, clock, newRef, onChange = () =
           ref,
           method: 'POST',
           path: '/events',
-          body: { ...entry, time: madeAt },
+          body: { time: madeAt, ...entry },
           createdAt: Date.parse(madeAt)
         });
 
@@ -110,6 +113,17 @@ export function createJournal({ request, storage, clock, newRef, onChange = () =
       return outbox.snapshot().pending.some((item) => item.ref === ref);
     },
 
+    // What there is to show of an entry, wherever it sits: the logged event, or
+    // the body of one still waiting its turn — both carry a type, a time and a
+    // comment, which is all an edit sheet needs.
+    entryFor(ref) {
+      return (
+        delivered.get(ref) ??
+        outbox.snapshot().pending.find((item) => item.ref === ref)?.body ??
+        null
+      );
+    },
+
     async undo(ref) {
       if (outbox.remove(ref)) {
         // Removed from the queue, but a replay may have picked it up already.
@@ -124,16 +138,19 @@ export function createJournal({ request, storage, clock, newRef, onChange = () =
       return sendOrQueue('DELETE', `/events/${event.id}`);
     },
 
-    async comment(ref, comment) {
-      if (outbox.update(ref, { comment })) {
+    // A comment, a corrected time, or both. On an entry still in the queue it
+    // rewrites the body that has yet to go out, so the server works its position
+    // out from the corrected time when it finally lands.
+    async edit(ref, patch) {
+      if (outbox.update(ref, patch)) {
         return null;
       }
       const event = delivered.get(ref);
       if (!event) {
         return null;
       }
-      delivered.set(ref, { ...event, comment });
-      return sendOrQueue('PATCH', `/events/${event.id}`, { comment });
+      delivered.set(ref, { ...event, ...patch });
+      return sendOrQueue('PATCH', `/events/${event.id}`, patch);
     }
   };
 }

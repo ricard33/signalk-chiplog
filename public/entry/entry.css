@@ -679,6 +679,23 @@ input {
   gap: 0.75rem;
 }
 
+.sheet-field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.sheet-field input,
+.note-time input {
+  font: inherit;
+  /* Thumb-sized: the sheet is read and tapped at arm's length. */
+  min-height: 3rem;
+}
+
+.note-time {
+  display: grid;
+  gap: 0.35rem;
+}
+
 .sheet-row {
   display: flex;
   flex-wrap: wrap;

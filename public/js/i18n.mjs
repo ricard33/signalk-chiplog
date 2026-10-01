@@ -282,6 +282,8 @@ export const MESSAGES = {
     'timeline.apparent': 'app.',
     'timeline.heading': 'hdg',
     'timeline.comment': 'Comment',
+    'timeline.eventTime': 'Time',
+    'timeline.timeFromTrack': 'Changing the time reads the position back from the track.',
     'timeline.deleteConfirm': 'Delete this log line? This cannot be undone.',
     'timeline.deleteAlarmConfirm': 'Delete this alarm and its resolution? This cannot be undone.',
 
@@ -462,6 +464,9 @@ export const MESSAGES = {
     'entry.undone': 'Undone',
     'entry.addComment': 'Add a comment',
     'entry.comment': 'Comment',
+    'entry.eventTime': 'Time',
+    'entry.timeFromTrack': 'Changing the time reads the position back from the track.',
+    'entry.noteTime': 'Time (now if left empty)',
     'entry.noPassageError': 'No passage to log this in: cast off or weigh anchor first.',
     'entry.refused': 'Not logged: {message}',
     'entry.chooseSail': 'Which sail is up?',
@@ -796,6 +801,8 @@ export const MESSAGES = {
     'timeline.apparent': 'app.',
     'timeline.heading': 'cap',
     'timeline.comment': 'Commentaire',
+    'timeline.eventTime': 'Heure',
+    'timeline.timeFromTrack': 'Changer l’heure relit la position dans la trace.',
     'timeline.deleteConfirm': 'Supprimer cette ligne du journal ? C’est irréversible.',
     'timeline.deleteAlarmConfirm': 'Supprimer cette alarme et sa résolution ? C’est irréversible.',
 
@@ -981,6 +988,9 @@ export const MESSAGES = {
     'entry.undone': 'Annulé',
     'entry.addComment': 'Ajouter un commentaire',
     'entry.comment': 'Commentaire',
+    'entry.eventTime': 'Heure',
+    'entry.timeFromTrack': 'Changer l’heure relit la position dans la trace.',
+    'entry.noteTime': 'Heure (maintenant si vide)',
     'entry.noPassageError':
       'Aucune navigation où consigner : appareillez ou levez l’ancre d’abord.',
     'entry.refused': 'Non consigné : {message}',

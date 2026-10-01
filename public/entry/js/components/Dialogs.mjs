@@ -1,28 +1,57 @@
 import { html, useEffect, useRef, useState } from '../../../vendor/preact-htm.mjs';
 import { useLocale } from '../../../js/context.mjs';
+import { EDITABLE_EVENT_TYPES } from '../../../js/log-lines.mjs';
 
-export function CommentDialog({ title, initial = '', onSave, onCancel }) {
-  const { t } = useLocale();
-  const [text, setText] = useState(initial ?? '');
+// Correcting an entry just made, or one picked out of the recent list: its
+// comment, and — for what the crew logged themselves — its time. Redating it
+// makes the server read its position back from the track, so an entry written up
+// after the fact still sits in the right place. `event` is the logged event, or
+// the body of one still waiting in the outbox.
+export function EventDialog({ title, event, bounds, onSave, onCancel }) {
+  const { t, format } = useLocale();
+  const [text, setText] = useState(event?.comment ?? '');
+  const [when, setWhen] = useState(() => (event?.time ? format.dateTimeInput(event.time) : ''));
   const field = useRef(null);
   useEffect(() => field.current?.focus(), []);
+  const retimeable = EDITABLE_EVENT_TYPES.includes(event?.type);
 
-  const submit = (event) => {
-    event.preventDefault();
-    onSave(text.trim() === '' ? null : text.trim());
+  const submit = (submitEvent) => {
+    submitEvent.preventDefault();
+    const comment = text.trim() === '' ? null : text.trim();
+    const patch = comment === (event?.comment ?? null) ? {} : { comment };
+    const time = retimeable && when !== '' ? format.fromDateTimeInput(when) : null;
+    if (time !== null && time !== event?.time) {
+      patch.time = time;
+    }
+    onSave(patch);
   };
 
   return html`
-    <div class="sheet-backdrop" onClick=${(event) => event.target === event.currentTarget && onCancel()}>
+    <div class="sheet-backdrop" onClick=${(clickEvent) => clickEvent.target === clickEvent.currentTarget && onCancel()}>
       <form class="sheet" role="dialog" aria-modal="true" aria-labelledby="comment-title" onSubmit=${submit}>
         <h2 id="comment-title">${title}</h2>
+        ${
+          retimeable &&
+          html`<label class="sheet-field">
+            <span>${t('entry.eventTime')}</span>
+            <input
+              type="datetime-local"
+              step="60"
+              value=${when}
+              min=${bounds?.start ? format.dateTimeInput(bounds.start) : undefined}
+              max=${format.dateTimeInput(bounds?.end ?? Date.now())}
+              onInput=${(inputEvent) => setWhen(inputEvent.currentTarget.value)}
+            />
+            <small class="muted">${t('entry.timeFromTrack')}</small>
+          </label>`
+        }
         <textarea
           ref=${field}
           rows="4"
           maxlength="10000"
           value=${text}
           aria-label=${t('entry.comment')}
-          onInput=${(event) => setText(event.currentTarget.value)}
+          onInput=${(inputEvent) => setText(inputEvent.currentTarget.value)}
         ></textarea>
         <div class="sheet-row">
           <button type="button" class="big-button" onClick=${onCancel}>${t('common.cancel')}</button>

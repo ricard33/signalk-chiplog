@@ -474,17 +474,71 @@ describe('entry journal', () => {
   it('adds a comment to a queued entry or to the logged event', async () => {
     const { journal, calls, server } = setup({ online: false });
     const queued = await journal.log({ type: 'manoeuvre', subtype: 'reef_in' });
-    await journal.comment(queued.ref, 'second reef');
+    await journal.edit(queued.ref, { comment: 'second reef' });
     assert.equal(journal.outbox.snapshot().pending[0].body.comment, 'second reef');
 
     server.online = true;
     await journal.flush();
-    await journal.comment(queued.ref, 'third reef');
+    await journal.edit(queued.ref, { comment: 'third reef' });
     assert.deepEqual(calls.at(-1), {
       method: 'PATCH',
       url: '/events/1',
       body: { comment: 'third reef' }
     });
+  });
+
+  it('sends a time the crew supplied themselves, online as well as queued', async () => {
+    const { journal, calls } = setup();
+
+    const sent = await journal.log({
+      type: 'text_annotation',
+      comment: 'dolphins',
+      time: '2026-09-13T09:15:00.000Z'
+    });
+    assert.equal(sent.status, 'sent');
+    assert.equal(calls[0].body.time, '2026-09-13T09:15:00.000Z');
+
+    const offline = setup({ online: false });
+    await offline.journal.log({
+      type: 'text_annotation',
+      comment: 'dolphins',
+      time: '2026-09-13T09:15:00.000Z'
+    });
+    assert.equal(
+      offline.journal.outbox.snapshot().pending[0].body.time,
+      '2026-09-13T09:15:00.000Z',
+      'the typed time wins over the moment the entry was made'
+    );
+  });
+
+  it('corrects the time of a queued entry in place, and of a logged one over PATCH', async () => {
+    const { journal, calls, server } = setup({ online: false });
+    const queued = await journal.log({ type: 'manoeuvre', subtype: 'tack' });
+
+    await journal.edit(queued.ref, { time: '2026-09-13T09:30:00.000Z' });
+    assert.equal(journal.outbox.snapshot().pending[0].body.time, '2026-09-13T09:30:00.000Z');
+    assert.equal(calls.length, 1, 'nothing goes out while the queue holds it');
+
+    server.online = true;
+    await journal.flush();
+    await journal.edit(queued.ref, { time: '2026-09-13T09:45:00.000Z', comment: 'at the buoy' });
+    assert.deepEqual(calls.at(-1), {
+      method: 'PATCH',
+      url: '/events/1',
+      body: { time: '2026-09-13T09:45:00.000Z', comment: 'at the buoy' }
+    });
+  });
+
+  it('reads back the entry behind a ref, logged or still queued', async () => {
+    const { journal, server } = setup({ online: false });
+    const queued = await journal.log({ type: 'manoeuvre', subtype: 'gybe' });
+    assert.equal(journal.entryFor(queued.ref).type, 'manoeuvre');
+    assert.equal(journal.entryFor(queued.ref).time, '2026-09-13T10:00:00.000Z');
+
+    server.online = true;
+    await journal.flush();
+    assert.equal(journal.entryFor(queued.ref).id, 1);
+    assert.equal(journal.entryFor('ref-nothing'), null);
   });
 
   it('queues the undo of a logged entry when the connection drops', async () => {

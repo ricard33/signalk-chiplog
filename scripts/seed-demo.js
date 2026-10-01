@@ -300,6 +300,11 @@ function seedDemoLogbook(db, { now = Date.now() } = {}) {
         points
       });
       observe(id, 'periodic', at(3, 12), points, { tws: 10.1, pressure: 101520 });
+      // Written up after the fact, its time typed in: the track held nothing near
+      // enough, so the line carries no position (SPEC §4.4).
+      log(id, at(3, 12, 5), 'text_annotation', {
+        comment: 'Ferry crossing ahead, written up later'
+      });
       log(id, at(3, 12, 15), 'manoeuvre', { subtype: 'tack', points });
       log(id, at(3, 12, 30), 'handwritten_annotation', {
         points,

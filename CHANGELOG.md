@@ -6,6 +6,15 @@ All notable changes to Chiplog are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **A manual entry's time can be typed in or corrected.** A note can be written up after the fact with the time it
+  happened, and any manoeuvre, note or sketch the crew logged can be redated later from the logbook's timeline or from
+  the tablet — an entry still waiting for the connection included. Since such an entry was not made where it happened,
+  its position is read back from the track at that time and left empty when the track has nothing within 2 minutes of
+  it, along with the instrument readings taken when the button was pressed. A time outside the passage or in the future
+  is refused, and the departure manoeuvre that opened a passage is still moved through that passage's departure time.
+
 ## [2.7.0] - 2026-09-22
 
 ### Added

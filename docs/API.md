@@ -555,6 +555,18 @@ Accepts `time`, `comment`, `subtype`, `payload`, and validates the result by the
 plugin produced (`sk_alarm`, `autopilot`, `weather_threshold`, `manual_correction`, `propulsion_change`, `stopover`,
 `heading_change`), only `comment` may change — annotating an alarm is fine, rewriting it is not.
 
+A new `time` redates the event, which unmoors it from where the crew was when they logged it:
+
+- Its `position` is read back from the passage's own track, the nearest point within 2 minutes, and is `null` when the
+  track recorded nothing that close. The vessel's present position is never reused — unlike creation, where a `time`
+  within 5 minutes of now still falls back to it, since that is an entry replayed from the tablet's queue.
+- The instrument snapshot taken when the event was first logged is dropped, unless another event of the passage still
+  stands at that time: those readings belong to the moment the button was pressed, not to the moment the event is moved
+  to.
+- `400` if the time is in the future, if it falls outside the passage's `startTime`…`endTime` (the present, while the
+  passage is open), or if the event is the departure manoeuvre that opened the passage — correct that passage's
+  `startTime` instead, with [`PATCH /entries/:id`](#patch-entriesid--readwrite).
+
 ### `DELETE /events/:id` — `readwrite`
 
 `204`. Deleting the departure manoeuvre that opened a passage, while the vessel has not moved yet and nothing else was

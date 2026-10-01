@@ -628,6 +628,26 @@ main {
   resize: vertical;
 }
 
+.timeline-comment-form textarea,
+.timeline-time-field input {
+  font: inherit;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.timeline-time-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.timeline-time-field small {
+  font-size: 0.8em;
+}
+
 /* Tide */
 
 .tide-place {

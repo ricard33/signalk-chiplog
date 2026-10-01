@@ -201,6 +201,12 @@ wrong times. Keep the clock set from GPS (e.g. with the `signalk-set-system-time
   selection of the sail hoisted), anchoring (anchored/weighed), mooring/casting off, watch change.
 - Each shortcut logs a timestamped event + position in the current entry; the user can add an optional comment right
   after, or undo it.
+- **The crew can date an entry themselves**, when they log it (writing up something that happened earlier) or by
+  correcting it afterwards from either app. A hand-written time is bounded by the passage it belongs to and cannot be in
+  the future, and the departure manoeuvre that opened a passage is corrected through the passage's own departure time
+  instead. Since such an entry was not made where it happened, its position comes from the track at that time, and is
+  left empty when the track has nothing within 2 minutes of it; the instrument snapshot of the moment the button was
+  pressed goes with it (§4.1).
 - **Departure manoeuvres open the passage.** Casting off or weighing anchor with no passage open opens one at that
   moment — the crew knows it is leaving before the boat moves. The passage starts stopped: detection carries it on when
   the vessel gets under way, and closes it at the cast-off if it has not moved within the tolerance
@@ -229,7 +235,8 @@ wrong times. Keep the clock set from GPS (e.g. with the `signalk-set-system-time
     stroke or eraser gesture, whichever came last. A stroke's colour and width (and `tool: "highlighter"` for its
     transparency) travel with it end to end — drawn the same way in the webapp's timeline and the PDF, not just on the
     tablet.
-- Both annotation types appear in the entry's timeline, timestamped and geolocated.
+- Both annotation types appear in the entry's timeline, timestamped and geolocated — or without a position, when the
+  time was typed in rather than lived through (§4.3).
 
 ### 4.5 Backup / continuity in case of abandoning ship
 
@@ -830,6 +837,7 @@ _(This MVP breakdown is a proposal — to be validated with you before committin
 | Events between passages                            | Attached to the last passage while within 1 nm of its arrival; otherwise not logged (§4.6)                                                                                                                                                                                                                                         |
 | Webapp stack                                       | Preact + htm as one vendored ES module, no build step, no CDN (a boat is usually offline); Leaflet for the map. The tablet PWA shares it                                                                                                                                                                                           |
 | Entry with no passage open                         | Cast off / anchor up opens a passage, or goes to the one detection closed less than the tolerance before; other entries go to the last passage within 1 nm of its arrival, else are refused (§4.3)                                                                                                                                 |
+| Hand-dated manual entry                            | The crew can type or correct a manual entry’s time; it must sit inside the passage and not be in the future, its position is then the track’s at that time or none, and the snapshot of the logging moment is dropped (§4.3)                                                                                                       |
 | Passage closure                                    | At once when the vessel stops; a departure within `stopClosureMinutes` (30 min) reopens it, the stop kept as a stopover. A crew close is final (§4.2)                                                                                                                                                                              |
 | Tablet offline                                     | Entries queued on the tablet with their time and an idempotency key, replayed in order (§4.9)                                                                                                                                                                                                                                      |
 | Tablet access                                      | Signal K device access request, token kept on the tablet; a user login works too (§4.9)                                                                                                                                                                                                                                            |

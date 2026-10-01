@@ -6,7 +6,7 @@ import { pickLanguage } from '../../js/i18n.mjs';
 import { createServerClock } from './clock.mjs';
 import { createJournal } from './journal.mjs';
 import { AccessGate } from './components/AccessGate.mjs';
-import { CommentDialog, Toast } from './components/Dialogs.mjs';
+import { EventDialog, Toast } from './components/Dialogs.mjs';
 import { CrewDialog } from './components/CrewDialog.mjs';
 import { PencilIcon } from './components/Icons.mjs';
 import { ManoeuvrePad } from './components/ManoeuvrePad.mjs';
@@ -97,7 +97,7 @@ function App({ journal }) {
   const [forbidden, setForbidden] = useState(false);
   const [queue, setQueue] = useState(journal.outbox.snapshot());
   const [toast, setToast] = useState(null);
-  const [commenting, setCommenting] = useState(null);
+  const [editing, setEditing] = useState(null);
   const [managingCrew, setManagingCrew] = useState(false);
   const [tab, setTab] = useState('note');
   const [night, setNight] = useState(readSetting(NIGHT_KEY) === 'on');
@@ -248,18 +248,21 @@ function App({ journal }) {
     refresh();
   };
 
-  const saveComment = async (comment) => {
-    const target = commenting;
-    setCommenting(null);
+  const saveEvent = async (patch) => {
+    const target = editing;
+    setEditing(null);
     // A note is its text: emptying it would be a deletion, which has its own button.
-    if (comment === null && target.event?.type === 'text_annotation') {
+    if (patch.comment === null && target.event?.type === 'text_annotation') {
+      return;
+    }
+    if (Object.keys(patch).length === 0) {
       return;
     }
     try {
       if (target.ref) {
-        noteFailure(await journal.comment(target.ref, comment));
+        noteFailure(await journal.edit(target.ref, patch));
       } else {
-        await request('PATCH', `/events/${target.event.id}`, { comment });
+        await request('PATCH', `/events/${target.event.id}`, patch);
       }
       refresh();
     } catch (error) {
@@ -331,7 +334,8 @@ function App({ journal }) {
     }
   };
 
-  const commentTitle = commenting?.what ?? t('entry.comment');
+  const editTitle = editing?.what ?? t('entry.comment');
+  const bounds = entry ? { start: entry.startTime, end: entry.endTime } : null;
 
   return html`
     <${StatusHeader}
@@ -402,7 +406,9 @@ function App({ journal }) {
               </button>`
             )}
           </div>
-          <div class="tab-panel" hidden=${tab !== 'note'}><${NotePanel} busy=${busy} onLog=${log} /></div>
+          <div class="tab-panel" hidden=${tab !== 'note'}>
+            <${NotePanel} busy=${busy} bounds=${bounds} onLog=${log} />
+          </div>
           <div class="tab-panel" hidden=${tab !== 'sketch'}>
             <${SketchPanel} busy=${busy} onLog=${log} night=${night} />
           </div>
@@ -415,22 +421,24 @@ function App({ journal }) {
         manoeuvreLabels=${manoeuvreLabels}
         onDelete=${deleteEvent}
         onDiscard=${discard}
-        onComment=${(event) => setCommenting({ event })}
+        onComment=${(event) => setEditing({ event })}
       />
     </main>
     <${Toast}
       toast=${toast}
       onClose=${() => setToast(null)}
       onUndo=${undo}
-      onComment=${() => setCommenting({ ref: toast.ref, what: toast.what })}
+      onComment=${() =>
+        setEditing({ ref: toast.ref, what: toast.what, event: journal.entryFor(toast.ref) })}
     />
     ${
-      commenting &&
-      html`<${CommentDialog}
-        title=${commentTitle}
-        initial=${commenting.event?.comment ?? null}
-        onCancel=${() => setCommenting(null)}
-        onSave=${saveComment}
+      editing &&
+      html`<${EventDialog}
+        title=${editTitle}
+        event=${editing.event}
+        bounds=${bounds}
+        onCancel=${() => setEditing(null)}
+        onSave=${saveEvent}
       />`
     }
     ${

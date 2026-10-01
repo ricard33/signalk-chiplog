@@ -115,4 +115,33 @@ describe('display formatting in a time zone', () => {
     assert.equal(paris.utcOffset('2026-12-01T12:00:00Z'), 'UTC+01:00');
     assert.equal(utc.utcOffset('2026-07-01T12:00:00Z'), 'UTC');
   });
+
+  it('writes an instant as a datetime-local field reads it, in that zone', () => {
+    assert.equal(paris.dateTimeInput('2026-09-13T22:30:00.000Z'), '2026-09-14T00:30');
+    assert.equal(utc.dateTimeInput('2026-09-13T22:30:00.000Z'), '2026-09-13T22:30');
+    assert.equal(paris.dateTimeInput('2026-12-01T09:05:00.000Z'), '2026-12-01T10:05');
+  });
+
+  it('reads a datetime-local field back to the instant it stands for', () => {
+    assert.equal(paris.fromDateTimeInput('2026-09-14T00:30'), '2026-09-13T22:30:00.000Z');
+    assert.equal(utc.fromDateTimeInput('2026-09-13T22:30'), '2026-09-13T22:30:00.000Z');
+    // Winter, so the zone is an hour ahead of UTC rather than two.
+    assert.equal(paris.fromDateTimeInput('2026-12-01T10:05'), '2026-12-01T09:05:00.000Z');
+    // A field stepped finer than a minute supplies seconds, which are dropped.
+    assert.equal(paris.fromDateTimeInput('2026-12-01T10:05:42'), '2026-12-01T09:05:00.000Z');
+  });
+
+  it('settles on the offset of the reading itself across a daylight-saving change', () => {
+    // Paris springs forward at 02:00 local on 2026-03-29: 03:30 is already summer
+    // time, an hour less from UTC than the offset in force half an hour earlier.
+    assert.equal(paris.fromDateTimeInput('2026-03-29T01:30'), '2026-03-29T00:30:00.000Z');
+    assert.equal(paris.fromDateTimeInput('2026-03-29T03:30'), '2026-03-29T01:30:00.000Z');
+    assert.equal(paris.dateTimeInput('2026-03-29T01:30:00.000Z'), '2026-03-29T03:30');
+  });
+
+  it('has nothing to read from an empty or malformed field', () => {
+    for (const value of ['', '2026-09-13', 'tomorrow', null, undefined]) {
+      assert.equal(paris.fromDateTimeInput(value), null, `${value}`);
+    }
+  });
 });

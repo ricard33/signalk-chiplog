@@ -214,8 +214,12 @@ Open **Chiplog** from the Signal K webapps, or `/signalk-chiplog/`. Reading need
   counter at departure and arrival and the hours run, and the tank levels and battery charge, voltage and current noted
   at departure), and the log: every reading and event in order, including handwritten notes. A passage in progress
   refreshes every minute. Each line's comment can be edited (read/write access); a manoeuvre or note the crew logged
-  themselves can also be deleted — automatic lines (alarms, autopilot, weather, corrections) can only be annotated.
-  Under each position, in grey, its bearing and distance from the nearest landmark.
+  themselves can also be **redated** and deleted — automatic lines (alarms, autopilot, weather, corrections) can only be
+  annotated. Correcting a time reads the position back from the track at that time, and leaves it empty when the track
+  has nothing within 2 minutes of it, since the entry was not made where it happened. A time outside the passage, or in
+  the future, is refused, and the departure manoeuvre that opened a passage is moved by changing that passage's
+  departure time in **Corrections** below. Under each position, in grey, its bearing and distance from the nearest
+  landmark.
 - **Corrections** (read/write access):
   - rename the departure, or the arrival once the passage is closed — a passage in progress has none yet to rename;
   - switch an engine period to sail or back;
@@ -372,7 +376,8 @@ note once moored belongs to the passage that brought you there. Anywhere else, t
 
 ### Notes and handwriting
 
-- **Note** — type and tap **Log it**.
+- **Note** — type and tap **Log it**. Leave **Time** empty for now, or fill it in to write up something that happened
+  earlier; a note dated by hand takes its position from the track rather than from where you are standing.
 - **Handwriting** — takes over the whole screen, with a toolbar above the pad: fine pen, thick pen, highlighter, eraser,
   undo, and a choice of colour (kept to the theme's colour in night mode, to spare night vision). Pen pressure also sets
   the line width. The eraser removes only what it actually touches, splitting a stroke rather than deleting all of it;
@@ -385,7 +390,8 @@ export, not just on the tablet.
 ### Latest entries
 
 Below, the latest entries of the current passage (or of the last one) are listed with their time. Each can take a
-comment, and your own entries can be deleted; a note's text can be edited.
+comment, and your own entries can be redated and deleted; a note's text can be edited. An entry still waiting for the
+connection can be corrected too — the change travels with it.
 
 ### Night mode
 
