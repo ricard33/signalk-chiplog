@@ -92,16 +92,17 @@ keep those modules free of browser APIs and vendor imports. Characters outside W
 `lib/pdf/winansi.js` maps them. `test/pdf-helpers.js` reads the text of a generated PDF back for assertions; to look at
 pages, render them to PNG (macOS: PDFKit via a short Swift script).
 
-`lib/place-names.js`, `lib/tide-forecaster.js`, `lib/weather-forecaster.js` and `lib/landmark-finder.js` are the only
-network access. Detection names places synchronously (known place, or coordinates marked pending); `index.js` runs the
-online lookups as a chain of `setTimeout`s, each `resolveNext()` saying when the next is due. `lib/tide-forecaster.js`
-and `lib/weather-forecaster.js` follow the same shape — `resolveNext()` on the shared engine
-`lib/departure-forecast.js`, each run by its own `lib/background-schedule.js` chain, which `index.js` nudges when
-detection reports a newly opened passage — to fetch the tide and weather forecasts near a passage's departure (SPEC
-§4.5.2, §4.5.3), one entry at a time, giving up (recording an empty result rather than retrying forever) once the
-departure is too long past for the fetch window to still mean anything. Tests inject `fetch` and never reach the network
-— `test/helpers.js` also starts the plugin with `geocodingEnabled: false`, `landmarksEnabled: false`,
-`tidesEnabled: false` and `weatherEnabled: false`; keep it that way.
+`lib/place-names.js`, `lib/tide-forecaster.js`, `lib/weather-forecaster.js`, `lib/landmark-finder.js`,
+`lib/passage-map.js` (map tiles) and `lib/smtp.js` (the mail relay) are the only network access. Detection names places
+synchronously (known place, or coordinates marked pending); `index.js` runs the online lookups as a chain of
+`setTimeout`s, each `resolveNext()` saying when the next is due. `lib/tide-forecaster.js` and
+`lib/weather-forecaster.js` follow the same shape — `resolveNext()` on the shared engine `lib/departure-forecast.js`,
+each run by its own `lib/background-schedule.js` chain, which `index.js` nudges when detection reports a newly opened
+passage — to fetch the tide and weather forecasts near a passage's departure (SPEC §4.5.2, §4.5.3), one entry at a time,
+giving up (recording an empty result rather than retrying forever) once the departure is too long past for the fetch
+window to still mean anything. Tests inject `fetch` and never reach the network — `test/helpers.js` also starts the
+plugin with `geocodingEnabled: false`, `landmarksEnabled: false`, `tidesEnabled: false`, `weatherEnabled: false` and
+`summaryMailEnabled: false`; keep it that way.
 
 `lib/landmark-finder.js` fills the gazetteer of amers (SPEC §4.13) from Overpass on the same `resolveNext()` shape, one
 half-degree cell per request, with `lib/landmarks.js` deciding which cell is wanted (`nextPendingArea`, driven by
@@ -109,6 +110,16 @@ half-degree cell per request, with `lib/landmarks.js` deciding which cell is wan
 HTML page, or a `remark` beside empty elements — so both count as retryable failures; keep that. Nothing about a bearing
 is stored: `public/js/landmarks.mjs` works it out at read time for the webapp and the PDF alike, which is what makes
 past passages fill in once their area is fetched.
+
+`lib/summary-mailer.js` emails a summary of each passage once it is definitively closed (SPEC §4.16), on the same
+`resolveNext()` shape run by its own `lib/background-schedule.js` chain. A passage is due one when it has stayed closed
+longer than `stopClosureMinutes` and has no row in `passage_summary_mails`; the row, written whatever the outcome, is
+what stops a second mail, and detection deletes it when a departure reopens the passage. Its parts are each usable on
+their own and tested on their own: `lib/passage-summary.js` (the wording and figures, from the webapp's pure modules as
+the PDF's are), `lib/passage-map.js` (the track drawn over tiles), `lib/png.js` (reading and writing the PNG, over
+`node:zlib`), `lib/mail.js` (addresses and the MIME tree) and `lib/smtp.js` (the client). None of them is reached by a
+test over the network: the mailer takes an injectable `fetch` and `createClient`, and `test/smtp.test.js` runs a real
+SMTP server on a local port.
 
 `index.js` owns the plugin lifecycle and hands the API a `getContext()` that throws `503` when the database is closed.
 This matters because the server calls `registerWithRouter` once — before `start()`, even while the plugin is disabled —

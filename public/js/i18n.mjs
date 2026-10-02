@@ -203,6 +203,14 @@ export const MESSAGES = {
     'passage.log': 'Log',
     'passage.noLog': 'Nothing logged yet.',
 
+    // The passage summary sent by email once a passage is definitively closed
+    // (SPEC §4.16).
+    'mail.subject': 'Passage {route}',
+    'mail.subjectVessel': '{vessel} — {route}',
+    'mail.when': '{date} ({zone})',
+    'mail.mapAlt': 'The track of the passage on the map',
+    'mail.footer': 'Sent automatically by Chiplog, this vessel’s logbook.',
+
     'map.seamarks': 'Seamarks',
 
     'animation.title': 'Passage animation',
@@ -721,6 +729,14 @@ export const MESSAGES = {
     'passage.rpm': '{rpm} tr/min',
     'passage.log': 'Journal',
     'passage.noLog': 'Rien de noté pour l’instant.',
+
+    // Le résumé de navigation envoyé par courriel une fois la navigation
+    // définitivement close (SPEC §4.16).
+    'mail.subject': 'Navigation {route}',
+    'mail.subjectVessel': '{vessel} — {route}',
+    'mail.when': 'Le {date} ({zone})',
+    'mail.mapAlt': 'La trace de la navigation sur la carte',
+    'mail.footer': 'Envoyé automatiquement par Chiplog, le journal de bord de ce navire.',
 
     'map.seamarks': 'Balisage',
 

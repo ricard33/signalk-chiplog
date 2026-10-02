@@ -18,11 +18,11 @@ Implemented in [`lib/api.js`](../lib/api.js); the behaviour described here is co
 **Access levels.** Signal K gives routes registered directly on the router **admin** authentication;
 `router.access('readonly')` and `router.access('readwrite')` open them further. The policy here:
 
-| Level       | What it covers                                                                                                                               |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `readonly`  | Reading the logbook and exporting it                                                                                                         |
-| `readwrite` | What the crew does underway: annotations, manoeuvres, closing an entry, correcting a name or a propulsion segment                            |
-| admin       | Destructive or configuration-shaped operations: importing a passage, deleting entries and places, managing shortcuts, triggering a USB write |
+| Level       | What it covers                                                                                                                                                  |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `readonly`  | Reading the logbook and exporting it                                                                                                                            |
+| `readwrite` | What the crew does underway: annotations, manoeuvres, closing an entry, correcting a name or a propulsion segment                                               |
+| admin       | Destructive or configuration-shaped operations: importing a passage, deleting entries and places, managing shortcuts, triggering a USB write or a summary email |
 
 Corrections are `readwrite` rather than admin on purpose — a crew member at the helm has to be able to fix a wrong place
 name or a mis-detected engine segment without an admin login.
@@ -48,13 +48,13 @@ timestamp is accepted in requests and normalised to millisecond precision.
 { "error": { "code": "entry_already_closed", "message": "Entry 42 is already closed" } }
 ```
 
-| Status | When                                                               | Codes                                                                                                                                                                                                                               |
-| ------ | ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `400`  | Malformed request                                                  | `invalid_request`, `unknown_manoeuvre_type`                                                                                                                                                                                         |
-| `404`  | Unknown resource                                                   | `entry_not_found`, `event_not_found`, `place_not_found`, `propulsion_segment_not_found`, `manoeuvre_type_not_found`, `crew_member_not_found`, `tide_not_found`, `weather_not_found`                                                 |
-| `409`  | The request conflicts with current state                           | `no_passage`, `entry_active`, `entry_already_closed`, `entry_overlaps`, `entries_not_consecutive`, `manoeuvre_type_exists`, `builtin_manoeuvre_type`, `usb_export_not_configured`, `usb_export_unavailable`, `constraint_violation` |
-| `500`  | Unexpected failure — detail goes to the server log, not the client | `internal_error`                                                                                                                                                                                                                    |
-| `503`  | The plugin is disabled or stopped                                  | `plugin_not_started`                                                                                                                                                                                                                |
+| Status | When                                                               | Codes                                                                                                                                                                                                                                                      |
+| ------ | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `400`  | Malformed request                                                  | `invalid_request`, `unknown_manoeuvre_type`                                                                                                                                                                                                                |
+| `404`  | Unknown resource                                                   | `entry_not_found`, `event_not_found`, `place_not_found`, `propulsion_segment_not_found`, `manoeuvre_type_not_found`, `crew_member_not_found`, `tide_not_found`, `weather_not_found`                                                                        |
+| `409`  | The request conflicts with current state                           | `no_passage`, `entry_active`, `entry_already_closed`, `entry_overlaps`, `entries_not_consecutive`, `manoeuvre_type_exists`, `builtin_manoeuvre_type`, `usb_export_not_configured`, `usb_export_unavailable`, `summary_mail_failed`, `constraint_violation` |
+| `500`  | Unexpected failure — detail goes to the server log, not the client | `internal_error`                                                                                                                                                                                                                                           |
+| `503`  | The plugin is disabled or stopped                                  | `plugin_not_started`                                                                                                                                                                                                                                       |
 
 The server registers plugin routes once and never removes them, so they keep answering while the plugin is disabled —
 with `503` until it is started again.
@@ -767,6 +767,48 @@ and `removed` list full paths.
 `409 usb_export_not_configured` without a configured directory; `409 usb_export_unavailable` if it does not exist —
 typically, the drive is not mounted. The copy made here is the same as the automatic one, and waits for one already
 running.
+
+## Passage summary email
+
+One email per passage once it is definitively closed (SPEC §4.16), sent in the background by the plugin. These routes
+are for the configuration screen; nothing here is needed for the mails to go out.
+
+### `GET /summary-mail` — `readonly`
+
+What the summaries are set up to do and how the last one went.
+
+```json
+{
+  "enabled": true,
+  "configured": true,
+  "problem": null,
+  "recipients": ["skipper@example.org", "crew@example.org"],
+  "lastSuccess": {
+    "at": "2026-09-13T16:12:40.100Z",
+    "entryId": 42,
+    "recipients": ["skipper@example.org", "crew@example.org"]
+  },
+  "lastError": null
+}
+```
+
+- `enabled` is the option; `configured` says a relay, a sender and at least one recipient are set, with `problem` naming
+  what is missing when they are not. Nothing is sent unless both are true.
+- `lastSuccess` and `lastError` — `{ at, entryId, message }` — are kept in memory and start empty when the plugin
+  starts.
+
+### `POST /entries/:id/summary-mail` — admin
+
+Sends that passage's summary now, whatever its state and whether or not one has already gone out: how the SMTP settings
+are tried without waiting for the next arrival. The passage is then recorded as summarised, so the automatic mail does
+not repeat it.
+
+```json
+{ "entryId": 42, "recipients": ["skipper@example.org"] }
+```
+
+`404` for an unknown passage; `409 summary_mail_failed` when the settings are incomplete or the relay refuses, with the
+reason in the message.
 
 ## Retrospective analysis
 

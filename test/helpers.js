@@ -45,13 +45,15 @@ async function startServer({ config = {}, self = {} } = {}) {
   const plugin = createPlugin(app);
   const { router, permissions } = createPluginRouter();
   plugin.registerWithRouter(router);
-  // Tests must never reach the public geocoding, landmark, tide or weather service.
+  // Tests must never reach the public geocoding, landmark, tide or weather
+  // service, a tile server or a mail relay.
   plugin.start(
     {
       geocodingEnabled: false,
       landmarksEnabled: false,
       tidesEnabled: false,
       weatherEnabled: false,
+      summaryMailEnabled: false,
       ...config
     },
     () => {}

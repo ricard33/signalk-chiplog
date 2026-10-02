@@ -53,6 +53,13 @@ describe('passage detection', () => {
       const stopLat = boat.position.lat;
       boat.sail(20, { sog: 0 });
       assert.equal(boat.entries()[0].state, 'closed');
+      // As if the summary of that arrival had already gone out.
+      boat.db
+        .prepare(
+          `INSERT INTO passage_summary_mails (entry_id, sent_at, created_at)
+           VALUES (?, '2026-01-01T00:00:00.000Z', '2026-01-01T00:00:00.000Z')`
+        )
+        .run(boat.entries()[0].id);
 
       const resumedAt = boat.nextTick();
       boat.sail(10, { sog: 5 });
@@ -71,6 +78,11 @@ describe('passage detection', () => {
       );
       assert.equal(entries[0].closed_by, null);
       assert.equal(entries[0].end_place_name, null);
+      assert.equal(
+        boat.db.prepare('SELECT COUNT(*) AS n FROM passage_summary_mails').get().n,
+        0,
+        'any summary already sent is forgotten: the passage is not over (SPEC §4.16)'
+      );
       const [stopover] = boat.events().filter((event) => event.type === 'stopover');
       assert.equal(stopover.entry_id, entries[0].id);
       assert.equal(stopover.time, iso(stoppedAt));

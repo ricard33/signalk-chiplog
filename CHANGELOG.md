@@ -6,6 +6,19 @@ All notable changes to Chiplog are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **A summary of each passage, by email.** Turn it on, give it your SMTP relay and a few addresses, and Chiplog mails
+  the day's run once the passage is over for good — once it has stayed closed past the delay within which leaving again
+  would have carried it on, so a lock or a lunch anchorage never sets one off. The mail opens on the map of the track,
+  drawn on the server over OpenStreetMap tiles (or your own tile server, or a plain background) and carried inside the
+  message rather than attached, and goes on with the departure and arrival places and times, the distance, the duration,
+  the time under way, under engine and under sail, the average and maximum speed and the maximum wind, in the logbook's
+  language and the ship's time zone. At sea the relay is usually out of reach: a passage stays on the list and is tried
+  again, less and less often, then the backlog goes out oldest first on the next connection, with anything older than a
+  week dropped. Switching the option on sends nothing retroactively, and `POST /entries/:id/summary-mail` sends one
+  passage's summary straight away to try the settings out.
+
 ## [2.8.0] - 2026-10-01
 
 ### Added

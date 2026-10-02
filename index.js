@@ -10,6 +10,8 @@ const { OBSERVATION_DEFAULTS } = require('./lib/observation-recorder');
 const { createPlaceNamer, GEOCODING_DEFAULTS } = require('./lib/place-names');
 const { PROPULSION_DEFAULTS } = require('./lib/propulsion-detector');
 const { createReplayJob } = require('./lib/replay-job');
+const { createSummaryMailer, SUMMARY_MAIL_DEFAULTS } = require('./lib/summary-mailer');
+const { SECURITIES } = require('./lib/smtp');
 const { createTideForecaster, TIDE_DEFAULTS } = require('./lib/tide-forecaster');
 const { createWeatherForecaster, WEATHER_DEFAULTS } = require('./lib/weather-forecaster');
 const { createTrackRecorder, SAMPLE_INTERVAL_MS, TRACK_DEFAULTS } = require('./lib/track-recorder');
@@ -30,6 +32,9 @@ const FIRST_FORECAST_DELAY_MS = 5 * 1000;
 // Landmarks are not needed for the passage under way, only for reading it back,
 // so the first lookup waits for the busier start-up work to be done.
 const FIRST_LANDMARK_DELAY_MS = 30 * 1000;
+// Likewise: a summary is never urgent, and the passage it is about has been
+// over for at least the reopening delay by the time it is due.
+const FIRST_SUMMARY_MAIL_DELAY_MS = 60 * 1000;
 
 const MOTION_LABELS = { underway: 'Under way', stopped: 'Stopped', unknown: 'Waiting for data' };
 const MODE_LABELS = { autostate: 'navigation.state', fallback: 'speed fallback' };
@@ -64,6 +69,7 @@ module.exports = function (app) {
   // The open passage detection last reported, to notice a new one.
   let lastActiveEntryId = null;
   let usbExport = null;
+  let summaryMailer = null;
   let replayJob = null;
   let namingTimer = null;
   let timers = [];
@@ -195,19 +201,73 @@ module.exports = function (app) {
         title: 'Copy to the USB drive at each arrival',
         default: USB_EXPORT_DEFAULTS.usbExportOnArrival
       },
+      summaryMailEnabled: {
+        type: 'boolean',
+        title: 'Email a summary of each passage',
+        description:
+          'Once a passage is over for good — past the delay within which a new departure would carry it on — sends its map and figures to the addresses below',
+        default: SUMMARY_MAIL_DEFAULTS.summaryMailEnabled
+      },
+      summaryMailTo: {
+        type: 'string',
+        title: 'Summary recipients',
+        description: 'One or more email addresses, separated by commas'
+      },
+      summaryMailFrom: {
+        type: 'string',
+        title: 'Summary sender',
+        description:
+          'The address the summaries are sent from, e.g. logbook@example.org. Most relays insist it be one they are allowed to send for'
+      },
+      smtpHost: {
+        type: 'string',
+        title: 'SMTP server',
+        description: 'The mail relay the summaries are handed to. Leave empty to turn them off'
+      },
+      smtpPort: {
+        type: 'number',
+        title: 'SMTP port',
+        description: '587 for submission with STARTTLS, 465 for implicit TLS, 25 for a local relay',
+        default: SUMMARY_MAIL_DEFAULTS.smtpPort,
+        minimum: 1
+      },
+      smtpSecurity: {
+        type: 'string',
+        title: 'SMTP security',
+        enum: SECURITIES,
+        enumNames: ['STARTTLS (port 587)', 'TLS (port 465)', 'None (local relay only)'],
+        default: SUMMARY_MAIL_DEFAULTS.smtpSecurity
+      },
+      smtpUsername: {
+        type: 'string',
+        title: 'SMTP user name',
+        description: 'Leave empty if the relay needs no authentication'
+      },
+      smtpPassword: {
+        type: 'string',
+        title: 'SMTP password',
+        format: 'password'
+      },
+      summaryMailTileUrl: {
+        type: 'string',
+        title: 'Map tiles for the summary',
+        description:
+          'The tiles the summary map is drawn over. The public OpenStreetMap instance by default (© OpenStreetMap contributors, ODbL), or a self-hosted one; empty draws the track on a plain background',
+        default: SUMMARY_MAIL_DEFAULTS.summaryMailTileUrl
+      },
       logbookLanguage: {
         type: 'string',
-        title: 'Logbook language (PDF)',
+        title: 'Logbook language (PDF and summary emails)',
         description:
-          'Language of the PDF logbook written to the USB drive; downloads from the webapp use the webapp language',
+          'Language of the PDF logbook written to the USB drive and of the passage summary emails; downloads from the webapp use the webapp language',
         enum: PDF_LANGUAGES,
         default: 'en'
       },
       logbookTimeZone: {
         type: 'string',
-        title: 'Ship’s time zone (PDF)',
+        title: 'Ship’s time zone (PDF and summary emails)',
         description:
-          'IANA time zone the PDF logbook on the USB drive is kept in, e.g. Europe/Paris. Empty uses the server’s time zone; downloads from the webapp use the browser’s'
+          'IANA time zone the PDF logbook on the USB drive and the passage summary emails are kept in, e.g. Europe/Paris. Empty uses the server’s time zone; downloads from the webapp use the browser’s'
       },
       windSpeedThresholds: {
         type: 'array',
@@ -465,6 +525,20 @@ module.exports = function (app) {
         usbExportIntervalMinutes:
           config.usbExportIntervalMinutes ?? USB_EXPORT_DEFAULTS.usbExportIntervalMinutes,
         usbExportOnArrival: config.usbExportOnArrival ?? USB_EXPORT_DEFAULTS.usbExportOnArrival,
+        summaryMailEnabled: config.summaryMailEnabled ?? SUMMARY_MAIL_DEFAULTS.summaryMailEnabled,
+        summaryMailTo: config.summaryMailTo || null,
+        summaryMailFrom: config.summaryMailFrom || null,
+        smtpHost: config.smtpHost || null,
+        smtpPort: config.smtpPort ?? SUMMARY_MAIL_DEFAULTS.smtpPort,
+        smtpSecurity: SECURITIES.includes(config.smtpSecurity)
+          ? config.smtpSecurity
+          : SUMMARY_MAIL_DEFAULTS.smtpSecurity,
+        smtpUsername: config.smtpUsername || null,
+        smtpPassword: config.smtpPassword || null,
+        summaryMailTileUrl:
+          config.summaryMailTileUrl === undefined
+            ? SUMMARY_MAIL_DEFAULTS.summaryMailTileUrl
+            : config.summaryMailTileUrl,
         logbookLanguage: PDF_LANGUAGES.includes(config.logbookLanguage)
           ? config.logbookLanguage
           : 'en',
@@ -542,6 +616,13 @@ module.exports = function (app) {
     // sailed through, each on its own chain rather than inside detection.
     const networkOptions = { db: database, settings, userAgent: `signalk-chiplog/${version}` };
     const log = (level, message) => (level === 'error' ? app.error(message) : app.debug(message));
+    summaryMailer = createSummaryMailer({
+      db: database,
+      settings,
+      userAgent: `signalk-chiplog/${version}`,
+      vesselName: () => readVesselName(app),
+      log
+    });
     lastActiveEntryId = null;
     schedules = [
       createBackgroundSchedule({
@@ -561,6 +642,14 @@ module.exports = function (app) {
         resolver: createLandmarkFinder(networkOptions),
         log,
         firstDelayMs: FIRST_LANDMARK_DELAY_MS
+      }),
+      // Nothing nudges this one: a passage becomes due a summary by growing
+      // old enough, not by anything detection reports (SPEC §4.16).
+      createBackgroundSchedule({
+        label: 'Passage summary email',
+        resolver: summaryMailer,
+        log,
+        firstDelayMs: FIRST_SUMMARY_MAIL_DELAY_MS
       })
     ];
     lastStatus = null;
@@ -600,6 +689,7 @@ module.exports = function (app) {
     schedules = [];
     usbExport?.stop();
     usbExport = null;
+    summaryMailer = null;
     replayJob?.cancel();
     replayJob = null;
     detector = null;
@@ -629,6 +719,7 @@ module.exports = function (app) {
           observeEvent: (entryId, time) => detector.observeEvent(entryId, time),
           noteDeparture: (entryId) => detector.noteDeparture(entryId),
           usbExport,
+          summaryMailer,
           replayJob,
           pdfOptions,
           detection: () => ({

@@ -296,6 +296,24 @@ Every field is `null` when the service did not give it — all the sea fields, i
 out. The 3-hour steps the webapp and the PDF show are derived when read (`public/js/weather.mjs`'s `forecastSteps`), not
 stored.
 
+### `passage_summary_mails` (migration 18)
+
+One row per entry (`entry_id` is the primary key) recording what became of its summary email (SPEC §4.16). The row is
+the whole mechanism: a closed passage with **no** row is one still due a summary, and writing a row is what stops a
+second one going out. `sent_at` holds when the mail left and `recipients` the addresses it went to; a row with `sent_at`
+null is one that will never be sent, with `error` saying why — the relay refused it for good, or it was closed too long
+ago for a summary to be worth sending.
+
+Nothing else is kept: the summary itself is rendered from the passage each time, so a correction to a place name or a
+figure is reflected in a summary resent by hand (`POST /entries/:id/summary-mail`).
+
+Two deletions matter. The foreign key cascades, so merging or deleting a passage takes its row with it; and detection
+deletes the row when a departure reopens a passage (§4.2), since the arrival that was summarised is no longer the
+passage's end.
+
+The migration that creates the table fills it for every entry already closed, marked as never sent. That is what keeps
+switching the option on from mailing the whole logbook.
+
 ## Migrations
 
 `MIGRATIONS` in `lib/database.js` is an ordered, **append-only** list; the applied index is stored in SQLite's
