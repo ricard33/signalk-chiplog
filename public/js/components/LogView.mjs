@@ -1,10 +1,14 @@
-import { html, useRef, useState } from '../../vendor/preact-htm.mjs';
+import { html, useEffect, useLayoutEffect, useRef, useState } from '../../vendor/preact-htm.mjs';
 import { get } from '../api.mjs';
-import { useLocale, usePolling } from '../context.mjs';
+import { useLocale, usePolling, viewMemory } from '../context.mjs';
 import { groupByDay } from '../days.mjs';
 import { elapsedSeconds, EngineSailBar, ErrorNotice, Loading, PlaceName } from './common.mjs';
 
+const VIEW = 'log';
 const PAGE_SIZE = 50;
+// Roughly a screenful and a half: far enough that the top is out of reach, not
+// so soon that the button sits over the first passages.
+const TO_TOP_AFTER_PX = 1200;
 const API_PAGE_LIMIT = 500;
 const REFRESH_MS = 60 * 1000;
 
@@ -22,6 +26,43 @@ async function loadEntries(count) {
     }
   }
   return { items, total };
+}
+
+// The logbook is long, and longer still with the older pages loaded: a way back
+// to the top that is not a scroll. Focus follows the scroll to the title, or a
+// reader on the keyboard would be left at the bottom of the page.
+function BackToTop({ title }) {
+  const { t } = useLocale();
+  const [shown, setShown] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setShown(window.scrollY > TO_TOP_AFTER_PX);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  if (!shown) {
+    return null;
+  }
+
+  const toTop = () => {
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: still ? 'auto' : 'smooth' });
+    title.current?.focus({ preventScroll: true });
+  };
+
+  return html`
+    <button
+      type="button"
+      class="to-top"
+      aria-label=${t('log.toTop')}
+      title=${t('log.toTop')}
+      onClick=${toTop}
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7" /></svg>
+    </button>
+  `;
 }
 
 // Totals across every passage ever logged, not just the pages loaded so far.
@@ -85,16 +126,31 @@ function PassageCard({ entry, continuesFromPreviousDay, continuesNextDay }) {
 
 export function LogView() {
   const { t, format } = useLocale();
-  const [log, setLog] = useState(null);
+  // Coming back from a passage, the logbook is rendered straight from what it
+  // was left showing -- the older pages included -- rather than from an empty
+  // page while it reloads. It is then its old height, so the reader lands
+  // exactly where they were instead of watching the page jump once the
+  // passages arrive. The poll below refreshes it right away.
+  const recalled = useRef(viewMemory.recall(VIEW));
+  const title = useRef(null);
+  const [log, setLog] = useState(() => recalled.current?.log ?? null);
   const [error, setError] = useState(null);
   const [loadingOlder, setLoadingOlder] = useState(false);
-  const wanted = useRef(PAGE_SIZE);
+  const wanted = useRef(recalled.current?.wanted ?? PAGE_SIZE);
+
+  useLayoutEffect(() => {
+    if (recalled.current?.scrollY) {
+      window.scrollTo(0, recalled.current.scrollY);
+    }
+  }, []);
 
   const reload = (isCurrent = () => true) =>
     Promise.all([loadEntries(wanted.current), get('/entries/stats')])
       .then(([page, stats]) => {
         if (isCurrent()) {
-          setLog({ ...page, stats });
+          const loaded = { ...page, stats };
+          setLog(loaded);
+          viewMemory.remember(VIEW, { log: loaded, wanted: wanted.current });
           setError(null);
         }
       })
@@ -121,7 +177,7 @@ export function LogView() {
   }
 
   return html`
-    <h1 class="page-title">${t('log.title')}</h1>
+    <h1 class="page-title" tabindex="-1" ref=${title}>${t('log.title')}</h1>
     <${ErrorNotice} error=${error} />
     <${LogStats} stats=${log.stats} />
     ${groupByDay(log.items).map(
@@ -150,5 +206,6 @@ export function LogView() {
         ${t('log.loadOlder')}
       </button>`
     }
+    <${BackToTop} title=${title} />
   `;
 }

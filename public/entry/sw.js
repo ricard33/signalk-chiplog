@@ -38,6 +38,7 @@ const SHELL = [
   '../js/landmarks.mjs',
   '../js/log-lines.mjs',
   '../js/status.mjs',
+  '../js/view-memory.mjs',
   '../js/components/common.mjs',
   '../js/components/Timeline.mjs',
   '../vendor/preact-htm.mjs'

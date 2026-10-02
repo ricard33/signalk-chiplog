@@ -1,7 +1,8 @@
-import { createContext, useContext, useEffect, useState } from '../vendor/preact-htm.mjs';
+import { createContext, useContext, useEffect, useRef, useState } from '../vendor/preact-htm.mjs';
 import { parseAnimationHash } from './days.mjs';
 import { createFormatter } from './format.mjs';
 import { createTranslator } from './i18n.mjs';
+import { createViewMemory } from './view-memory.mjs';
 
 const LocaleContext = createContext(null);
 
@@ -40,12 +41,30 @@ function parseRoute(hash) {
   return hash === '#/replay' ? { name: 'replay' } : { name: 'log' };
 }
 
+// What the views have left behind, shared by all of them: one logbook, one
+// place it was left.
+export const viewMemory = createViewMemory();
+
 export function useRoute() {
   const [route, setRoute] = useState(() => parseRoute(location.hash));
+  const leaving = useRef(route);
   useEffect(() => {
     const onChange = () => {
-      setRoute(parseRoute(location.hash));
-      window.scrollTo(0, 0);
+      const from = leaving.current;
+      const to = parseRoute(location.hash);
+      leaving.current = to;
+      // Saved here rather than as the view goes: nothing has re-rendered yet,
+      // so this is still where the reader left the page.
+      if (viewMemory.recall(from.name)) {
+        viewMemory.remember(from.name, { scrollY: window.scrollY });
+      }
+      setRoute(to);
+      // A view with something to come back to scrolls itself, once it has
+      // rendered enough page to scroll (see LogView); every other arrival
+      // starts at the top.
+      if (!viewMemory.recall(to.name)) {
+        window.scrollTo(0, 0);
+      }
     };
     window.addEventListener('hashchange', onChange);
     return () => window.removeEventListener('hashchange', onChange);

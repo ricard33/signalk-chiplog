@@ -189,9 +189,9 @@ has **no build step**: native ES modules (`.mjs`, served as JavaScript) and Prea
 - No bare imports (`import 'preact'`) and no import maps — only relative paths. Third-party browser code comes from
   `scripts/vendor.js`, which copies it out of `node_modules`; `public/vendor/` is git-ignored but published through the
   `files` field in `package.json`. Never load anything from a CDN: the boat is usually offline.
-- Pure logic lives in modules that import nothing from `vendor/` (`format.mjs`, `days.mjs`, `i18n.mjs`), so
-  `test/webapp-*.test.mjs` can import them under Node. Components are verified in a real browser against a real Signal K
-  server, not with a DOM test framework.
+- Pure logic lives in modules that import nothing from `vendor/` (`format.mjs`, `days.mjs`, `i18n.mjs`,
+  `view-memory.mjs`), so `test/webapp-*.test.mjs` can import them under Node. Components are verified in a real browser
+  against a real Signal K server, not with a DOM test framework.
 - Every user-facing string goes in **both** dictionaries of `public/js/i18n.mjs`; a test fails on a missing key or a
   mismatched `{placeholder}`.
 - The animation's 3D view brings **three.js**, and it cannot be copied like the rest: its add-ons import the bare
@@ -205,6 +205,11 @@ has **no build step**: native ES modules (`.mjs`, served as JavaScript) and Prea
 - Prettier leaves `html` templates alone in `public/` (`embeddedLanguageFormatting: off`): htm drops whitespace that
   contains a newline, so reflowing a template changes what is displayed. Build text such as `start – end` as one string.
 - The API returns SI units; conversion for display happens only in `format.mjs`.
+- Going back to a view lands where the reader left it: `public/js/view-memory.mjs` holds, per view, what it wants to
+  find again. `useRoute` in `context.mjs` saves the outgoing view's scroll on a hash change and scrolls to the top only
+  for a view with nothing remembered; `LogView.mjs` is the one that remembers — the passages it had loaded and the
+  scroll — and re-renders from them before restoring the scroll in a layout effect, which is what keeps the page from
+  jumping. A view that never calls `remember` is never restored, so adding one is opting in.
 
 ## Tablet entry PWA
 

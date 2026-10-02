@@ -49,6 +49,7 @@ export const MESSAGES = {
     'log.empty':
       'No passage recorded yet. Passages are logged automatically once the vessel gets under way.',
     'log.loadOlder': 'Load older passages',
+    'log.toTop': 'Back to the top of the logbook',
     'log.inProgress': 'in progress',
     'log.dayDistance': '{distance} sailed',
     'log.fromPreviousDay': 'continued from the previous day',
@@ -574,6 +575,7 @@ export const MESSAGES = {
     'log.empty':
       'Aucune navigation enregistrée pour l’instant. Elles sont notées automatiquement dès que le bateau fait route.',
     'log.loadOlder': 'Charger les navigations plus anciennes',
+    'log.toTop': 'Revenir en haut du journal',
     'log.inProgress': 'en cours',
     'log.dayDistance': '{distance} parcourus',
     'log.fromPreviousDay': 'suite de la veille',

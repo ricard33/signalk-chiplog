@@ -6,6 +6,17 @@ All notable changes to Chiplog are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- **Coming back from a passage lands where you left the logbook.** Going back — with the browser's back button, with
+  "Back to the logbook" or from the nav bar — reopened the logbook at the top of the page, with only the first page of
+  passages: whatever had been loaded with "Load older passages" was gone, and so was the place you had scrolled to. The
+  logbook is now put back as it was, the older pages included, and rendered from what it was showing rather than from an
+  empty page, so it comes back at its old height and the scroll goes straight back where it was instead of jumping once
+  the passages arrive. Every other page still opens at the top.
+- **A button takes you back to the top of the logbook.** Once you have scrolled a way down — further still with the
+  older pages loaded — a round button in the corner brings you back up, rather than scrolling back through a season.
+
 ### Added
 
 - **A summary of each passage, by email.** Turn it on, give it your SMTP relay and a few addresses, and Chiplog mails
