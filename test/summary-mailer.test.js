@@ -441,14 +441,17 @@ describe('the plugin and its summary emails', () => {
       const before = openDatabase(dataDir).db;
       const closed = insertEntry(before, { end_time: iso(T0) });
       const open = insertEntry(before, { state: 'active', end_time: null });
-      const version = before.prepare('PRAGMA user_version').get().user_version;
+      const latest = before.prepare('PRAGMA user_version').get().user_version;
+      // Back to the version before migration 18, which brought summary emails,
+      // undoing it and every migration since.
+      before.exec('DROP TABLE logbook_identity');
       before.exec('DROP TABLE passage_summary_mails');
-      before.exec(`PRAGMA user_version = ${version - 1}`);
+      before.exec('PRAGMA user_version = 17');
       before.close();
 
       const { db, migrated } = openDatabase(dataDir);
       try {
-        assert.equal(migrated.to, version);
+        assert.deepEqual(migrated, { from: 17, to: latest });
         assert.deepEqual(
           db
             .prepare('SELECT entry_id, sent_at FROM passage_summary_mails')

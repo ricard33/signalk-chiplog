@@ -29,6 +29,7 @@ English and French, chosen from the browser's language.
 - [Configuration](#configuration-)
 - [Signal K data used](#signal-k-data-used-)
 - [Backups and abandon ship](#backups-and-abandon-ship-)
+- [Online backup](#online-backup-)
 - [Passage summary emails](#passage-summary-emails-)
 - [Retrospective analysis](#retrospective-analysis-)
 - [Importing from PostgSail](#importing-from-postgsail-)
@@ -503,6 +504,23 @@ None of these is required except position and speed over ground; each feature us
   - Each file is flushed to the drive before it appears, so pulling the drive out never leaves a half-written file.
   - The Export page shows the schedule, the last copy, the next one, and the last failure if any.
 - **The database** — `chiplog.sqlite` in the plugin's data folder can be copied while the plugin is stopped.
+- **Online** — see [Online backup](#online-backup-) below.
+
+## Online backup 🌐
+
+Keep a copy of the logbook off the boat, on the Miles Astern online service. Turn **Back the logbook up online** on in
+the plugin configuration, fill in the **Online service address** and paste the **Device token** the service gave your
+boat. From then on, whenever the boat has a connection, Chiplog sends:
+
+- every passage with its track, events, handwritten notes, instrument readings, crew and forecasts — the newest first,
+  so the latest passages are safe first after a long time offline;
+- only what changed since the service last heard of it, compressed: a passage under way sends the points added since,
+  not its whole track again;
+- the removal of passages deleted or merged on board.
+
+It checks every 15 minutes (**Online backup interval**) and straight away at each departure and arrival. Out of reach of
+a network, it simply tries again later. The logbook on board stays the record: nothing ever comes back from the service
+to change it.
 
 ## Passage summary emails 📧
 
@@ -618,7 +636,10 @@ node scripts/import-postgsail.js PostgSail_Trip.geojson --url http://boat.local:
   Offline, the track is still drawn, on a blank background.
 - **Retrospective analysis.** Running one queries the InfluxDB database set in the plugin configuration — the boat's
   own, local or remote, never a third party — for the Signal K history in the requested range.
-- **Nothing else** leaves the boat. There is no account, analytics or cloud service.
+- **Online backup.** With it on, every passage — track, events, handwritten notes, readings, crew and forecasts — is
+  sent to the online service at the address you configure, with the device token it gave your boat. Nothing at all when
+  it is off.
+- **Nothing else** leaves the boat. There is no analytics, and no account unless you choose the online backup.
 
 Map data and place names © OpenStreetMap contributors (ODbL); seamarks © OpenSeaMap; tide and weather data ©
 [Open-Meteo.com](https://open-meteo.com/) (CC BY 4.0).

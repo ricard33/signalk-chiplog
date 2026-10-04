@@ -810,6 +810,38 @@ not repeat it.
 `404` for an unknown passage; `409 summary_mail_failed` when the settings are incomplete or the relay refuses, with the
 reason in the message.
 
+## Online backup
+
+The logbook pushed to the online service (SPEC §4.17), in the background. These routes report it and start a run;
+nothing here is needed for the backup to happen.
+
+### `GET /cloud-sync` — `readonly`
+
+```json
+{
+  "enabled": true,
+  "configured": true,
+  "problem": null,
+  "logbookId": "37ff7ef8-28e8-4a28-9277-c34df9391976",
+  "inProgress": { "total": 12, "done": 5 },
+  "lastSuccess": { "at": "2026-09-13T16:12:40.100Z", "sent": 3, "deleted": 0, "held": 57 },
+  "lastError": null
+}
+```
+
+- `enabled` is the option; `configured` says the service address and the device token are set, with `problem` naming
+  what is missing when they are not.
+- `logbookId` is the identity the service files this logbook's passages under.
+- `inProgress` counts the passages to send or delete in the run under way, `null` between runs.
+- `lastSuccess` gives the passages sent and deleted by the last complete run and those on board; `lastError` is
+  `{ at, message, code }`, `code` being the service's error code when it answered one. Both are kept in memory and start
+  empty when the plugin starts.
+
+### `POST /cloud-sync` — admin
+
+Starts a run now rather than at the next interval, and answers the status as above. The run goes on in the background,
+never alongside another. `409 cloud_sync_not_configured` while the backup is off or not set up.
+
 ## Retrospective analysis
 
 Reconstructs passages for a past date range from the boat's recorded history — the server's own History API provider, or

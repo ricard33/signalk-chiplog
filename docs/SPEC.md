@@ -815,13 +815,48 @@ the day's run without opening the webapp.
   option on does not mail the whole logbook.
 - **Off by default**, and inert until a relay, a sender and at least one recipient are configured.
 
+### 4.17 Online backup
+
+Pushes the logbook to the Miles Astern online service, which keeps a copy off the boat and builds statistics, digests
+and sharing on it. This is the "publication to a remote server" left open in §4.5, with one target rather than a generic
+webhook.
+
+- **Push only, boat to service.** The plugin calls out over HTTPS; the service never calls the boat, and nothing ever
+  comes back from it to change the logbook. The logbook on board stays the record.
+- **The logbook has an identity of its own**: a random UUID made once by migration 19 (`logbook_identity`). The service
+  files passages under it and the passage's entry id. A reinstalled plugin starts a new logbook, so its entry ids, which
+  start again from 1, can never overwrite or delete what an earlier one sent; a copy of the database file is the same
+  logbook.
+- **What is sent, per passage**: the entry as `GET /entries/:id` gives it, its events (handwriting included), instrument
+  snapshots, engine/sail periods, crew, and tide and weather forecasts — the JSON export's bundle without the landmarks,
+  which are reference data — and its track, cut into chunks of 2,000 points. All in Signal K units, compressed with
+  gzip.
+- **What is not sent**: the plugin configuration, the SMTP password, the gazetteer of landmarks.
+- **Working out what to send.** Each run asks the service what it holds of the logbook: per passage, a hash of its
+  content, a hash of its chunk hashes, and whether every chunk arrived. The plugin works out the same hashes (SHA-256 of
+  the JSON) and sends each passage whose content or track differs or is incomplete — newest first, so the latest
+  passages are safe first after a long time offline. The service answers which chunks it lacks, so a passage whose track
+  only grew sends its last chunk and the new ones, not the whole track. Passages the service holds that are gone from
+  board — deleted or merged away — are deleted there, into a 30-day trash. Nothing is recorded on board about what was
+  sent: the service's answer is the record, and a restart only costs working the hashes out again. Between runs the
+  hashes are kept in memory against the passage's export fingerprint, so an unchanged passage is not read in full each
+  time.
+- **When.** Every `cloudSyncIntervalMinutes` (15 by default), at each departure and arrival, and on demand
+  (`POST /cloud-sync`). A passage under way is sent as it stands and completed as it goes.
+- **Offline is normal at sea.** A service out of reach is retried with a growing delay, from one minute to an hour. A
+  token the service refuses is reported in the Signal K log and retried hourly.
+- **Authentication**: a device token issued by the service for this boat, sent as a bearer token.
+- **Off by default**, and inert until the service address and the token are set.
+- **Not yet**: pairing by a short code instead of pasting the token, restoring from the service, a mode for paid links
+  that holds full tracks back, and a webapp page showing the backup's state (the API below already reports it).
+
 ## 5. Data model and API
 
 The data model has been refined into a precise schema: the authoritative DDL lives in
 [`lib/database.js`](../lib/database.js), with the conventions and rationale documented in
 [DATA_MODEL.md](DATA_MODEL.md). Entities: `log_entries`, `track_points`, `observations`, `propulsion_segments`,
 `events`, `places`, `manoeuvre_types`, `crew_members`, `log_entry_crew`, `tide_forecasts`, `weather_forecasts`,
-`landmarks`, `landmark_areas`, `passage_summary_mails`.
+`landmarks`, `landmark_areas`, `passage_summary_mails`, `logbook_identity`.
 
 Two points worth carrying back into this document:
 

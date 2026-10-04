@@ -46,7 +46,7 @@ async function startServer({ config = {}, self = {} } = {}) {
   const { router, permissions } = createPluginRouter();
   plugin.registerWithRouter(router);
   // Tests must never reach the public geocoding, landmark, tide or weather
-  // service, a tile server or a mail relay.
+  // service, a tile server, a mail relay or the online backup service.
   plugin.start(
     {
       geocodingEnabled: false,
@@ -54,6 +54,7 @@ async function startServer({ config = {}, self = {} } = {}) {
       tidesEnabled: false,
       weatherEnabled: false,
       summaryMailEnabled: false,
+      cloudSyncEnabled: false,
       ...config
     },
     () => {}
