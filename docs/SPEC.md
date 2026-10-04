@@ -845,10 +845,20 @@ webhook.
   (`POST /cloud-sync`). A passage under way is sent as it stands and completed as it goes.
 - **Offline is normal at sea.** A service out of reach is retried with a growing delay, from one minute to an hour. A
   token the service refuses is reported in the Signal K log and retried hourly.
-- **Authentication**: a device token issued by the service for this boat, sent as a bearer token.
+- **Pairing by a short code.** The Export page asks for the service's address and gets a code from it (`POST /pairings`,
+  eight letters and digits such as `K7QF-3MXB`, valid 15 minutes), shown in large type with a link to the service's
+  claim page when it has a public address. The owner enters the code on the service, signed in, and attaches it to a
+  boat. Meanwhile the plugin polls with a secret only it holds; once the code is claimed it collects its **device
+  token** — handed over once, never stored by the service — and saves it, with the address, into the plugin
+  configuration (`app.savePluginOptions`) as if typed in the admin, keeping every other setting. The backup turns on at
+  once, without a restart. A dropped connection while waiting is retried as long as the code lives. The token can still
+  be pasted by hand in the plugin configuration.
+- **Authentication**: the device token, sent as a bearer token. A reinstalled plugin pairs again; the owner attaches it
+  to the same boat, and its new logbook sits beside the old one.
+- **The Export page** shows the backup: where it goes, the run under way, the last success and the last failure, a
+  **Back up now** button, and pairing.
 - **Off by default**, and inert until the service address and the token are set.
-- **Not yet**: pairing by a short code instead of pasting the token, restoring from the service, a mode for paid links
-  that holds full tracks back, and a webapp page showing the backup's state (the API below already reports it).
+- **Not yet**: restoring from the service, and a mode for paid links that holds full tracks back.
 
 ## 5. Data model and API
 

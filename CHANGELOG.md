@@ -13,6 +13,9 @@ All notable changes to Chiplog are documented here. The format follows
   service whenever there is a connection: every 15 minutes, at each departure and arrival, newest passage first. Only
   what changed goes out, compressed, and a track that grew only sends its new points. Passages deleted or merged on
   board are removed from the service too. Off by default; nothing leaves the boat while it is.
+- **Pairing with the online service by a short code.** On the Export page, ask the service for a code, enter it on the
+  service signed in to your account, and the backup turns on by itself: no token to copy. The same card shows the last
+  backup and a **Back up now** button.
 
 ### Changed
 

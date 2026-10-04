@@ -33,13 +33,18 @@ function createPluginRouter() {
 async function startServer({ config = {}, self = {} } = {}) {
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chiplog-test-'));
   const errors = [];
+  const savedOptions = [];
   const app = {
     getDataDirPath: () => dataDir,
     getSelfPath: (selfPath) => selfPath.split('.').reduce((node, key) => node?.[key], self),
     debug: () => {},
     error: (message) => errors.push(message),
     setPluginStatus: () => {},
-    setPluginError: () => {}
+    setPluginError: () => {},
+    savePluginOptions: (options, callback) => {
+      savedOptions.push(options);
+      callback(null);
+    }
   };
 
   const plugin = createPlugin(app);
@@ -95,7 +100,19 @@ async function startServer({ config = {}, self = {} } = {}) {
     fs.rmSync(dataDir, { recursive: true, force: true });
   }
 
-  return { baseUrl, db, plugin, router, permissions, errors, self, dataDir, request, close };
+  return {
+    baseUrl,
+    db,
+    plugin,
+    router,
+    permissions,
+    errors,
+    savedOptions,
+    self,
+    dataDir,
+    request,
+    close
+  };
 }
 
 function insert(db, table, row) {

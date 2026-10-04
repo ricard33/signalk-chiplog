@@ -285,6 +285,7 @@ describe('online backup', () => {
       enabled: true,
       configured: true,
       problem: null,
+      url: 'https://service.test/',
       logbookId: getLogbookId(db),
       inProgress: null,
       lastSuccess: { at: at(6), sent: 1, deleted: 0, held: 1 },

@@ -508,9 +508,18 @@ None of these is required except position and speed over ground; each feature us
 
 ## Online backup 🌐
 
-Keep a copy of the logbook off the boat, on the Miles Astern online service. Turn **Back the logbook up online** on in
-the plugin configuration, fill in the **Online service address** and paste the **Device token** the service gave your
-boat. From then on, whenever the boat has a connection, Chiplog sends:
+Keep a copy of the logbook off the boat, on the Miles Astern online service.
+
+1. On the **Export** page, under **Online backup**, enter the service address and choose **Get a pairing code**.
+2. On the service, signed in to your account, enter the code shown (e.g. `K7QF-3MXB`) and choose your boat. The code is
+   valid for 15 minutes.
+3. The page soon says the boat is paired: Chiplog has saved the service address and its own token in the plugin
+   configuration and turned the backup on.
+
+You can also paste a token by hand: turn **Back the logbook up online** on in the plugin configuration, fill in the
+**Online service address** and the **Device token**.
+
+From then on, whenever the boat has a connection, Chiplog sends:
 
 - every passage with its track, events, handwritten notes, instrument readings, crew and forecasts — the newest first,
   so the latest passages are safe first after a long time offline;
@@ -518,9 +527,10 @@ boat. From then on, whenever the boat has a connection, Chiplog sends:
   not its whole track again;
 - the removal of passages deleted or merged on board.
 
-It checks every 15 minutes (**Online backup interval**) and straight away at each departure and arrival. Out of reach of
-a network, it simply tries again later. The logbook on board stays the record: nothing ever comes back from the service
-to change it.
+It checks every 15 minutes (**Online backup interval**), straight away at each departure and arrival, and when you
+choose **Back up now** on the Export page, which also shows the last backup and the last failure. Out of reach of a
+network, it simply tries again later. The logbook on board stays the record: nothing ever comes back from the service to
+change it.
 
 ## Passage summary emails 📧
 

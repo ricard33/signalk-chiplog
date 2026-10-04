@@ -822,25 +822,51 @@ nothing here is needed for the backup to happen.
   "enabled": true,
   "configured": true,
   "problem": null,
+  "url": "https://api.example.org",
   "logbookId": "37ff7ef8-28e8-4a28-9277-c34df9391976",
   "inProgress": { "total": 12, "done": 5 },
   "lastSuccess": { "at": "2026-09-13T16:12:40.100Z", "sent": 3, "deleted": 0, "held": 57 },
-  "lastError": null
+  "lastError": null,
+  "pairing": { "state": "idle" }
 }
 ```
 
 - `enabled` is the option; `configured` says the service address and the device token are set, with `problem` naming
   what is missing when they are not.
+- `url` is the service address configured, `null` when none.
 - `logbookId` is the identity the service files this logbook's passages under.
 - `inProgress` counts the passages to send or delete in the run under way, `null` between runs.
 - `lastSuccess` gives the passages sent and deleted by the last complete run and those on board; `lastError` is
   `{ at, message, code }`, `code` being the service's error code when it answered one. Both are kept in memory and start
   empty when the plugin starts.
 
+- `pairing` follows the last pairing since the plugin started: `{ "state": "idle" }`;
+  `{ "state": "waiting", "url", "code", "claimUrl", "expiresAt" }` while the code waits to be claimed (`claimUrl` is
+  `null` when the service has no public address); `{ "state": "paired", "vesselName", "at" }`;
+  `{ "state": "expired", "at" }`; or `{ "state": "failed", "error": { "message", "code" } }`, `code` being `save_failed`
+  when the token came but the configuration could not be saved.
+
 ### `POST /cloud-sync` — admin
 
 Starts a run now rather than at the next interval, and answers the status as above. The run goes on in the background,
 never alongside another. `409 cloud_sync_not_configured` while the backup is off or not set up.
+
+### `POST /cloud-sync/pairing` — admin
+
+Asks the service at `url` for a pairing code, then waits in the background for it to be claimed; answers the `pairing`
+state as above, `waiting`. A pairing already waiting is dropped.
+
+```json
+{ "url": "https://api.example.org" }
+```
+
+`400` when `url` is missing or not an http or https URL; `409 cloud_pairing_failed` when the service cannot be reached
+or refuses, with the reason in the message. Once claimed, the address and the token are saved into the plugin
+configuration and the backup turns on.
+
+### `DELETE /cloud-sync/pairing` — admin
+
+Stops waiting for the code to be claimed; answers the `pairing` state.
 
 ## Retrospective analysis
 

@@ -12,6 +12,7 @@ const { PROPULSION_DEFAULTS } = require('./lib/propulsion-detector');
 const { createReplayJob } = require('./lib/replay-job');
 const { createSummaryMailer, SUMMARY_MAIL_DEFAULTS } = require('./lib/summary-mailer');
 const { createCloudSync, CLOUD_SYNC_DEFAULTS } = require('./lib/cloud-sync');
+const { createCloudPairing } = require('./lib/cloud-pairing');
 const { SECURITIES } = require('./lib/smtp');
 const { createTideForecaster, TIDE_DEFAULTS } = require('./lib/tide-forecaster');
 const { createWeatherForecaster, WEATHER_DEFAULTS } = require('./lib/weather-forecaster');
@@ -76,6 +77,9 @@ module.exports = function (app) {
   let summaryMailer = null;
   let cloudSync = null;
   let cloudSchedule = null;
+  let cloudPairing = null;
+  // The configuration as saved, so pairing can add the token to it without losing the rest.
+  let savedConfig = {};
   let replayJob = null;
   let namingTimer = null;
   let timers = [];
@@ -535,7 +539,35 @@ module.exports = function (app) {
     version
   });
 
+  // Saves what pairing brought into the plugin configuration, as if typed in the admin, and
+  // starts using it at once: the backup's settings are read on every run, so no restart.
+  function savePairing(url, token) {
+    const next = {
+      ...savedConfig,
+      cloudSyncEnabled: true,
+      cloudSyncUrl: url,
+      cloudSyncToken: token
+    };
+    return new Promise((resolve, reject) => {
+      app.savePluginOptions(next, (err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        savedConfig = next;
+        if (settings) {
+          settings.cloudSyncEnabled = true;
+          settings.cloudSyncUrl = url;
+          settings.cloudSyncToken = token;
+        }
+        cloudSchedule?.nudge();
+        resolve();
+      });
+    });
+  }
+
   plugin.start = function (config = {}) {
+    savedConfig = config;
     try {
       const { db, migrated } = openDatabase(app.getDataDirPath());
       database = db;
@@ -677,6 +709,12 @@ module.exports = function (app) {
       log,
       firstDelayMs: FIRST_CLOUD_SYNC_DELAY_MS
     });
+    cloudPairing = createCloudPairing({
+      db: database,
+      userAgent: `signalk-chiplog/${version}`,
+      log,
+      onPaired: ({ url, token }) => savePairing(url, token)
+    });
     lastActiveEntryId = null;
     schedules = [
       cloudSchedule,
@@ -747,6 +785,8 @@ module.exports = function (app) {
     summaryMailer = null;
     cloudSync = null;
     cloudSchedule = null;
+    cloudPairing?.stop();
+    cloudPairing = null;
     replayJob?.cancel();
     replayJob = null;
     detector = null;
@@ -779,6 +819,7 @@ module.exports = function (app) {
           summaryMailer,
           cloudSync,
           nudgeCloudSync: () => cloudSchedule?.nudge(),
+          cloudPairing,
           replayJob,
           pdfOptions,
           detection: () => ({
