@@ -25,6 +25,8 @@ const SETTINGS = {
 // answers which chunks it lacks, and refuses a chunk the passage does not declare.
 function fakeService() {
   const passages = new Map();
+  // What the service holds of the logbook's places; `knowsPlaces` off is an older service.
+  const places = { hash: null, list: [], knowsPlaces: true };
   const requests = [];
   const control = { down: false, status: null };
 
@@ -45,7 +47,9 @@ function fakeService() {
     }
     const payload = body ? JSON.parse(zlib.gunzipSync(body)) : undefined;
     const match =
-      /^\/v1\/logbooks\/([^/]+)(?:\/passages\/(\d+)(?:\/track\/(\d+))?|\/sync-state)$/.exec(route);
+      /^\/v1\/logbooks\/([^/]+)(?:\/passages\/(\d+)(?:\/track\/(\d+))?|\/sync-state|\/places)$/.exec(
+        route
+      );
     assert.ok(match, `unexpected route ${route}`);
     const originId = match[2] && Number(match[2]);
     const index = match[3] && Number(match[3]);
@@ -58,8 +62,15 @@ function fakeService() {
           contentHash: p.contentHash,
           trackHash: jsonHash(p.chunkHashes),
           complete: p.chunkHashes.every((hash, i) => p.chunks.get(i) === hash)
-        }))
+        })),
+        ...(places.knowsPlaces ? { placesHash: places.hash } : {})
       });
+    }
+    if (route.endsWith('/places')) {
+      assert.equal(jsonHash(payload.places), payload.hash);
+      places.hash = payload.hash;
+      places.list = payload.places;
+      return reply(204);
     }
     if (method === 'DELETE') {
       passages.delete(originId);
@@ -92,7 +103,7 @@ function fakeService() {
     return reply(204);
   }
 
-  return { fetch, passages, requests, control };
+  return { fetch, passages, places, requests, control };
 }
 
 function point(n) {
@@ -288,9 +299,106 @@ describe('online backup', () => {
       url: 'https://service.test/',
       logbookId: getLogbookId(db),
       inProgress: null,
-      lastSuccess: { at: at(6), sent: 1, deleted: 0, held: 1 },
+      lastSuccess: { at: at(6), sent: 1, deleted: 0, held: 1, places: false },
       lastError: null
     });
+  });
+});
+
+describe('online backup of places', () => {
+  let dataDir;
+  let db;
+  let service;
+
+  const sync = () =>
+    createCloudSync({
+      db,
+      settings: SETTINGS,
+      userAgent: 'signalk-chiplog/2.9.0',
+      log: () => {},
+      fetch: service.fetch
+    });
+  const addPlace = (name, countryCode = null) =>
+    insert(db, 'places', {
+      name,
+      lat: 46.16,
+      lon: -1.15,
+      source: 'geocoding',
+      country_code: countryCode,
+      created_at: T0,
+      updated_at: T0
+    });
+  const methods = () => service.requests.map((r) => `${r.method} ${r.route.split('/').pop()}`);
+
+  beforeEach(() => {
+    dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chiplog-cloud-places-'));
+    ({ db } = openDatabase(dataDir));
+    service = fakeService();
+  });
+
+  afterEach(() => {
+    db.close();
+    fs.rmSync(dataDir, { recursive: true, force: true });
+  });
+
+  it('sends the places with their position and country, once', async () => {
+    const id = addPlace('La Rochelle', 'FR');
+    const cloud = sync();
+
+    const result = await cloud.resolveNext();
+
+    assert.equal(result.outcome, 'sent');
+    assert.deepEqual(service.places.list, [
+      {
+        id,
+        name: 'La Rochelle',
+        position: { lat: 46.16, lon: -1.15 },
+        source: 'geocoding',
+        countryCode: 'FR',
+        createdAt: T0,
+        updatedAt: T0
+      }
+    ]);
+    assert.equal(cloud.status().lastSuccess.places, true);
+
+    service.requests.length = 0;
+    assert.equal((await cloud.resolveNext()).outcome, 'idle');
+    assert.deepEqual(methods(), ['GET sync-state']);
+  });
+
+  it('sends the list again when a place is renamed, gets its country or goes', async () => {
+    const id = addPlace('46°09.6′N 001°09.0′W');
+    const cloud = sync();
+    await cloud.resolveNext();
+
+    db.prepare('UPDATE places SET name = ?, country_code = ? WHERE id = ?').run(
+      'La Rochelle',
+      'FR',
+      id
+    );
+    await cloud.resolveNext();
+    assert.equal(service.places.list[0].name, 'La Rochelle');
+    assert.equal(service.places.list[0].countryCode, 'FR');
+
+    db.prepare('DELETE FROM places WHERE id = ?').run(id);
+    await cloud.resolveNext();
+    assert.deepEqual(service.places.list, []);
+  });
+
+  it('does not send an empty list to a service that holds none', async () => {
+    await sync().resolveNext();
+
+    assert.deepEqual(methods(), ['GET sync-state']);
+  });
+
+  it('sends no places to a service that does not know of them', async () => {
+    addPlace('La Rochelle', 'FR');
+    service.places.knowsPlaces = false;
+
+    const result = await sync().resolveNext();
+
+    assert.equal(result.outcome, 'idle');
+    assert.deepEqual(methods(), ['GET sync-state']);
   });
 });
 

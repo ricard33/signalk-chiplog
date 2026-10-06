@@ -831,6 +831,11 @@ webhook.
   snapshots, engine/sail periods, crew, and tide and weather forecasts — the JSON export's bundle without the landmarks,
   which are reference data — and its track, cut into chunks of 2,000 points. All in Signal K units, compressed with
   gzip.
+- **The places too**: every place of the gazetteer (§4.8) with its name, position, origin and country, as `GET /places`
+  gives them. The list goes whole, after the passages, whenever its hash differs from the one the service reports — a
+  place renamed, deleted or given its country needs no message of its own — and it is what lets the service tell the
+  countries visited. Nothing is sent to a service that does not report a places hash, nor an empty list to one that
+  holds none.
 - **What is not sent**: the plugin configuration, the SMTP password, the gazetteer of landmarks.
 - **Working out what to send.** Each run asks the service what it holds of the logbook: per passage, a hash of its
   content, a hash of its chunk hashes, and whether every chunk arrived. The plugin works out the same hashes (SHA-256 of

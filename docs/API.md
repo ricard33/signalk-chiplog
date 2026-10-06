@@ -825,7 +825,7 @@ nothing here is needed for the backup to happen.
   "url": "https://api.example.org",
   "logbookId": "37ff7ef8-28e8-4a28-9277-c34df9391976",
   "inProgress": { "total": 12, "done": 5 },
-  "lastSuccess": { "at": "2026-09-13T16:12:40.100Z", "sent": 3, "deleted": 0, "held": 57 },
+  "lastSuccess": { "at": "2026-09-13T16:12:40.100Z", "sent": 3, "deleted": 0, "held": 57, "places": false },
   "lastError": null,
   "pairing": { "state": "idle" }
 }
@@ -836,9 +836,9 @@ nothing here is needed for the backup to happen.
 - `url` is the service address configured, `null` when none.
 - `logbookId` is the identity the service files this logbook's passages under.
 - `inProgress` counts the passages to send or delete in the run under way, `null` between runs.
-- `lastSuccess` gives the passages sent and deleted by the last complete run and those on board; `lastError` is
-  `{ at, message, code }`, `code` being the service's error code when it answered one. Both are kept in memory and start
-  empty when the plugin starts.
+- `lastSuccess` gives the passages sent and deleted by the last complete run, those on board, and whether the list of
+  places was sent; `lastError` is `{ at, message, code }`, `code` being the service's error code when it answered one.
+  Both are kept in memory and start empty when the plugin starts.
 
 - `pairing` follows the last pairing since the plugin started: `{ "state": "idle" }`;
   `{ "state": "waiting", "url", "code", "claimUrl", "expiresAt" }` while the code waits to be claimed (`claimUrl` is

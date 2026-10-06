@@ -525,7 +525,8 @@ From then on, whenever the boat has a connection, Chiplog sends:
   so the latest passages are safe first after a long time offline;
 - only what changed since the service last heard of it, compressed: a passage under way sends the points added since,
   not its whole track again;
-- the removal of passages deleted or merged on board.
+- the removal of passages deleted or merged on board;
+- the places — names, positions and countries — whenever one is added, renamed or gets its country.
 
 It checks every 15 minutes (**Online backup interval**), straight away at each departure and arrival, and when you
 choose **Back up now** on the Export page, which also shows the last backup and the last failure. Out of reach of a
@@ -646,9 +647,9 @@ node scripts/import-postgsail.js PostgSail_Trip.geojson --url http://boat.local:
   Offline, the track is still drawn, on a blank background.
 - **Retrospective analysis.** Running one queries the InfluxDB database set in the plugin configuration — the boat's
   own, local or remote, never a third party — for the Signal K history in the requested range.
-- **Online backup.** With it on, every passage — track, events, handwritten notes, readings, crew and forecasts — is
-  sent to the online service at the address you configure, with the device token it gave your boat. Nothing at all when
-  it is off.
+- **Online backup.** With it on, every passage — track, events, handwritten notes, readings, crew and forecasts — and
+  every place, with its name, position and country, is sent to the online service at the address you configure, with the
+  device token it gave your boat. Nothing at all when it is off.
 - **Nothing else** leaves the boat. There is no analytics, and no account unless you choose the online backup.
 
 Map data and place names © OpenStreetMap contributors (ODbL); seamarks © OpenSeaMap; tide and weather data ©
