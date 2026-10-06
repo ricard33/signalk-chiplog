@@ -821,8 +821,9 @@ Pushes the logbook to the Miles Astern online service, which keeps a copy off th
 and sharing on it. This is the "publication to a remote server" left open in §4.5, with one target rather than a generic
 webhook.
 
-- **Push only, boat to service.** The plugin calls out over HTTPS; the service never calls the boat, and nothing ever
-  comes back from it to change the logbook. The logbook on board stays the record.
+- **The boat always asks.** The plugin calls out over HTTPS; the service never calls the boat, and nothing comes back
+  from it to change a logbook that holds passages. The logbook on board stays the record. The one thing read back is an
+  earlier logbook, into an empty one (below).
 - **The logbook has an identity of its own**: a random UUID made once by migration 19 (`logbook_identity`). The service
   files passages under it and the passage's entry id. A reinstalled plugin starts a new logbook, so its entry ids, which
   start again from 1, can never overwrite or delete what an earlier one sent; a copy of the database file is the same
@@ -839,13 +840,13 @@ webhook.
 - **What is not sent**: the plugin configuration, the SMTP password, the gazetteer of landmarks.
 - **Working out what to send.** Each run asks the service what it holds of the logbook: per passage, a hash of its
   content, a hash of its chunk hashes, and whether every chunk arrived. The plugin works out the same hashes (SHA-256 of
-  the JSON) and sends each passage whose content or track differs or is incomplete — newest first, so the latest
-  passages are safe first after a long time offline. The service answers which chunks it lacks, so a passage whose track
-  only grew sends its last chunk and the new ones, not the whole track. Passages the service holds that are gone from
-  board — deleted or merged away — are deleted there, into a 30-day trash. Nothing is recorded on board about what was
-  sent: the service's answer is the record, and a restart only costs working the hashes out again. Between runs the
-  hashes are kept in memory against the passage's export fingerprint, so an unchanged passage is not read in full each
-  time.
+  the JSON, keys sorted) and sends each passage whose content or track differs or is incomplete — newest first, so the
+  latest passages are safe first after a long time offline. The service answers which chunks it lacks, so a passage
+  whose track only grew sends its last chunk and the new ones, not the whole track. Passages the service holds that are
+  gone from board — deleted or merged away — are deleted there, into a 30-day trash. Nothing is recorded on board about
+  what was sent: the service's answer is the record, and a restart only costs working the hashes out again. Between runs
+  the hashes are kept in memory against the passage's export fingerprint, so an unchanged passage is not read in full
+  each time.
 - **When.** Every `cloudSyncIntervalMinutes` (15 by default), at each departure and arrival, and on demand
   (`POST /cloud-sync`). A passage under way is sent as it stands and completed as it goes.
 - **Offline is normal at sea.** A service out of reach is retried with a growing delay, from one minute to an hour. A
@@ -863,7 +864,30 @@ webhook.
 - **The Export page** shows the backup: where it goes, the run under way, the last success and the last failure, a
   **Back up now** button, and pairing.
 - **Off by default**, and inert until the service address and the token are set.
-- **Not yet**: restoring from the service, and a mode for paid links that holds full tracks back.
+- **Restoring into an empty logbook.** After a lost SD card or on a new computer, the plugin starts with an empty
+  logbook and a new identity. Once paired with the same boat, the Export page offers the earlier logbooks the service
+  holds for it (passages, first and last dates) and a **Restore this logbook** button. The plugin then reads the logbook
+  back — still the boat asking, never the service calling — and writes each passage with everything it carried: entry,
+  track, events, instrument snapshots, engine/sail periods, crew, forecasts, and the places. Three rules shape it:
+  - **This logbook takes the identity of the one restored, and passages keep their ids**, events, snapshots and
+    engine/sail periods too. The backup then carries on where it stopped: each passage hashes as it did when it was
+    sent, so nothing is sent again and no second logbook appears on the service. This is why only an **empty** logbook
+    can be restored into.
+  - **The backup holds off while a restore is unfinished** (`logbook_identity.restoring`): a logbook half restored lacks
+    passages the service holds, and a run would report them deleted on board. The identity is taken first and passages
+    already written are skipped, so a restore cut short — link lost, plugin stopped — carries on from where it was, by
+    itself at the next start or from the Export page. Entry ids up to the highest one to come are reserved at the start,
+    so a passage logged live meanwhile takes a number past them.
+  - **What comes back is history.** A passage that was under way when it was last sent is closed where its track ends.
+    No summary email is sent for a restored passage. A passage this version cannot write (a kind of event from a later
+    one) is skipped and reported in the Signal K log, without keeping the others out.
+
+  Not restored: the crew list beyond who sailed each passage (members are made again from the passages), the landmarks
+  (looked up again), the date a place was created, and passages in the service's trash.
+
+- **Hashes ignore the order of keys**: both sides hash the JSON with every object's keys sorted, because the service's
+  database keeps no key order and a restored passage must hash as the original did.
+- **Not yet**: a mode for paid links that holds full tracks back.
 
 ## 5. Data model and API
 

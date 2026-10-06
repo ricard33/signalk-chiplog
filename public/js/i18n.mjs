@@ -429,6 +429,16 @@ export const MESSAGES = {
     'cloud.lastError': 'The last backup failed, {time}: {message}',
     'cloud.backUpNow': 'Back up now',
     'cloud.pairTitle': 'Pair this boat with the service',
+    'cloud.restoreIntro':
+      'This logbook is empty, and the service holds an earlier one for this boat. Bring it back here to carry on where it stopped:',
+    'cloud.restoreUnfinished': 'The restore was cut short. Carry on with it:',
+    'cloud.restoreLogbook': '{count} passages, from {first} to {last}',
+    'cloud.restore': 'Restore this logbook',
+    'cloud.restoreResume': 'Carry on',
+    'cloud.restoring': 'Restoring the logbook: {done} of {total} passages…',
+    'cloud.restored': 'Logbook restored: {count} passages brought back.',
+    'cloud.restoreRefused': '{count} could not be written; see the server log.',
+    'cloud.restoreFailed': 'The restore stopped: {message}',
     'cloud.pairAgain': 'Pair with another account or service',
     'cloud.pairIntro':
       'Enter the service address and ask for a code, then enter the code on the service, signed in to your account. The backup turns on as soon as it is claimed.',
@@ -982,6 +992,16 @@ export const MESSAGES = {
     'cloud.lastError': 'La dernière sauvegarde a échoué, {time} : {message}',
     'cloud.backUpNow': 'Sauvegarder maintenant',
     'cloud.pairTitle': 'Appairer ce bateau avec le service',
+    'cloud.restoreIntro':
+      'Ce journal est vide, et le service en conserve un plus ancien pour ce bateau. Récupérez-le ici pour reprendre là où il s’est arrêté :',
+    'cloud.restoreUnfinished': 'La restauration a été interrompue. Reprenez-la :',
+    'cloud.restoreLogbook': '{count} navigations, du {first} au {last}',
+    'cloud.restore': 'Restaurer ce journal',
+    'cloud.restoreResume': 'Reprendre',
+    'cloud.restoring': 'Restauration du journal : {done} navigations sur {total}…',
+    'cloud.restored': 'Journal restauré : {count} navigations récupérées.',
+    'cloud.restoreRefused': '{count} n’ont pas pu être écrites ; voir le journal du serveur.',
+    'cloud.restoreFailed': 'La restauration s’est arrêtée : {message}',
     'cloud.pairAgain': 'Appairer avec un autre compte ou service',
     'cloud.pairIntro':
       'Indiquez l’adresse du service et demandez un code, puis saisissez ce code sur le service, connecté à votre compte. La sauvegarde s’active dès qu’il est utilisé.',

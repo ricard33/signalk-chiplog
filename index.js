@@ -13,6 +13,7 @@ const { createReplayJob } = require('./lib/replay-job');
 const { createSummaryMailer, SUMMARY_MAIL_DEFAULTS } = require('./lib/summary-mailer');
 const { createCloudSync, CLOUD_SYNC_DEFAULTS } = require('./lib/cloud-sync');
 const { createCloudPairing } = require('./lib/cloud-pairing');
+const { createCloudRestore } = require('./lib/cloud-restore');
 const { SECURITIES } = require('./lib/smtp');
 const { createTideForecaster, TIDE_DEFAULTS } = require('./lib/tide-forecaster');
 const { createWeatherForecaster, WEATHER_DEFAULTS } = require('./lib/weather-forecaster');
@@ -78,6 +79,7 @@ module.exports = function (app) {
   let cloudSync = null;
   let cloudSchedule = null;
   let cloudPairing = null;
+  let cloudRestore = null;
   // The configuration as saved, so pairing can add the token to it without losing the rest.
   let savedConfig = {};
   let replayJob = null;
@@ -715,6 +717,16 @@ module.exports = function (app) {
       log,
       onPaired: ({ url, token }) => savePairing(url, token)
     });
+    cloudRestore = createCloudRestore({
+      db: database,
+      settings,
+      userAgent: `signalk-chiplog/${version}`,
+      log,
+      // The backup held off while passages were coming back: it has places to send, at least.
+      onDone: () => cloudSchedule?.nudge()
+    });
+    // A restore the last run left unfinished carries on by itself.
+    cloudRestore.resume();
     lastActiveEntryId = null;
     schedules = [
       cloudSchedule,
@@ -787,6 +799,8 @@ module.exports = function (app) {
     cloudSchedule = null;
     cloudPairing?.stop();
     cloudPairing = null;
+    cloudRestore?.stop();
+    cloudRestore = null;
     replayJob?.cancel();
     replayJob = null;
     detector = null;
@@ -820,6 +834,7 @@ module.exports = function (app) {
           cloudSync,
           nudgeCloudSync: () => cloudSchedule?.nudge(),
           cloudPairing,
+          cloudRestore,
           replayJob,
           pdfOptions,
           detection: () => ({

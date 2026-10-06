@@ -827,7 +827,15 @@ nothing here is needed for the backup to happen.
   "inProgress": { "total": 12, "done": 5 },
   "lastSuccess": { "at": "2026-09-13T16:12:40.100Z", "sent": 3, "deleted": 0, "held": 57, "places": false },
   "lastError": null,
-  "pairing": { "state": "idle" }
+  "pairing": { "state": "idle" },
+  "restore": {
+    "restoring": false,
+    "running": false,
+    "possible": false,
+    "inProgress": null,
+    "lastResult": null,
+    "lastError": null
+  }
 }
 ```
 
@@ -845,6 +853,12 @@ nothing here is needed for the backup to happen.
   `null` when the service has no public address); `{ "state": "paired", "vesselName", "at" }`;
   `{ "state": "expired", "at" }`; or `{ "state": "failed", "error": { "message", "code" } }`, `code` being `save_failed`
   when the token came but the configuration could not be saved.
+
+- `restore` follows the restore of an earlier logbook (below): `restoring` while one is unfinished — under way
+  (`running`) or cut short and waiting to be carried on with; `possible` when one could start, the boat being paired and
+  the logbook empty; `inProgress` as `{ total, done }` in passages; `lastResult` as
+  `{ at, logbookId, passages, failed, total }` and `lastError` as `{ at, message, code }`, both since the plugin
+  started. While `restoring`, the backup does not run.
 
 ### `POST /cloud-sync` — admin
 
@@ -867,6 +881,45 @@ configuration and the backup turns on.
 ### `DELETE /cloud-sync/pairing` — admin
 
 Stops waiting for the code to be claimed; answers the `pairing` state.
+
+### `GET /cloud-sync/restore` — `readonly`
+
+The `restore` state as above, with `logbooks`: the earlier logbooks of this boat the service can give back, asked of the
+service now. Empty while the boat is not paired; this logbook itself is never listed.
+
+```json
+{
+  "restoring": false,
+  "running": false,
+  "possible": true,
+  "inProgress": null,
+  "lastResult": null,
+  "lastError": null,
+  "logbooks": [
+    {
+      "logbookId": "37ff7ef8-28e8-4a28-9277-c34df9391976",
+      "passages": 57,
+      "firstStart": "2025-04-12T07:30:00.000Z",
+      "lastStart": "2026-09-13T08:00:00.000Z"
+    }
+  ]
+}
+```
+
+`409 cloud_restore_failed` when the service cannot be reached or refuses.
+
+### `POST /cloud-sync/restore` — admin
+
+Starts bringing an earlier logbook back into this one, in the background; answers the `restore` state. The logbook takes
+the identity of the one restored, and its passages their ids (SPEC §4.17).
+
+```json
+{ "logbookId": "37ff7ef8-28e8-4a28-9277-c34df9391976" }
+```
+
+`400` without a `logbookId`; `409 cloud_sync_not_configured` while the boat is not paired, `409 logbook_not_empty` when
+this logbook already holds passages — unless it is that very restore, cut short, being carried on with — and
+`409 restore_running` while one is under way.
 
 ## Retrospective analysis
 

@@ -1,4 +1,4 @@
-import { html, useState } from '../../vendor/preact-htm.mjs';
+import { html, useEffect, useState } from '../../vendor/preact-htm.mjs';
 import { get, request } from '../api.mjs';
 import { useLocale, usePolling } from '../context.mjs';
 import { ErrorNotice } from './common.mjs';
@@ -97,6 +97,78 @@ function PairingForm({ initialUrl, onStart, busy }) {
   `;
 }
 
+// Getting an earlier logbook of this boat back from the service, into a logbook still empty
+// (SPEC §4.17): offered then, followed while it runs, and to carry on with if it was cut short.
+function Restore({ restore, busy, onStart }) {
+  const { t, format } = useLocale();
+  const [logbooks, setLogbooks] = useState(null);
+  const offered = restore.possible || (restore.restoring && !restore.running);
+
+  useEffect(() => {
+    if (!offered) {
+      setLogbooks(null);
+      return undefined;
+    }
+    let current = true;
+    get('/cloud-sync/restore')
+      .then((answer) => current && setLogbooks(answer.logbooks))
+      // Nothing to offer when the service cannot be asked: the backup's own status says why.
+      .catch(() => current && setLogbooks([]));
+    return () => {
+      current = false;
+    };
+  }, [offered]);
+
+  if (restore.running) {
+    const { done, total } = restore.inProgress ?? { done: 0, total: 0 };
+    return html`<p class="notice" role="status">${t('cloud.restoring', { done, total })}</p>`;
+  }
+  return html`
+    ${
+      restore.lastError &&
+      html`<p class="notice notice-error">
+        ${t('cloud.restoreFailed', { message: restore.lastError.message })}
+      </p>`
+    }
+    ${
+      restore.lastResult &&
+      html`<p class="notice notice-ok">
+        ${t('cloud.restored', { count: restore.lastResult.passages })}
+        ${restore.lastResult.failed > 0 && t('cloud.restoreRefused', { count: restore.lastResult.failed })}
+      </p>`
+    }
+    ${
+      offered &&
+      logbooks?.length > 0 &&
+      html`
+        <div class="restore-offer">
+          <p>${restore.restoring ? t('cloud.restoreUnfinished') : t('cloud.restoreIntro')}</p>
+          <ul>
+            ${logbooks.map(
+              (logbook) => html`
+                <li>
+                  ${t('cloud.restoreLogbook', {
+                    count: logbook.passages,
+                    first: format.shortDate(logbook.firstStart),
+                    last: format.shortDate(logbook.lastStart)
+                  })}
+                  <button
+                    type="button"
+                    disabled=${busy}
+                    onClick=${() => onStart(logbook.logbookId)}
+                  >
+                    ${restore.restoring ? t('cloud.restoreResume') : t('cloud.restore')}
+                  </button>
+                </li>
+              `
+            )}
+          </ul>
+        </div>
+      `
+    }
+  `;
+}
+
 // The online backup (SPEC §4.17): what it last did, sending now, and pairing the boat with the
 // service by a short code.
 export function CloudBackup() {
@@ -106,6 +178,8 @@ export function CloudBackup() {
   const [busy, setBusy] = useState(false);
   const [version, setVersion] = useState(0);
   const waiting = status?.pairing?.state === 'waiting';
+  // Followed closely, so the page shows passages coming back.
+  const restoring = status?.restore?.running === true;
 
   usePolling(
     (isCurrent) => {
@@ -113,8 +187,8 @@ export function CloudBackup() {
         .then((next) => isCurrent() && setStatus(next))
         .catch((err) => isCurrent() && setError(err));
     },
-    waiting ? PAIRING_REFRESH_MS : STATUS_REFRESH_MS,
-    [version, waiting]
+    waiting || restoring ? PAIRING_REFRESH_MS : STATUS_REFRESH_MS,
+    [version, waiting, restoring]
   );
 
   const act = async (method, path, body) => {
@@ -141,6 +215,15 @@ export function CloudBackup() {
         html`<button type="button" disabled=${busy} onClick=${() => act('POST', '/cloud-sync')}>
           ${t('cloud.backUpNow')}
         </button>`
+      }
+      ${
+        ready &&
+        status.restore &&
+        html`<${Restore}
+          restore=${status.restore}
+          busy=${busy}
+          onStart=${(logbookId) => act('POST', '/cloud-sync/restore', { logbookId })}
+        />`
       }
       ${
         status?.pairing &&

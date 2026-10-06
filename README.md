@@ -533,6 +533,14 @@ choose **Back up now** on the Export page, which also shows the last backup and 
 network, it simply tries again later. The logbook on board stays the record: nothing ever comes back from the service to
 change it.
 
+### Getting the logbook back
+
+Lost the SD card, or moved to a new computer? Install Chiplog, pair it with the same boat on the service, and the
+**Export** page offers the logbook the service kept: choose **Restore this logbook**. Every passage comes back with its
+track, events, notes, readings, crew and forecasts, and the backup carries on where it had stopped. A restore cut short
+by a lost connection picks up by itself. Restore **before** sailing with the new installation: only an empty logbook can
+take one back.
+
 ## Passage summary emails 📧
 
 Get the day's run in your inbox — and let whoever follows the boat from ashore get it too — without opening the webapp.

@@ -93,17 +93,17 @@ keep those modules free of browser APIs and vendor imports. Characters outside W
 pages, render them to PNG (macOS: PDFKit via a short Swift script).
 
 `lib/place-names.js`, `lib/tide-forecaster.js`, `lib/weather-forecaster.js`, `lib/landmark-finder.js`,
-`lib/passage-map.js` (map tiles), `lib/smtp.js` (the mail relay) and `lib/cloud-sync.js` (the online backup) are the
-only network access. Detection names places synchronously (known place, or coordinates marked pending); `index.js` runs
-the online lookups as a chain of `setTimeout`s, each `resolveNext()` saying when the next is due.
-`lib/tide-forecaster.js` and `lib/weather-forecaster.js` follow the same shape — `resolveNext()` on the shared engine
-`lib/departure-forecast.js`, each run by its own `lib/background-schedule.js` chain, which `index.js` nudges when
-detection reports a newly opened passage — to fetch the tide and weather forecasts near a passage's departure (SPEC
-§4.5.2, §4.5.3), one entry at a time, giving up (recording an empty result rather than retrying forever) once the
-departure is too long past for the fetch window to still mean anything. Tests inject `fetch` and never reach the network
-— `test/helpers.js` also starts the plugin with `geocodingEnabled: false`, `landmarksEnabled: false`,
-`tidesEnabled: false`, `weatherEnabled: false` and `summaryMailEnabled: false` and `cloudSyncEnabled: false`; keep it
-that way.
+`lib/passage-map.js` (map tiles), `lib/smtp.js` (the mail relay), `lib/cloud-sync.js` (the online backup) and
+`lib/cloud-restore.js` (reading an earlier logbook back from it, into an empty one) are the only network access.
+Detection names places synchronously (known place, or coordinates marked pending); `index.js` runs the online lookups as
+a chain of `setTimeout`s, each `resolveNext()` saying when the next is due. `lib/tide-forecaster.js` and
+`lib/weather-forecaster.js` follow the same shape — `resolveNext()` on the shared engine `lib/departure-forecast.js`,
+each run by its own `lib/background-schedule.js` chain, which `index.js` nudges when detection reports a newly opened
+passage — to fetch the tide and weather forecasts near a passage's departure (SPEC §4.5.2, §4.5.3), one entry at a time,
+giving up (recording an empty result rather than retrying forever) once the departure is too long past for the fetch
+window to still mean anything. Tests inject `fetch` and never reach the network — `test/helpers.js` also starts the
+plugin with `geocodingEnabled: false`, `landmarksEnabled: false`, `tidesEnabled: false`, `weatherEnabled: false` and
+`summaryMailEnabled: false` and `cloudSyncEnabled: false`; keep it that way.
 
 `lib/landmark-finder.js` fills the gazetteer of amers (SPEC §4.13) from Overpass on the same `resolveNext()` shape, one
 half-degree cell per request, with `lib/landmarks.js` deciding which cell is wanted (`nextPendingArea`, driven by
@@ -245,3 +245,12 @@ Signal K callbacks are expected.
 - Keep README files highly scannable: use clean tables, bullet points starting with bold text, and visual anchors
   (emojis).
 - Ensure a blank line exists before and after every header, list, and code block to avoid rendering bugs on GitHub.
+
+## Restoring from the online service
+
+`lib/cloud-restore.js` writes an earlier logbook back into an empty database (SPEC §4.17). It takes that logbook's
+identity and writes every row under the id it had, so each passage hashes as it did when sent and the backup has nothing
+to send again — `test/cloud-restore.test.js` checks the round trip to the letter. A column added to a table a passage
+carries (`log_entries`, `events`, `observations`, `propulsion_segments`, `log_entry_crew`, the forecasts) must be added
+to `restorePassage` as well as to the serialiser that sends it, or it is lost on the way back. `jsonHash` sorts keys:
+the service's database does not keep their order.
