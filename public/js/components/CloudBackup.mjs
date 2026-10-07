@@ -24,6 +24,10 @@ function BackupStatus({ status }) {
           ${t('cloud.lastError', { time: when(lastError.at), message: lastError.message })}
         </li>`
       }
+      ${
+        lastSuccess?.waiting > 0 &&
+        html`<li>${t('cloud.waiting', { count: lastSuccess.waiting })}</li>`
+      }
       <li>
         ${
           lastSuccess
@@ -240,6 +244,22 @@ export function CloudBackup() {
         html`<button type="button" disabled=${busy} onClick=${() => act('POST', '/cloud-sync')}>
           ${t('cloud.backUpNow')}
         </button>`
+      }
+      ${
+        ready &&
+        html`
+          <label class="costly-link">
+            <input
+              type="checkbox"
+              checked=${status.costlyLink}
+              disabled=${busy}
+              onChange=${(event) =>
+                act('POST', '/cloud-sync/costly-link', { costly: event.currentTarget.checked })}
+            />
+            ${t('cloud.costlyLink')}
+          </label>
+          <p class="muted">${t('cloud.costlyLinkHelp')}</p>
+        `
       }
       ${
         ready &&

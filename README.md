@@ -533,6 +533,14 @@ choose **Back up now** on the Export page, which also shows the last backup and 
 network, it simply tries again later. The logbook on board stays the record: nothing ever comes back from the service to
 change it.
 
+### On a satellite link
+
+Tick **Costly link** on the Export page (or in the plugin configuration) when every kilobyte is paid for. Chiplog then
+sends only a summary of each passage and a thinned-out track — a few kilobytes — at departures and arrivals and every
+six hours: enough for the service to know where you went, and for those ashore to follow. Full tracks, instrument
+readings, forecasts and places wait on board. Untick it back in harbour and everything follows; or choose **Back up
+now** to send it all at once anyway.
+
 ### Getting the logbook back
 
 Lost the SD card, or moved to a new computer? Install Chiplog, pair it with the same boat on the service, and the

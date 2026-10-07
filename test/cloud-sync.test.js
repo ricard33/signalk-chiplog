@@ -8,7 +8,10 @@ const { openDatabase } = require('../lib/database');
 const {
   createCloudSync,
   CLOUD_SYNC_DEFAULTS,
+  COSTLY_INTERVAL_MS,
+  LIGHT_CHUNK_POINTS,
   TRACK_CHUNK_POINTS,
+  lightTrack,
   getLogbookId,
   jsonHash
 } = require('../lib/cloud-sync');
@@ -38,7 +41,7 @@ function fakeService() {
 
   async function fetch(url, { method, headers, body }) {
     const route = new URL(url).pathname;
-    requests.push({ method, route, headers });
+    requests.push({ method, route, headers, bytes: body ? body.length : 0 });
     if (control.down) {
       throw new TypeError('fetch failed');
     }
@@ -61,7 +64,8 @@ function fakeService() {
           originId: id,
           contentHash: p.contentHash,
           trackHash: jsonHash(p.chunkHashes),
-          complete: p.chunkHashes.every((hash, i) => p.chunks.get(i) === hash)
+          complete: p.chunkHashes.every((hash, i) => p.chunks.get(i) === hash),
+          light: p.light
         })),
         ...(places.knowsPlaces ? { placesHash: places.hash } : {})
       });
@@ -78,6 +82,10 @@ function fakeService() {
     }
     if (index === undefined) {
       const previous = passages.get(originId);
+      if (payload.light && previous && !previous.light) {
+        return reply(409, { error: 'full_copy_held', message: 'A full copy is held' });
+      }
+      assert.equal(jsonHash(payload.passage), payload.contentHash);
       const chunks = new Map();
       payload.track.chunkHashes.forEach((hash, i) => {
         if (previous?.chunks.get(i) === hash) {
@@ -86,6 +94,7 @@ function fakeService() {
       });
       passages.set(originId, {
         contentHash: payload.contentHash,
+        light: payload.light === true,
         content: payload.passage,
         chunkHashes: payload.track.chunkHashes,
         chunks,
@@ -297,9 +306,18 @@ describe('online backup', () => {
       configured: true,
       problem: null,
       url: 'https://service.test/',
+      costlyLink: false,
       logbookId: getLogbookId(db),
       inProgress: null,
-      lastSuccess: { at: at(6), sent: 1, deleted: 0, held: 1, places: false },
+      lastSuccess: {
+        at: at(6),
+        sent: 1,
+        light: 0,
+        waiting: 0,
+        deleted: 0,
+        held: 1,
+        places: false
+      },
       lastError: null
     });
   });
@@ -419,5 +437,316 @@ describe('GET and POST /cloud-sync', () => {
     const refused = await ctx.request('POST', '/cloud-sync');
     assert.equal(refused.status, 409);
     assert.equal(refused.body.error.code, 'cloud_sync_not_configured');
+  });
+});
+
+describe('online backup over a costly link', () => {
+  let dataDir;
+  let db;
+  let service;
+
+  const sync = (settings = {}) =>
+    createCloudSync({
+      db,
+      settings: { ...SETTINGS, cloudSyncCostlyLink: true, ...settings },
+      userAgent: 'signalk-chiplog/2.9.0',
+      log: () => {},
+      fetch: service.fetch,
+      clock: () => Date.parse(at(6))
+    });
+
+  // A passage of four hours with a point every ten seconds, and all that weighs on a link.
+  function heavyPassage() {
+    const id = insertEntry(db, { distance: 40000 });
+    for (let n = 0; n <= 1440; n += 1) {
+      insert(db, 'track_points', {
+        entry_id: id,
+        time: new Date(Date.parse(T0) + n * 10000).toISOString(),
+        lat: 46 + n / 10000,
+        lon: -1.2,
+        sog: 3.2,
+        tws: 8,
+        heading: 0.1
+      });
+    }
+    for (let n = 0; n < 24; n += 1) {
+      insert(db, 'observations', {
+        entry_id: id,
+        time: at(n / 6),
+        reason: 'periodic',
+        pressure: 101300
+      });
+    }
+    insert(db, 'events', {
+      entry_id: id,
+      time: at(1),
+      type: 'text_annotation',
+      comment: 'Reefed',
+      source: 'manual',
+      created_at: at(1)
+    });
+    insert(db, 'events', {
+      entry_id: id,
+      time: at(2),
+      type: 'handwritten_annotation',
+      payload: JSON.stringify({ strokes: Array.from({ length: 500 }, (_, i) => [i, i * 2]) }),
+      source: 'manual',
+      created_at: at(2)
+    });
+    insert(db, 'weather_forecasts', {
+      entry_id: id,
+      lat: 46,
+      lon: -1.2,
+      fetched_at: T0,
+      points: JSON.stringify(Array.from({ length: 48 }, (_, i) => ({ time: at(i), windSpeed: 6 })))
+    });
+    insert(db, 'log_entry_crew', { entry_id: id, name: 'Cédric', created_at: T0 });
+    return id;
+  }
+
+  beforeEach(() => {
+    dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chiplog-costly-'));
+    ({ db } = openDatabase(dataDir));
+    service = fakeService();
+  });
+
+  afterEach(() => {
+    db.close();
+    fs.rmSync(dataDir, { recursive: true, force: true });
+  });
+
+  it('thins a track to a point every ten minutes of the clock, and its last', () => {
+    const points = Array.from({ length: 1441 }, (_, n) => ({
+      time: new Date(Date.parse(T0) + n * 10000).toISOString(),
+      lat: 46 + n / 10000,
+      lon: -1.2,
+      sog: 3.2,
+      tws: 8
+    }));
+
+    const light = lightTrack(points);
+
+    assert.equal(light.length, 25, 'four hours: twenty-four ten-minute marks, and the arrival');
+    assert.deepEqual(light[0], { time: T0, lat: 46, lon: -1.2, sog: 3.2 });
+    assert.equal(light.at(-1).time, points.at(-1).time);
+    // A track that grew keeps the points it had: only the end changes.
+    const grown = lightTrack(points.slice(0, 1000));
+    assert.deepEqual(light.slice(0, grown.length - 1), grown.slice(0, -1));
+    assert.deepEqual(lightTrack([]), []);
+  });
+
+  it('sends a summary and a thinned-out track, in a few kilobytes', async () => {
+    const id = heavyPassage();
+    const cloud = sync();
+
+    const outcome = await cloud.resolveNext();
+
+    assert.equal(outcome.outcome, 'sent');
+    const held = service.passages.get(id);
+    assert.equal(held.light, true);
+    assert.deepEqual(held.content.observations, []);
+    assert.equal(held.content.weather, null);
+    assert.equal(held.content.events.length, 2);
+    assert.equal(held.content.events[0].comment, 'Reefed', 'what was written is in the summary');
+    assert.equal(held.content.events[1].payload, null, 'the strokes of a drawing are not');
+    assert.deepEqual(
+      held.content.crew.map((member) => member.name),
+      ['Cédric']
+    );
+    assert.equal(held.content.entry.distance, 40000);
+    assert.equal([...held.points.values()].flat().length, 25);
+    assert.deepEqual(cloud.status().lastSuccess, {
+      at: at(6),
+      sent: 1,
+      light: 1,
+      waiting: 1,
+      deleted: 0,
+      held: 1,
+      places: false
+    });
+
+    const sent = service.requests
+      .filter((request) => request.method === 'PUT')
+      .reduce((sum, request) => sum + request.bytes, 0);
+    assert.ok(sent < 4000, `${sent} bytes went out`);
+  });
+
+  it('has nothing to send again while the passage does not change', async () => {
+    heavyPassage();
+    const cloud = sync();
+    await cloud.resolveNext();
+    const before = service.requests.length;
+
+    const outcome = await cloud.resolveNext();
+
+    assert.equal(outcome.outcome, 'idle');
+    assert.deepEqual(
+      service.requests.slice(before).map((request) => request.method),
+      ['GET']
+    );
+    assert.equal(cloud.status().lastSuccess.waiting, 1, 'its full copy still waits');
+  });
+
+  it('runs every six hours rather than every few minutes', async () => {
+    insertEntry(db);
+
+    assert.equal((await sync().resolveNext()).retryInMs, COSTLY_INTERVAL_MS);
+    assert.equal(
+      (await sync({ cloudSyncIntervalMinutes: 24 * 60 }).resolveNext()).retryInMs,
+      24 * 60 * 60 * 1000,
+      'a longer interval asked for is kept'
+    );
+    assert.equal(
+      (await sync({ cloudSyncCostlyLink: false }).resolveNext()).retryInMs,
+      15 * 60 * 1000
+    );
+  });
+
+  it('only sends the end of the track again as a passage goes on', async () => {
+    const id = insertEntry(db, { state: 'active' });
+    const addPoints = (from, to) => {
+      for (let n = from; n < to; n += 1) {
+        insert(db, 'track_points', {
+          entry_id: id,
+          time: new Date(Date.parse(T0) + n * 600000).toISOString(),
+          lat: 46 + n / 1000,
+          lon: -1.2
+        });
+      }
+    };
+    // Forty hours under way: 240 light points, three chunks.
+    addPoints(0, 240);
+    const cloud = sync();
+    await cloud.resolveNext();
+    assert.equal(service.passages.get(id).chunkHashes.length, Math.ceil(240 / LIGHT_CHUNK_POINTS));
+    const before = service.requests.length;
+
+    addPoints(240, 250);
+    db.prepare('UPDATE log_entries SET updated_at = ? WHERE id = ?').run(at(42), id);
+    await cloud.resolveNext();
+
+    const chunksSent = service.requests
+      .slice(before)
+      .filter((request) => /\/track\/\d+$/.test(request.route))
+      .map((request) => request.route.split('/').pop());
+    assert.deepEqual(chunksSent, ['2'], 'the first two hundred points stay where they are');
+  });
+
+  it('leaves alone a full copy the service holds, even out of date', async () => {
+    const id = heavyPassage();
+    await sync({ cloudSyncCostlyLink: false }).resolveNext();
+    assert.equal(service.passages.get(id).light, false);
+    const fullHash = service.passages.get(id).contentHash;
+    db.prepare('UPDATE log_entries SET end_place_name = ?, updated_at = ? WHERE id = ?').run(
+      'Port-Joinville',
+      at(5),
+      id
+    );
+    const cloud = sync();
+    const before = service.requests.length;
+
+    const outcome = await cloud.resolveNext();
+
+    assert.equal(outcome.outcome, 'idle');
+    assert.deepEqual(
+      service.requests.slice(before).map((request) => request.method),
+      ['GET'],
+      'no light copy is sent over it'
+    );
+    assert.equal(service.passages.get(id).contentHash, fullHash);
+    assert.equal(cloud.status().lastSuccess.waiting, 1);
+  });
+
+  it('sends everything in full once the link is cheap again', async () => {
+    const id = heavyPassage();
+    const settings = { ...SETTINGS, cloudSyncCostlyLink: true };
+    const cloud = createCloudSync({
+      db,
+      settings,
+      userAgent: 'signalk-chiplog/2.9.0',
+      log: () => {},
+      fetch: service.fetch
+    });
+    await cloud.resolveNext();
+    assert.equal(service.passages.get(id).light, true);
+
+    settings.cloudSyncCostlyLink = false;
+    await cloud.resolveNext();
+
+    const held = service.passages.get(id);
+    assert.equal(held.light, false);
+    assert.equal(held.content.observations.length, 24);
+    assert.equal([...held.points.values()].flat().length, 1441);
+    assert.equal(cloud.status().lastSuccess.waiting, 0);
+    assert.equal(cloud.status().lastSuccess.light, 0);
+  });
+
+  it('sends everything in full when asked by hand, then goes back to light', async () => {
+    const id = heavyPassage();
+    const cloud = sync();
+    await cloud.resolveNext();
+
+    cloud.requestFull();
+    await cloud.resolveNext();
+
+    assert.equal(service.passages.get(id).light, false);
+    assert.equal([...service.passages.get(id).points.values()].flat().length, 1441);
+
+    // The next passage, with nobody asking, goes light again.
+    const next = insertEntry(db, { start_time: at(24), end_time: at(28) });
+    await cloud.resolveNext();
+    assert.equal(service.passages.get(next).light, true);
+  });
+
+  it('holds the places back, and still reports deletions', async () => {
+    insert(db, 'places', {
+      name: 'La Rochelle',
+      lat: 46.15,
+      lon: -1.15,
+      source: 'manual',
+      created_at: T0,
+      updated_at: T0
+    });
+    const id = insertEntry(db);
+    const cloud = sync();
+    await cloud.resolveNext();
+    assert.equal(service.places.hash, null, 'the list of places waits');
+
+    db.prepare('DELETE FROM log_entries WHERE id = ?').run(id);
+    await cloud.resolveNext();
+
+    assert.equal(service.passages.has(id), false);
+    assert.equal(cloud.status().lastSuccess.deleted, 1);
+  });
+});
+
+describe('costly link API', () => {
+  let server;
+
+  beforeEach(async () => {
+    server = await startServer();
+  });
+
+  afterEach(() => server.close());
+
+  it('declares the link costly, and cheap again, in the plugin configuration', async () => {
+    assert.equal((await server.request('GET', '/cloud-sync')).body.costlyLink, false);
+
+    const costly = await server.request('POST', '/cloud-sync/costly-link', { costly: true });
+
+    assert.equal(costly.status, 200);
+    assert.equal(costly.body.costlyLink, true);
+    assert.equal(server.savedOptions.at(-1).cloudSyncCostlyLink, true);
+    assert.equal(server.savedOptions.at(-1).geocodingEnabled, false, 'the other settings are kept');
+
+    const cheap = await server.request('POST', '/cloud-sync/costly-link', { costly: false });
+    assert.equal(cheap.body.costlyLink, false);
+    assert.equal(server.savedOptions.at(-1).cloudSyncCostlyLink, false);
+  });
+
+  it('refuses anything but true or false', async () => {
+    const response = await server.request('POST', '/cloud-sync/costly-link', { costly: 'yes' });
+
+    assert.equal(response.status, 400);
   });
 });

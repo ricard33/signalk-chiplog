@@ -823,9 +823,18 @@ nothing here is needed for the backup to happen.
   "configured": true,
   "problem": null,
   "url": "https://api.example.org",
+  "costlyLink": false,
   "logbookId": "37ff7ef8-28e8-4a28-9277-c34df9391976",
   "inProgress": { "total": 12, "done": 5 },
-  "lastSuccess": { "at": "2026-09-13T16:12:40.100Z", "sent": 3, "deleted": 0, "held": 57, "places": false },
+  "lastSuccess": {
+    "at": "2026-09-13T16:12:40.100Z",
+    "sent": 3,
+    "light": 0,
+    "waiting": 0,
+    "deleted": 0,
+    "held": 57,
+    "places": false
+  },
   "lastError": null,
   "pairing": { "state": "idle" },
   "restore": {
@@ -843,6 +852,8 @@ nothing here is needed for the backup to happen.
   what is missing when they are not.
 - `url` is the service address configured, `null` when none.
 - `logbookId` is the identity the service files this logbook's passages under.
+- `costlyLink` says the link is declared costly: passages go as light copies (SPEC §4.17). `lastSuccess.light` counts
+  those sent that way by the last run, `lastSuccess.waiting` the passages the service does not hold in full yet.
 - `inProgress` counts the passages to send or delete in the run under way, `null` between runs.
 - `lastSuccess` gives the passages sent and deleted by the last complete run, those on board, and whether the list of
   places was sent; `lastError` is `{ at, message, code }`, `code` being the service's error code when it answered one.
@@ -864,8 +875,20 @@ nothing here is needed for the backup to happen.
 
 ### `POST /cloud-sync` — admin
 
-Starts a run now rather than at the next interval, and answers the status as above. The run goes on in the background,
-never alongside another. `409 cloud_sync_not_configured` while the backup is off or not set up.
+Starts a run now rather than at the next interval, and answers the status as above. Asked for by hand, that run sends
+every passage in full, even on a costly link. The run goes on in the background, never alongside another.
+`409 cloud_sync_not_configured` while the backup is off or not set up.
+
+### `POST /cloud-sync/costly-link` — admin
+
+Declares the link costly or cheap again, saved into the plugin configuration; answers the status. Back to cheap, a run
+starts at once.
+
+```json
+{ "costly": true }
+```
+
+`400` unless `costly` is `true` or `false`; `409 cloud_sync_save_failed` when the configuration could not be saved.
 
 ### `POST /cloud-sync/pairing` — admin
 

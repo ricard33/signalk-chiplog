@@ -889,7 +889,20 @@ webhook.
 
 - **Hashes ignore the order of keys**: both sides hash the JSON with every object's keys sorted, because the service's
   database keeps no key order and a restored passage must hash as the original did.
-- **Not yet**: a mode for paid links that holds full tracks back.
+- **Costly link** (`cloudSyncCostlyLink`, also a tick box on the Export page): for satellite or roaming, where every
+  kilobyte is paid for. A passage then goes as a **light copy** — the entry, the crew, the engine/sail periods and the
+  events without the strokes of handwritten notes, no instrument snapshots, no forecasts; and its track thinned to the
+  first point of every ten minutes of the clock plus the last, position and speed only, in chunks of 100 points. A day's
+  passage is a few kilobytes. Cut on the clock, a growing track keeps the points it had, so a passage under way only
+  sends its last chunk again. Rules:
+  - The backup runs at departures and arrivals and every six hours, rather than every few minutes: each run costs a
+    connection and the service's list of what it holds.
+  - **A light copy never replaces a full one.** A passage the service already holds in full, even out of date, is left
+    alone until the full passage can be sent; the service refuses it too (`409 full_copy_held`).
+  - The places are held back; deletions still go, they weigh nothing.
+  - **Full passages follow** as soon as the option is turned off, or when **Back up now** is chosen: asking by hand is
+    saying it is worth it, and that one run sends everything in full.
+  - The page says how many passages wait to be backed up in full.
 
 ## 5. Data model and API
 

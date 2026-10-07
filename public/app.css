@@ -1122,6 +1122,13 @@ button.preset-on {
   margin: 0.25rem 0;
 }
 
+.costly-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
 .qr-code {
   display: block;
   width: 11rem;

@@ -293,6 +293,13 @@ module.exports = function (app) {
         default: CLOUD_SYNC_DEFAULTS.cloudSyncIntervalMinutes,
         minimum: 1
       },
+      cloudSyncCostlyLink: {
+        type: 'boolean',
+        title: 'Costly link (satellite, roaming)',
+        description:
+          'Sends only a summary of each passage and a thinned-out track, a few kilobytes, at departures and arrivals and every six hours. Full tracks, instrument readings, forecasts and places wait until this is turned off, or until Back up now is chosen on the Export page',
+        default: CLOUD_SYNC_DEFAULTS.cloudSyncCostlyLink
+      },
       logbookLanguage: {
         type: 'string',
         title: 'Logbook language (PDF and summary emails)',
@@ -568,6 +575,28 @@ module.exports = function (app) {
     });
   }
 
+  // Declares the link costly or cheap from the Export page, saved like the rest of the
+  // configuration. Back to cheap, a run starts at once: full passages have been waiting.
+  function saveCostlyLink(costly) {
+    const next = { ...savedConfig, cloudSyncCostlyLink: costly };
+    return new Promise((resolve, reject) => {
+      app.savePluginOptions(next, (err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        savedConfig = next;
+        if (settings) {
+          settings.cloudSyncCostlyLink = costly;
+        }
+        if (!costly) {
+          cloudSchedule?.nudge();
+        }
+        resolve();
+      });
+    });
+  }
+
   plugin.start = function (config = {}) {
     savedConfig = config;
     try {
@@ -613,6 +642,7 @@ module.exports = function (app) {
         cloudSyncToken: config.cloudSyncToken || null,
         cloudSyncIntervalMinutes:
           config.cloudSyncIntervalMinutes ?? CLOUD_SYNC_DEFAULTS.cloudSyncIntervalMinutes,
+        cloudSyncCostlyLink: config.cloudSyncCostlyLink ?? CLOUD_SYNC_DEFAULTS.cloudSyncCostlyLink,
         logbookLanguage: PDF_LANGUAGES.includes(config.logbookLanguage)
           ? config.logbookLanguage
           : 'en',
@@ -833,6 +863,7 @@ module.exports = function (app) {
           summaryMailer,
           cloudSync,
           nudgeCloudSync: () => cloudSchedule?.nudge(),
+          saveCostlyLink,
           cloudPairing,
           cloudRestore,
           replayJob,

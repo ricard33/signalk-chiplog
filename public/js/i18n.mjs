@@ -427,6 +427,10 @@ export const MESSAGES = {
     'cloud.lastSuccess': 'Last backup {time}: {sent} passages sent, {held} on board.',
     'cloud.notYet': 'No backup made since the plugin started.',
     'cloud.lastError': 'The last backup failed, {time}: {message}',
+    'cloud.costlyLink': 'Costly link (satellite, roaming)',
+    'cloud.costlyLinkHelp':
+      'Only a summary of each passage and a thinned-out track are sent, a few kilobytes, at departures and arrivals and every six hours. Full tracks, readings, forecasts and places wait until you untick this — or choose Back up now, which sends everything.',
+    'cloud.waiting': '{count} passages wait for a cheap link to be backed up in full.',
     'cloud.backUpNow': 'Back up now',
     'cloud.pairTitle': 'Pair this boat with the service',
     'cloud.restoreIntro':
@@ -992,6 +996,11 @@ export const MESSAGES = {
     'cloud.lastSuccess': 'Dernière sauvegarde {time} : {sent} navigations envoyées, {held} à bord.',
     'cloud.notYet': 'Aucune sauvegarde depuis le démarrage du plugin.',
     'cloud.lastError': 'La dernière sauvegarde a échoué, {time} : {message}',
+    'cloud.costlyLink': 'Liaison coûteuse (satellite, itinérance)',
+    'cloud.costlyLinkHelp':
+      'Seuls un résumé de chaque navigation et une trace allégée sont envoyés, quelques kilo-octets, aux départs, aux arrivées et toutes les six heures. Les traces complètes, les relevés, les prévisions et les lieux attendent que vous décochiez cette case — ou que vous choisissiez Sauvegarder maintenant, qui envoie tout.',
+    'cloud.waiting':
+      '{count} navigations attendent une liaison bon marché pour être sauvegardées en entier.',
     'cloud.backUpNow': 'Sauvegarder maintenant',
     'cloud.pairTitle': 'Appairer ce bateau avec le service',
     'cloud.restoreIntro':
