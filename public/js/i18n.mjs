@@ -446,6 +446,8 @@ export const MESSAGES = {
     'cloud.pair': 'Get a pairing code',
     'cloud.enterCode': 'Enter this code on the service:',
     'cloud.openClaim': 'Open the service to enter it',
+    'cloud.scanClaim':
+      'Or scan this with your phone: it opens the service with the code filled in.',
     'cloud.codeExpires': 'Valid until {time}.',
     'cloud.paired': 'Paired with {vessel}: the backup is on.',
     'cloud.expired': 'The code expired before it was used. Ask for a new one.',
@@ -1009,6 +1011,8 @@ export const MESSAGES = {
     'cloud.pair': 'Obtenir un code d’appairage',
     'cloud.enterCode': 'Saisissez ce code sur le service :',
     'cloud.openClaim': 'Ouvrir le service pour le saisir',
+    'cloud.scanClaim':
+      'Ou scannez ceci avec votre téléphone : il ouvre le service avec le code déjà saisi.',
     'cloud.codeExpires': 'Valable jusqu’à {time}.',
     'cloud.paired': 'Appairé avec {vessel} : la sauvegarde est active.',
     'cloud.expired': 'Le code a expiré sans avoir été utilisé. Demandez-en un nouveau.',

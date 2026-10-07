@@ -511,8 +511,8 @@ None of these is required except position and speed over ground; each feature us
 Keep a copy of the logbook off the boat, on the Miles Astern online service.
 
 1. On the **Export** page, under **Online backup**, enter the service address and choose **Get a pairing code**.
-2. On the service, signed in to your account, enter the code shown (e.g. `K7QF-3MXB`) and choose your boat. The code is
-   valid for 15 minutes.
+2. On the service, signed in to your account, enter the code shown (e.g. `K7QF-3MXB`) and choose your boat — or scan the
+   QR code beside it with your phone, which opens the service with the code filled in. The code is valid for 15 minutes.
 3. The page soon says the boat is paired: Chiplog has saved the service address and its own token in the plugin
    configuration and turned the backup on.
 

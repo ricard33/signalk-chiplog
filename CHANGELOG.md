@@ -14,6 +14,8 @@ All notable changes to Chiplog are documented here. The format follows
   what changed goes out, compressed, and a track that grew only sends its new points. Passages deleted or merged on
   board are removed from the service too, and the places go with their position and country, which is how the service
   tells the countries visited. Off by default; nothing leaves the boat while it is.
+- **A QR code beside the pairing code.** Scan it with a phone and the service opens with the code already filled in:
+  nothing to type from the chart table's screen.
 - **Restoring the logbook from the online service.** After a lost SD card or on a new computer, pair the new
   installation with the same boat and the Export page offers the logbook the service kept: one button brings every
   passage back — track, events, handwriting, readings, crew, forecasts and places — and the backup carries on where it

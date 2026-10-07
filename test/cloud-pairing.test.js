@@ -7,6 +7,7 @@ const { openDatabase } = require('../lib/database');
 const { createCloudPairing } = require('../lib/cloud-pairing');
 const { getLogbookId } = require('../lib/cloud-sync');
 const { startServer } = require('./helpers');
+const { qrCode } = require('../lib/qr');
 
 const reply = (status, body) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
@@ -97,6 +98,7 @@ describe('pairing with the online service', () => {
     assert.equal(started.state, 'waiting');
     assert.equal(started.code, 'K7QF-3MXB');
     assert.equal(started.claimUrl, 'https://service.test/pair?code=K7QF-3MXB');
+    assert.deepEqual(started.claimQr, qrCode('https://service.test/pair?code=K7QF-3MXB'));
     assert.equal(started.pollSecret, undefined, 'the secret stays in the plugin');
     assert.equal(service.requests[0].url, 'https://service.test/v1/pairings');
     assert.deepEqual(service.requests[0].payload, { logbookId: getLogbookId(db) });

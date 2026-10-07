@@ -853,12 +853,14 @@ webhook.
   token the service refuses is reported in the Signal K log and retried hourly.
 - **Pairing by a short code.** The Export page asks for the service's address and gets a code from it (`POST /pairings`,
   eight letters and digits such as `K7QF-3MXB`, valid 15 minutes), shown in large type with a link to the service's
-  claim page when it has a public address. The owner enters the code on the service, signed in, and attaches it to a
-  boat. Meanwhile the plugin polls with a secret only it holds; once the code is claimed it collects its **device
-  token** — handed over once, never stored by the service — and saves it, with the address, into the plugin
-  configuration (`app.savePluginOptions`) as if typed in the admin, keeping every other setting. The backup turns on at
-  once, without a restart. A dropped connection while waiting is retried as long as the code lives. The token can still
-  be pasted by hand in the plugin configuration.
+  claim page when it has a public address — and that link as a **QR code**, so the phone in someone's hand opens the
+  service with the code already filled in while the plugin's page stays on the chart table. The QR code is made on board
+  (`lib/qr.js`: byte mode, level M, versions 1 to 6), with no dependency and nothing asked of the network. The owner
+  enters the code on the service, signed in, and attaches it to a boat. Meanwhile the plugin polls with a secret only it
+  holds; once the code is claimed it collects its **device token** — handed over once, never stored by the service — and
+  saves it, with the address, into the plugin configuration (`app.savePluginOptions`) as if typed in the admin, keeping
+  every other setting. The backup turns on at once, without a restart. A dropped connection while waiting is retried as
+  long as the code lives. The token can still be pasted by hand in the plugin configuration.
 - **Authentication**: the device token, sent as a bearer token. A reinstalled plugin pairs again; the owner attaches it
   to the same boat, and its new logbook sits beside the old one.
 - **The Export page** shows the backup: where it goes, the run under way, the last success and the last failure, a

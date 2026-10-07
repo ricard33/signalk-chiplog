@@ -254,3 +254,7 @@ to send again — `test/cloud-restore.test.js` checks the round trip to the lett
 carries (`log_entries`, `events`, `observations`, `propulsion_segments`, `log_entry_crew`, the forecasts) must be added
 to `restorePassage` as well as to the serialiser that sends it, or it is lost on the way back. `jsonHash` sorts keys:
 the service's database does not keep their order.
+
+`lib/qr.js` makes the QR code of the pairing link itself (byte mode, level M, versions 1 to 6, so no version blocks and
+one alignment pattern). `test/qr.test.js` reads every length back with `jsqr`, a development dependency: change the
+encoder only with that test green.

@@ -39,6 +39,26 @@ function BackupStatus({ status }) {
   `;
 }
 
+// A QR code from its rows of '1' and '0', with the light margin a reader needs around it.
+// Always dark on white, whatever the theme: a phone reads contrast, not style.
+const QR_MARGIN = 4;
+function QrCode({ rows, label }) {
+  const size = rows.length + 2 * QR_MARGIN;
+  const path = rows
+    .flatMap((row, y) =>
+      [...row].map((module, x) =>
+        module === '1' ? `M${x + QR_MARGIN} ${y + QR_MARGIN}h1v1h-1z` : ''
+      )
+    )
+    .join('');
+  return html`
+    <svg class="qr-code" viewBox=${`0 0 ${size} ${size}`} role="img" aria-label=${label}>
+      <rect width=${size} height=${size} fill="#fff" />
+      <path d=${path} fill="#000" />
+    </svg>
+  `;
+}
+
 function PairingState({ pairing, onCancel }) {
   const { t, format } = useLocale();
   if (pairing.state === 'waiting') {
@@ -49,6 +69,11 @@ function PairingState({ pairing, onCancel }) {
         ${
           pairing.claimUrl &&
           html`<p><a href=${pairing.claimUrl} target="_blank" rel="noopener">${t('cloud.openClaim')}</a></p>`
+        }
+        ${
+          pairing.claimQr &&
+          html`<${QrCode} rows=${pairing.claimQr} label=${t('cloud.scanClaim')} />
+            <p class="muted">${t('cloud.scanClaim')}</p>`
         }
         <p class="muted">${t('cloud.codeExpires', { time: format.time(pairing.expiresAt) })}</p>
         <button type="button" onClick=${onCancel}>${t('common.cancel')}</button>

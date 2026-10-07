@@ -849,10 +849,12 @@ nothing here is needed for the backup to happen.
   Both are kept in memory and start empty when the plugin starts.
 
 - `pairing` follows the last pairing since the plugin started: `{ "state": "idle" }`;
-  `{ "state": "waiting", "url", "code", "claimUrl", "expiresAt" }` while the code waits to be claimed (`claimUrl` is
-  `null` when the service has no public address); `{ "state": "paired", "vesselName", "at" }`;
-  `{ "state": "expired", "at" }`; or `{ "state": "failed", "error": { "message", "code" } }`, `code` being `save_failed`
-  when the token came but the configuration could not be saved.
+  `{ "state": "waiting", "url", "code", "claimUrl", "claimQr", "expiresAt" }` while the code waits to be claimed
+  (`claimUrl` is `null` when the service has no public address; `claimQr` is that address as a QR code, its rows as
+  strings of `1` for dark and `0` for light, without the margin around — `null` with no address, or one too long);
+  `{ "state": "paired", "vesselName", "at" }`; `{ "state": "expired", "at" }`; or
+  `{ "state": "failed", "error": { "message", "code" } }`, `code` being `save_failed` when the token came but the
+  configuration could not be saved.
 
 - `restore` follows the restore of an earlier logbook (below): `restoring` while one is unfinished — under way
   (`running`) or cut short and waiting to be carried on with; `possible` when one could start, the boat being paired and
