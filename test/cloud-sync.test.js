@@ -181,6 +181,18 @@ describe('online backup', () => {
     assert.equal(first.headers['x-chiplog-version'], '2.9.0');
   });
 
+  it('says how many passages are on board, for the service to tell how far the backup is', async () => {
+    insertEntry(db, { start_time: at(-48), end_time: at(-44) });
+    insertEntry(db, { start_time: at(0), end_time: at(4) });
+
+    await sync().resolveNext();
+
+    const asked = service.requests.find((r) => r.method === 'GET');
+    assert.equal(asked.headers['x-chiplog-passages'], '2');
+    const put = service.requests.find((r) => r.method === 'PUT');
+    assert.equal(put.headers['x-chiplog-passages'], undefined);
+  });
+
   it('sends nothing more when the service already holds everything', async () => {
     insertEntry(db);
     const cloud = sync();

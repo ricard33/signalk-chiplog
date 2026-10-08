@@ -13,7 +13,8 @@ All notable changes to Chiplog are documented here. The format follows
   service whenever there is a connection: every 15 minutes, at each departure and arrival, newest passage first. Only
   what changed goes out, compressed, and a track that grew only sends its new points. Passages deleted or merged on
   board are removed from the service too, and the places go with their position and country, which is how the service
-  tells the countries visited. Off by default; nothing leaves the boat while it is.
+  tells the countries visited. Each run also says how many passages are on board, so that the service can show how far a
+  first backup is. Off by default; nothing leaves the boat while it is.
 - **Costly link.** A tick box for satellite or roaming: the online backup then sends only a summary of each passage and
   a thinned-out track, a few kilobytes, at departures and arrivals and every six hours. Full tracks, readings, forecasts
   and places wait until it is unticked, or until **Back up now** is chosen.
