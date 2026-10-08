@@ -6,6 +6,29 @@ All notable changes to Chiplog are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **Online backup.** Turn **Back the logbook up online** on, paste the service address and the device token it gave your
+  boat, and Chiplog sends each passage — track, events, handwriting, readings, crew and forecasts — to the Miles Astern
+  service whenever there is a connection: every 15 minutes, at each departure and arrival, newest passage first. Only
+  what changed goes out, compressed, and a track that grew only sends its new points. Passages deleted or merged on
+  board are removed from the service too, and the places go with their position and country, which is how the service
+  tells the countries visited. Each run also says how many passages are on board, so that the service can show how far a
+  first backup is. Off by default; nothing leaves the boat while it is.
+- **Costly link.** A tick box for satellite or roaming: the online backup then sends only a summary of each passage and
+  a thinned-out track, a few kilobytes, at departures and arrivals and every six hours. Full tracks, readings, forecasts
+  and places wait until it is unticked, or until **Back up now** is chosen.
+- **A QR code beside the pairing code.** Scan it with a phone and the service opens with the code already filled in:
+  nothing to type from the chart table's screen.
+- **Restoring the logbook from the online service.** After a lost SD card or on a new computer, pair the new
+  installation with the same boat and the Export page offers the logbook the service kept: one button brings every
+  passage back — track, events, handwriting, readings, crew, forecasts and places — and the backup carries on where it
+  stopped, without sending anything again. Only an empty logbook can take one back; a restore cut short picks up by
+  itself.
+- **Pairing with the online service by a short code.** On the Export page, ask the service for a code, enter it on the
+  service signed in to your account, and the backup turns on by itself: no token to copy. The same card shows the last
+  backup and a **Back up now** button.
+
 ### Changed
 
 - **Coming back from a passage lands where you left the logbook.** Going back — with the browser's back button, with

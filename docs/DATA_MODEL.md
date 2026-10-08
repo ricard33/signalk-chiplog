@@ -314,6 +314,20 @@ passage's end.
 The migration that creates the table fills it for every entry already closed, marked as never sent. That is what keeps
 switching the option on from mailing the whole logbook.
 
+### `logbook_identity` (migrations 19, 20)
+
+One row: the logbook's own `id`, a random UUID made by the migration, and when. The online service (SPEC §4.17) files
+passages under it and the entry id, which is what keeps a reinstalled plugin — whose ids start again from 1 — from
+overwriting or deleting what an earlier logbook sent. It travels with the database file: a restored copy is the same
+logbook. Nothing about what was sent is stored: the service reports what it holds.
+
+`restoring` (migration 20) is 1 while an earlier logbook is being read back from the service: the `id` is already that
+of the logbook restored, but not all its passages are written yet. The backup does not run while it is set — it would
+report the missing passages as deleted on board — and a restore cut short is carried on with at the next start.
+Restoring writes rows under the ids they had (`log_entries`, `events`, `observations`, `propulsion_segments`,
+`log_entry_crew`, `places`), which is what makes a restored passage hash as the original did; it raises
+`sqlite_sequence` for `log_entries` first, so a passage logged meanwhile cannot take the id of one still to come.
+
 ## Migrations
 
 `MIGRATIONS` in `lib/database.js` is an ordered, **append-only** list; the applied index is stored in SQLite's
@@ -331,6 +345,5 @@ Each migration runs in a transaction and rolls back as a unit on failure.
 
 Not in the schema yet, to be added by a later migration when the feature lands:
 
-- **Remote publication state** (SPEC §4.5) — per-entry sync status once a target is defined.
 - **Author per event** (SPEC §3.4) — attributing an individual annotation or manoeuvre to whoever logged it, if V2
   confirms the need. A per-passage crew _roster_ is delivered in V1 instead — see `crew_members`/`log_entry_crew` above.

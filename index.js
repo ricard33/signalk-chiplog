@@ -11,6 +11,9 @@ const { createPlaceNamer, GEOCODING_DEFAULTS } = require('./lib/place-names');
 const { PROPULSION_DEFAULTS } = require('./lib/propulsion-detector');
 const { createReplayJob } = require('./lib/replay-job');
 const { createSummaryMailer, SUMMARY_MAIL_DEFAULTS } = require('./lib/summary-mailer');
+const { createCloudSync, CLOUD_SYNC_DEFAULTS } = require('./lib/cloud-sync');
+const { createCloudPairing } = require('./lib/cloud-pairing');
+const { createCloudRestore } = require('./lib/cloud-restore');
 const { SECURITIES } = require('./lib/smtp');
 const { createTideForecaster, TIDE_DEFAULTS } = require('./lib/tide-forecaster');
 const { createWeatherForecaster, WEATHER_DEFAULTS } = require('./lib/weather-forecaster');
@@ -35,6 +38,9 @@ const FIRST_LANDMARK_DELAY_MS = 30 * 1000;
 // Likewise: a summary is never urgent, and the passage it is about has been
 // over for at least the reopening delay by the time it is due.
 const FIRST_SUMMARY_MAIL_DELAY_MS = 60 * 1000;
+// The first run after a start reads every passage to work out its hashes: not
+// while detection and the other chains are starting up.
+const FIRST_CLOUD_SYNC_DELAY_MS = 2 * 60 * 1000;
 
 const MOTION_LABELS = { underway: 'Under way', stopped: 'Stopped', unknown: 'Waiting for data' };
 const MODE_LABELS = { autostate: 'navigation.state', fallback: 'speed fallback' };
@@ -70,6 +76,12 @@ module.exports = function (app) {
   let lastActiveEntryId = null;
   let usbExport = null;
   let summaryMailer = null;
+  let cloudSync = null;
+  let cloudSchedule = null;
+  let cloudPairing = null;
+  let cloudRestore = null;
+  // The configuration as saved, so pairing can add the token to it without losing the rest.
+  let savedConfig = {};
   let replayJob = null;
   let namingTimer = null;
   let timers = [];
@@ -255,6 +267,39 @@ module.exports = function (app) {
           'The tiles the summary map is drawn over. The public OpenStreetMap instance by default (© OpenStreetMap contributors, ODbL), or a self-hosted one; empty draws the track on a plain background',
         default: SUMMARY_MAIL_DEFAULTS.summaryMailTileUrl
       },
+      cloudSyncEnabled: {
+        type: 'boolean',
+        title: 'Back the logbook up online',
+        description:
+          'Sends each passage, with its track, events and readings, to the online service below as soon as there is a connection: new and changed passages, newest first, and the removal of those deleted here. Nothing is sent while this is off',
+        default: CLOUD_SYNC_DEFAULTS.cloudSyncEnabled
+      },
+      cloudSyncUrl: {
+        type: 'string',
+        title: 'Online service address',
+        description: 'The address of the Miles Astern service, e.g. https://api.example.org'
+      },
+      cloudSyncToken: {
+        type: 'string',
+        title: 'Device token',
+        description: 'The token the service gave this boat',
+        format: 'password'
+      },
+      cloudSyncIntervalMinutes: {
+        type: 'number',
+        title: 'Online backup interval (minutes)',
+        description:
+          'How often to check for passages to send; each departure and arrival is sent straight away',
+        default: CLOUD_SYNC_DEFAULTS.cloudSyncIntervalMinutes,
+        minimum: 1
+      },
+      cloudSyncCostlyLink: {
+        type: 'boolean',
+        title: 'Costly link (satellite, roaming)',
+        description:
+          'Sends only a summary of each passage and a thinned-out track, a few kilobytes, at departures and arrivals and every six hours. Full tracks, instrument readings, forecasts and places wait until this is turned off, or until Back up now is chosen on the Export page',
+        default: CLOUD_SYNC_DEFAULTS.cloudSyncCostlyLink
+      },
       logbookLanguage: {
         type: 'string',
         title: 'Logbook language (PDF and summary emails)',
@@ -427,6 +472,9 @@ module.exports = function (app) {
       // retry delay left from an earlier failure.
       if (outcome.activeEntryId !== null && outcome.activeEntryId !== lastActiveEntryId) {
         schedules.forEach((schedule) => schedule.nudge());
+      } else if (outcome.activeEntryId !== lastActiveEntryId) {
+        // An arrival: back the finished passage up while the boat is in reach.
+        cloudSchedule?.nudge();
       }
       lastActiveEntryId = outcome.activeEntryId;
       const usbError = usbExport.status().lastError;
@@ -500,7 +548,57 @@ module.exports = function (app) {
     version
   });
 
+  // Saves what pairing brought into the plugin configuration, as if typed in the admin, and
+  // starts using it at once: the backup's settings are read on every run, so no restart.
+  function savePairing(url, token) {
+    const next = {
+      ...savedConfig,
+      cloudSyncEnabled: true,
+      cloudSyncUrl: url,
+      cloudSyncToken: token
+    };
+    return new Promise((resolve, reject) => {
+      app.savePluginOptions(next, (err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        savedConfig = next;
+        if (settings) {
+          settings.cloudSyncEnabled = true;
+          settings.cloudSyncUrl = url;
+          settings.cloudSyncToken = token;
+        }
+        cloudSchedule?.nudge();
+        resolve();
+      });
+    });
+  }
+
+  // Declares the link costly or cheap from the Export page, saved like the rest of the
+  // configuration. Back to cheap, a run starts at once: full passages have been waiting.
+  function saveCostlyLink(costly) {
+    const next = { ...savedConfig, cloudSyncCostlyLink: costly };
+    return new Promise((resolve, reject) => {
+      app.savePluginOptions(next, (err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        savedConfig = next;
+        if (settings) {
+          settings.cloudSyncCostlyLink = costly;
+        }
+        if (!costly) {
+          cloudSchedule?.nudge();
+        }
+        resolve();
+      });
+    });
+  }
+
   plugin.start = function (config = {}) {
+    savedConfig = config;
     try {
       const { db, migrated } = openDatabase(app.getDataDirPath());
       database = db;
@@ -539,6 +637,12 @@ module.exports = function (app) {
           config.summaryMailTileUrl === undefined
             ? SUMMARY_MAIL_DEFAULTS.summaryMailTileUrl
             : config.summaryMailTileUrl,
+        cloudSyncEnabled: config.cloudSyncEnabled ?? CLOUD_SYNC_DEFAULTS.cloudSyncEnabled,
+        cloudSyncUrl: config.cloudSyncUrl || null,
+        cloudSyncToken: config.cloudSyncToken || null,
+        cloudSyncIntervalMinutes:
+          config.cloudSyncIntervalMinutes ?? CLOUD_SYNC_DEFAULTS.cloudSyncIntervalMinutes,
+        cloudSyncCostlyLink: config.cloudSyncCostlyLink ?? CLOUD_SYNC_DEFAULTS.cloudSyncCostlyLink,
         logbookLanguage: PDF_LANGUAGES.includes(config.logbookLanguage)
           ? config.logbookLanguage
           : 'en',
@@ -623,8 +727,39 @@ module.exports = function (app) {
       vesselName: () => readVesselName(app),
       log
     });
+    cloudSync = createCloudSync({
+      db: database,
+      settings,
+      userAgent: `signalk-chiplog/${version}`,
+      log
+    });
+    // Nudged at departures and arrivals, apart from the forecasts which only
+    // care about departures.
+    cloudSchedule = createBackgroundSchedule({
+      label: 'Online backup',
+      resolver: cloudSync,
+      log,
+      firstDelayMs: FIRST_CLOUD_SYNC_DELAY_MS
+    });
+    cloudPairing = createCloudPairing({
+      db: database,
+      userAgent: `signalk-chiplog/${version}`,
+      log,
+      onPaired: ({ url, token }) => savePairing(url, token)
+    });
+    cloudRestore = createCloudRestore({
+      db: database,
+      settings,
+      userAgent: `signalk-chiplog/${version}`,
+      log,
+      // The backup held off while passages were coming back: it has places to send, at least.
+      onDone: () => cloudSchedule?.nudge()
+    });
+    // A restore the last run left unfinished carries on by itself.
+    cloudRestore.resume();
     lastActiveEntryId = null;
     schedules = [
+      cloudSchedule,
       createBackgroundSchedule({
         label: 'Tide forecast',
         resolver: createTideForecaster(networkOptions),
@@ -690,6 +825,12 @@ module.exports = function (app) {
     usbExport?.stop();
     usbExport = null;
     summaryMailer = null;
+    cloudSync = null;
+    cloudSchedule = null;
+    cloudPairing?.stop();
+    cloudPairing = null;
+    cloudRestore?.stop();
+    cloudRestore = null;
     replayJob?.cancel();
     replayJob = null;
     detector = null;
@@ -720,6 +861,11 @@ module.exports = function (app) {
           noteDeparture: (entryId) => detector.noteDeparture(entryId),
           usbExport,
           summaryMailer,
+          cloudSync,
+          nudgeCloudSync: () => cloudSchedule?.nudge(),
+          saveCostlyLink,
+          cloudPairing,
+          cloudRestore,
           replayJob,
           pdfOptions,
           detection: () => ({

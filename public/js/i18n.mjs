@@ -419,6 +419,43 @@ export const MESSAGES = {
     'export.usbNeverCopied': 'No copy made since the plugin started.',
     'export.usbLastError': 'The last copy failed, {time}: {message}',
     'export.usbNextCopy': 'Next automatic copy around {time}.',
+    'cloud.title': 'Online backup',
+    'cloud.intro':
+      'Keep a copy of the logbook off the boat, on the Miles Astern service: each passage is sent whenever there is a connection, newest first.',
+    'cloud.backingUpTo': 'Backed up to {url}.',
+    'cloud.inProgress': 'Sending: {done} of {total} passages done.',
+    'cloud.lastSuccess': 'Last backup {time}: {sent} passages sent, {held} on board.',
+    'cloud.notYet': 'No backup made since the plugin started.',
+    'cloud.lastError': 'The last backup failed, {time}: {message}',
+    'cloud.costlyLink': 'Costly link (satellite, roaming)',
+    'cloud.costlyLinkHelp':
+      'Only a summary of each passage and a thinned-out track are sent, a few kilobytes, at departures and arrivals and every six hours. Full tracks, readings, forecasts and places wait until you untick this — or choose Back up now, which sends everything.',
+    'cloud.waiting': '{count} passages wait for a cheap link to be backed up in full.',
+    'cloud.backUpNow': 'Back up now',
+    'cloud.pairTitle': 'Pair this boat with the service',
+    'cloud.restoreIntro':
+      'This logbook is empty, and the service holds an earlier one for this boat. Bring it back here to carry on where it stopped:',
+    'cloud.restoreUnfinished': 'The restore was cut short. Carry on with it:',
+    'cloud.restoreLogbook': '{count} passages, from {first} to {last}',
+    'cloud.restore': 'Restore this logbook',
+    'cloud.restoreResume': 'Carry on',
+    'cloud.restoring': 'Restoring the logbook: {done} of {total} passages…',
+    'cloud.restored': 'Logbook restored: {count} passages brought back.',
+    'cloud.restoreRefused': '{count} could not be written; see the server log.',
+    'cloud.restoreFailed': 'The restore stopped: {message}',
+    'cloud.pairAgain': 'Pair with another account or service',
+    'cloud.pairIntro':
+      'Enter the service address and ask for a code, then enter the code on the service, signed in to your account. The backup turns on as soon as it is claimed.',
+    'cloud.serviceUrl': 'Service address',
+    'cloud.pair': 'Get a pairing code',
+    'cloud.enterCode': 'Enter this code on the service:',
+    'cloud.openClaim': 'Open the service to enter it',
+    'cloud.scanClaim':
+      'Or scan this with your phone: it opens the service with the code filled in.',
+    'cloud.codeExpires': 'Valid until {time}.',
+    'cloud.paired': 'Paired with {vessel}: the backup is on.',
+    'cloud.expired': 'The code expired before it was used. Ask for a new one.',
+    'cloud.pairingFailed': 'Pairing failed: {message}',
 
     'replay.title': 'Retrospective analysis',
     'replay.intro':
@@ -951,6 +988,44 @@ export const MESSAGES = {
     'export.usbNeverCopied': 'Aucune copie depuis le démarrage du plugin.',
     'export.usbLastError': 'La dernière copie a échoué, {time} : {message}',
     'export.usbNextCopy': 'Prochaine copie automatique vers {time}.',
+    'cloud.title': 'Sauvegarde en ligne',
+    'cloud.intro':
+      'Gardez une copie du journal hors du bateau, sur le service Miles Astern : chaque navigation est envoyée dès qu’une connexion le permet, la plus récente d’abord.',
+    'cloud.backingUpTo': 'Sauvegardé sur {url}.',
+    'cloud.inProgress': 'Envoi en cours : {done} navigations sur {total}.',
+    'cloud.lastSuccess': 'Dernière sauvegarde {time} : {sent} navigations envoyées, {held} à bord.',
+    'cloud.notYet': 'Aucune sauvegarde depuis le démarrage du plugin.',
+    'cloud.lastError': 'La dernière sauvegarde a échoué, {time} : {message}',
+    'cloud.costlyLink': 'Liaison coûteuse (satellite, itinérance)',
+    'cloud.costlyLinkHelp':
+      'Seuls un résumé de chaque navigation et une trace allégée sont envoyés, quelques kilo-octets, aux départs, aux arrivées et toutes les six heures. Les traces complètes, les relevés, les prévisions et les lieux attendent que vous décochiez cette case — ou que vous choisissiez Sauvegarder maintenant, qui envoie tout.',
+    'cloud.waiting':
+      '{count} navigations attendent une liaison bon marché pour être sauvegardées en entier.',
+    'cloud.backUpNow': 'Sauvegarder maintenant',
+    'cloud.pairTitle': 'Appairer ce bateau avec le service',
+    'cloud.restoreIntro':
+      'Ce journal est vide, et le service en conserve un plus ancien pour ce bateau. Récupérez-le ici pour reprendre là où il s’est arrêté :',
+    'cloud.restoreUnfinished': 'La restauration a été interrompue. Reprenez-la :',
+    'cloud.restoreLogbook': '{count} navigations, du {first} au {last}',
+    'cloud.restore': 'Restaurer ce journal',
+    'cloud.restoreResume': 'Reprendre',
+    'cloud.restoring': 'Restauration du journal : {done} navigations sur {total}…',
+    'cloud.restored': 'Journal restauré : {count} navigations récupérées.',
+    'cloud.restoreRefused': '{count} n’ont pas pu être écrites ; voir le journal du serveur.',
+    'cloud.restoreFailed': 'La restauration s’est arrêtée : {message}',
+    'cloud.pairAgain': 'Appairer avec un autre compte ou service',
+    'cloud.pairIntro':
+      'Indiquez l’adresse du service et demandez un code, puis saisissez ce code sur le service, connecté à votre compte. La sauvegarde s’active dès qu’il est utilisé.',
+    'cloud.serviceUrl': 'Adresse du service',
+    'cloud.pair': 'Obtenir un code d’appairage',
+    'cloud.enterCode': 'Saisissez ce code sur le service :',
+    'cloud.openClaim': 'Ouvrir le service pour le saisir',
+    'cloud.scanClaim':
+      'Ou scannez ceci avec votre téléphone : il ouvre le service avec le code déjà saisi.',
+    'cloud.codeExpires': 'Valable jusqu’à {time}.',
+    'cloud.paired': 'Appairé avec {vessel} : la sauvegarde est active.',
+    'cloud.expired': 'Le code a expiré sans avoir été utilisé. Demandez-en un nouveau.',
+    'cloud.pairingFailed': 'L’appairage a échoué : {message}',
 
     'replay.title': 'Analyse rétrospective',
     'replay.intro':

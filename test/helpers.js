@@ -33,20 +33,25 @@ function createPluginRouter() {
 async function startServer({ config = {}, self = {} } = {}) {
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chiplog-test-'));
   const errors = [];
+  const savedOptions = [];
   const app = {
     getDataDirPath: () => dataDir,
     getSelfPath: (selfPath) => selfPath.split('.').reduce((node, key) => node?.[key], self),
     debug: () => {},
     error: (message) => errors.push(message),
     setPluginStatus: () => {},
-    setPluginError: () => {}
+    setPluginError: () => {},
+    savePluginOptions: (options, callback) => {
+      savedOptions.push(options);
+      callback(null);
+    }
   };
 
   const plugin = createPlugin(app);
   const { router, permissions } = createPluginRouter();
   plugin.registerWithRouter(router);
   // Tests must never reach the public geocoding, landmark, tide or weather
-  // service, a tile server or a mail relay.
+  // service, a tile server, a mail relay or the online backup service.
   plugin.start(
     {
       geocodingEnabled: false,
@@ -54,6 +59,7 @@ async function startServer({ config = {}, self = {} } = {}) {
       tidesEnabled: false,
       weatherEnabled: false,
       summaryMailEnabled: false,
+      cloudSyncEnabled: false,
       ...config
     },
     () => {}
@@ -94,7 +100,19 @@ async function startServer({ config = {}, self = {} } = {}) {
     fs.rmSync(dataDir, { recursive: true, force: true });
   }
 
-  return { baseUrl, db, plugin, router, permissions, errors, self, dataDir, request, close };
+  return {
+    baseUrl,
+    db,
+    plugin,
+    router,
+    permissions,
+    errors,
+    savedOptions,
+    self,
+    dataDir,
+    request,
+    close
+  };
 }
 
 function insert(db, table, row) {

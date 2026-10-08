@@ -1100,6 +1100,58 @@ button.preset-on {
   padding: 0;
 }
 
+.pairing-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.pairing-form label {
+  display: grid;
+  gap: 0.25rem;
+  flex: 1 1 16rem;
+}
+
+.pairing-code .code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  margin: 0.25rem 0;
+}
+
+.costly-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.qr-code {
+  display: block;
+  width: 11rem;
+  max-width: 100%;
+  height: auto;
+  margin: 0.75rem 0 0.25rem;
+  /* Sharp squares at any size: a blurred edge is a module misread. */
+  shape-rendering: crispEdges;
+}
+
+.restore-offer ul {
+  list-style: none;
+  padding: 0;
+}
+
+.restore-offer li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin: 0.5rem 0;
+}
+
 /* Retrospective analysis */
 
 .replay-actions {
