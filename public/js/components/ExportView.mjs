@@ -2,6 +2,7 @@ import { html, useState } from '../../vendor/preact-htm.mjs';
 import { apiUrl, get, request } from '../api.mjs';
 import { useLocale, usePolling } from '../context.mjs';
 import { rangeBoundary } from '../days.mjs';
+import { CloudBackup } from './CloudBackup.mjs';
 import { DateRangePicker } from './DateRangePicker.mjs';
 import { ErrorNotice } from './common.mjs';
 
@@ -167,5 +168,7 @@ export function ExportView() {
       <button type="button" disabled=${writing} onClick=${writeUsb}>${t('export.usbWrite')}</button>
       <${UsbResult} outcome=${usb} />
     </section>
+
+    <${CloudBackup} />
   `;
 }
