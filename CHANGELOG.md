@@ -6,6 +6,13 @@ All notable changes to Chiplog are documented here. The format follows
 
 ## [Unreleased]
 
+## [2.13.0] - 2026-10-24
+
+### Added
+
+- **Remove the pairing** from the Export page, after a confirmation: the plugin forgets its token and the backup stops.
+  What is already on the service stays there.
+
 ### Changed
 
 - **Online backup says why the service cannot be reached.** Instead of "fetch failed", pairing, backup and restore name
@@ -14,11 +21,6 @@ All notable changes to Chiplog are documented here. The format follows
   log.
 - **Pairing no longer asks for the service address.** It is `https://app.tibord.com` for a new plugin; another one, for
   testing or development, is set in the plugin configuration.
-
-### Added
-
-- **Remove the pairing** from the Export page, after a confirmation: the plugin forgets its token and the backup stops.
-  What is already on the service stays there.
 
 ## [2.12.0] - 2026-10-24
 
@@ -509,7 +511,8 @@ First release.
 - REST API under `/plugins/signalk-chiplog/api`, documented in [docs/API.md](docs/API.md).
 - Single SQLite database through Node's built-in `node:sqlite`: no native module to build.
 
-[Unreleased]: https://github.com/ricard33/signalk-chiplog/compare/v2.12.0...HEAD
+[Unreleased]: https://github.com/ricard33/signalk-chiplog/compare/v2.13.0...HEAD
+[2.13.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.12.0...v2.13.0
 [2.12.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.11.0...v2.12.0
 [2.11.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.10.0...v2.11.0
 [2.10.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.9.0...v2.10.0
