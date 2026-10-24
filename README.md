@@ -540,11 +540,14 @@ backup** card links to as well.
 1. On the **Export** page, under **Online backup**, choose **Get a pairing code**.
 2. On the service, signed in to your account, enter the code shown (e.g. `K7QF-3MXB`) and choose your boat — or scan the
    QR code beside it with your phone, which opens the service with the code filled in. The code is valid for 15 minutes.
-3. The page soon says the boat is paired: Chiplog has saved the service address and its own token in the plugin
-   configuration and turned the backup on.
+3. The page soon says the boat is paired: Chiplog has saved its own token in the plugin configuration and turned the
+   backup on.
 
-You can also paste a token by hand: turn **Back the logbook up online** on in the plugin configuration, fill in the
-**Online service address** and the **Device token**.
+You can also paste a token by hand: turn **Back the logbook up online** on in the plugin configuration and fill in the
+**Device token**. The **Online service address** is `https://app.tibord.com`; change it only to test another instance.
+
+**Remove the pairing**, on the same card, asks for a confirmation, then forgets the token and stops the backup. What is
+already on the service stays there; revoke the device from your account on the service to stop it for good.
 
 From then on, whenever the boat has a connection, Chiplog sends:
 
