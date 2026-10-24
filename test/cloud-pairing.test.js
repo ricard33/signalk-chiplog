@@ -23,7 +23,7 @@ function fakeService() {
     const payload = JSON.parse(body);
     requests.push({ url, route, payload });
     if (control.down) {
-      throw new TypeError('fetch failed');
+      throw new TypeError('fetch failed', { cause: control.cause });
     }
     if (route === '/v1/pairings') {
       return reply(201, {
@@ -150,6 +150,31 @@ describe('pairing with the online service', () => {
 
     assert.equal(cloud.status().state, 'idle');
     assert.equal(service.requests.length, 1);
+  });
+
+  it('says why the service could not be reached, on the page and in the log', async () => {
+    const logged = [];
+    const cloud = createCloudPairing({
+      db,
+      userAgent: 'signalk-chiplog/2.9.0',
+      onPaired: async () => {},
+      log: (level, message) => logged.push({ level, message }),
+      fetch: service.fetch
+    });
+    service.control.down = true;
+    service.control.cause = Object.assign(new Error('getaddrinfo ENOTFOUND service.test'), {
+      code: 'ENOTFOUND'
+    });
+
+    await assert.rejects(cloud.start('https://service.test'), (error) => {
+      assert.match(error.message, /^Cannot reach service\.test \(getaddrinfo ENOTFOUND/);
+      assert.match(error.message, /DNS/);
+      assert.equal(error.code, 'ENOTFOUND');
+      return true;
+    });
+    assert.equal(logged.length, 1);
+    assert.equal(logged[0].level, 'error');
+    assert.match(logged[0].message, /could not start: Cannot reach service\.test/);
   });
 
   it('refuses an address that is not a web address', async () => {

@@ -334,7 +334,7 @@ describe('online backup', () => {
     assert.equal(first.outcome, 'failed');
     assert.equal(first.retryInMs, 60 * 1000);
     assert.equal(second.retryInMs, 2 * 60 * 1000);
-    assert.equal(cloud.status().lastError.message, 'fetch failed');
+    assert.match(cloud.status().lastError.message, /^Cannot reach /);
   });
 
   it('waits an hour after the service refuses the token, and says so in the log', async () => {

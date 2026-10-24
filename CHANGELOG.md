@@ -6,6 +6,13 @@ All notable changes to Chiplog are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- **Online backup says why the service cannot be reached.** Instead of "fetch failed", pairing, backup and restore name
+  the host and the cause (name not resolved, connection refused, certificate refused, no answer in time), with a hint
+  for the common ones — a wrong clock behind a certificate refused. A pairing that cannot start is written to the server
+  log.
+
 ## [2.12.0] - 2026-10-24
 
 ### Added

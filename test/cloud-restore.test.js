@@ -436,7 +436,7 @@ describe('restoring from the online backup', () => {
 
     await restore.start(service.logbookId).finished;
 
-    assert.match(restore.status().lastError.message, /fetch failed/);
+    assert.match(restore.status().lastError.message, /^Cannot reach /);
     assert.equal(restore.status().restoring, true);
     assert.equal(done, 0);
     assert.equal(getLogbookId(db), service.logbookId, 'the identity is taken first');
