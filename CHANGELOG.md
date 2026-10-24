@@ -6,6 +6,8 @@ All notable changes to Chiplog are documented here. The format follows
 
 ## [Unreleased]
 
+## [2.12.0] - 2026-10-24
+
 ### Added
 
 - **Helm entry beside the chart.** Chartplotters supporting the Plotter Extensions API can open Chiplog from a toolbar
@@ -493,7 +495,8 @@ First release.
 - REST API under `/plugins/signalk-chiplog/api`, documented in [docs/API.md](docs/API.md).
 - Single SQLite database through Node's built-in `node:sqlite`: no native module to build.
 
-[Unreleased]: https://github.com/ricard33/signalk-chiplog/compare/v2.11.0...HEAD
+[Unreleased]: https://github.com/ricard33/signalk-chiplog/compare/v2.12.0...HEAD
+[2.12.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.11.0...v2.12.0
 [2.11.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.10.0...v2.11.0
 [2.10.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.9.0...v2.10.0
 [2.9.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.8.0...v2.9.0
