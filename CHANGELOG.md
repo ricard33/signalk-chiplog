@@ -12,6 +12,8 @@ All notable changes to Chiplog are documented here. The format follows
   the host and the cause (name not resolved, connection refused, certificate refused, no answer in time), with a hint
   for the common ones — a wrong clock behind a certificate refused. A pairing that cannot start is written to the server
   log.
+- **Pairing no longer asks for the service address.** It is `https://app.tibord.com` for a new plugin; another one, for
+  testing or development, is set in the plugin configuration.
 
 ## [2.12.0] - 2026-10-24
 

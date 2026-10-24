@@ -537,7 +537,7 @@ Keep a copy of the logbook off the boat, on the Ti Bord online service. What it 
 and how you can share your passages and voyages from it, is at [tibord.com](https://tibord.com), which the **Online
 backup** card links to as well.
 
-1. On the **Export** page, under **Online backup**, enter the service address and choose **Get a pairing code**.
+1. On the **Export** page, under **Online backup**, choose **Get a pairing code**.
 2. On the service, signed in to your account, enter the code shown (e.g. `K7QF-3MXB`) and choose your boat — or scan the
    QR code beside it with your phone, which opens the service with the code filled in. The code is valid for 15 minutes.
 3. The page soon says the boat is paired: Chiplog has saved the service address and its own token in the plugin

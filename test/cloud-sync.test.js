@@ -486,7 +486,7 @@ describe('GET and POST /cloud-sync', () => {
     const { status, body } = await ctx.request('GET', '/cloud-sync');
     assert.equal(status, 200);
     assert.equal(body.enabled, false);
-    assert.equal(body.problem, 'no service address');
+    assert.equal(body.problem, 'no device token');
     assert.match(body.logbookId, /^[0-9a-f-]{36}$/);
 
     const refused = await ctx.request('POST', '/cloud-sync');

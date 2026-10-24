@@ -244,10 +244,33 @@ describe('POST and DELETE /cloud-sync/pairing', () => {
     assert.equal(body.pairing.state, 'paired');
   });
 
-  it('refuses a missing or malformed address, and cancels on request', async () => {
+  it('pairs with the configured service when no address is given', async () => {
+    const service = fakeService();
+    globalThis.fetch = (url, options) =>
+      String(url).startsWith('https://service.test')
+        ? service.fetch(url, options)
+        : realFetch(url, options);
+    ctx = await startServer({ config: { cloudSyncUrl: 'https://service.test/' } });
+
+    const started = await ctx.request('POST', '/cloud-sync/pairing', {});
+
+    assert.equal(started.status, 200);
+    assert.equal(started.body.url, 'https://service.test');
+    assert.equal(service.requests[0].url, 'https://service.test/v1/pairings');
+  });
+
+  it('backs up to Ti Bord unless the configuration names another service', async () => {
     ctx = await startServer();
 
-    assert.equal((await ctx.request('POST', '/cloud-sync/pairing', {})).status, 400);
+    const { body } = await ctx.request('GET', '/cloud-sync');
+
+    assert.equal(body.url, 'https://app.tibord.com');
+  });
+
+  it('refuses a malformed address, and cancels on request', async () => {
+    ctx = await startServer();
+
+    assert.equal((await ctx.request('POST', '/cloud-sync/pairing', { url: '' })).status, 400);
     assert.equal(
       (await ctx.request('POST', '/cloud-sync/pairing', { url: 'not a url' })).status,
       400

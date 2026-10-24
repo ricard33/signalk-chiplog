@@ -278,7 +278,9 @@ module.exports = function (app) {
       cloudSyncUrl: {
         type: 'string',
         title: 'Online service address',
-        description: 'The address of the Ti Bord service: https://app.tibord.com'
+        description:
+          'The address of the Ti Bord service. Leave it as it is unless you test another instance',
+        default: CLOUD_SYNC_DEFAULTS.cloudSyncUrl
       },
       cloudSyncToken: {
         type: 'string',
@@ -654,7 +656,7 @@ module.exports = function (app) {
             ? SUMMARY_MAIL_DEFAULTS.summaryMailTileUrl
             : config.summaryMailTileUrl,
         cloudSyncEnabled: config.cloudSyncEnabled ?? CLOUD_SYNC_DEFAULTS.cloudSyncEnabled,
-        cloudSyncUrl: config.cloudSyncUrl || null,
+        cloudSyncUrl: config.cloudSyncUrl || CLOUD_SYNC_DEFAULTS.cloudSyncUrl,
         cloudSyncToken: config.cloudSyncToken || null,
         cloudSyncIntervalMinutes:
           config.cloudSyncIntervalMinutes ?? CLOUD_SYNC_DEFAULTS.cloudSyncIntervalMinutes,
@@ -765,6 +767,7 @@ module.exports = function (app) {
     });
     cloudPairing = createCloudPairing({
       db: database,
+      serviceUrl: () => settings.cloudSyncUrl,
       userAgent: `signalk-chiplog/${version}`,
       log,
       onPaired: ({ url, token }) => savePairing(url, token)

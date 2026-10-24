@@ -105,27 +105,16 @@ function PairingState({ pairing, onCancel }) {
   return null;
 }
 
-function PairingForm({ initialUrl, onStart, busy }) {
+function PairingForm({ onStart, busy }) {
   const { t } = useLocale();
-  const [url, setUrl] = useState(initialUrl ?? '');
   return html`
     <form
       class="pairing-form"
       onSubmit=${(event) => {
         event.preventDefault();
-        onStart(url);
+        onStart();
       }}
     >
-      <label>
-        ${t('cloud.serviceUrl')}
-        <input
-          type="url"
-          required
-          placeholder="https://"
-          value=${url}
-          onInput=${(event) => setUrl(event.currentTarget.value)}
-        />
-      </label>
       <button type="submit" disabled=${busy}>${t('cloud.pair')}</button>
     </form>
   `;
@@ -293,11 +282,7 @@ export function CloudBackup() {
           <details open=${!ready}>
             <summary>${ready ? t('cloud.pairAgain') : t('cloud.pairTitle')}</summary>
             <p>${t('cloud.pairIntro')}</p>
-            <${PairingForm}
-              initialUrl=${status.url}
-              busy=${busy}
-              onStart=${(url) => act('POST', '/cloud-sync/pairing', { url })}
-            />
+            <${PairingForm} busy=${busy} onStart=${() => act('POST', '/cloud-sync/pairing', {})} />
           </details>
         `
       }

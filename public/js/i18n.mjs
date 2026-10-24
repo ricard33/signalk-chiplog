@@ -452,11 +452,10 @@ export const MESSAGES = {
     'cloud.restored': 'Logbook restored: {count} passages brought back.',
     'cloud.restoreRefused': '{count} could not be written; see the server log.',
     'cloud.restoreFailed': 'The restore stopped: {message}',
-    'cloud.pairAgain': 'Pair with another account or service',
+    'cloud.pairAgain': 'Pair with another account',
     'cloud.pairIntro':
-      'Enter the service address and ask for a code, then enter the code on the service, signed in to your account. The backup turns on as soon as it is claimed.',
+      'Ask for a code, then enter it on Ti Bord, signed in to your account. The backup turns on as soon as it is claimed.',
     'cloud.learnMore': 'More about the backups, and about sharing your passages and voyages:',
-    'cloud.serviceUrl': 'Service address',
     'cloud.pair': 'Get a pairing code',
     'cloud.enterCode': 'Enter this code on the service:',
     'cloud.openClaim': 'Open the service to enter it',
@@ -1037,12 +1036,11 @@ export const MESSAGES = {
     'cloud.restored': 'Journal restauré : {count} navigations récupérées.',
     'cloud.restoreRefused': '{count} n’ont pas pu être écrites ; voir le journal du serveur.',
     'cloud.restoreFailed': 'La restauration s’est arrêtée : {message}',
-    'cloud.pairAgain': 'Appairer avec un autre compte ou service',
+    'cloud.pairAgain': 'Appairer avec un autre compte',
     'cloud.pairIntro':
-      'Indiquez l’adresse du service et demandez un code, puis saisissez ce code sur le service, connecté à votre compte. La sauvegarde s’active dès qu’il est utilisé.',
+      'Demandez un code, puis saisissez-le sur Ti Bord, connecté à votre compte. La sauvegarde s’active dès qu’il est utilisé.',
     'cloud.learnMore':
       'Plus d’informations sur les sauvegardes et sur le partage de vos navigations et de vos voyages :',
-    'cloud.serviceUrl': 'Adresse du service',
     'cloud.pair': 'Obtenir un code d’appairage',
     'cloud.enterCode': 'Saisissez ce code sur le service :',
     'cloud.openClaim': 'Ouvrir le service pour le saisir',

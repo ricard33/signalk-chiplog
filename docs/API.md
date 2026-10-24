@@ -858,7 +858,7 @@ nothing here is needed for the backup to happen.
 
 - `enabled` is the option; `configured` says the service address and the device token are set, with `problem` naming
   what is missing when they are not.
-- `url` is the service address configured, `null` when none.
+- `url` is the service address configured, `https://app.tibord.com` unless the configuration names another.
 - `logbookId` is the identity the service files this logbook's passages under.
 - `costlyLink` says the link is declared costly: passages go as light copies (SPEC §4.17). `lastSuccess.light` counts
   those sent that way by the last run, `lastSuccess.waiting` the passages the service does not hold in full yet.
@@ -900,15 +900,16 @@ starts at once.
 
 ### `POST /cloud-sync/pairing` — admin
 
-Asks the service at `url` for a pairing code, then waits in the background for it to be claimed; answers the `pairing`
-state as above, `waiting`. A pairing already waiting is dropped.
+Asks the configured service — or the one at `url`, when given — for a pairing code, then waits in the background for it
+to be claimed; answers the `pairing` state as above, `waiting`. A pairing already waiting is dropped. The body may be
+empty.
 
 ```json
-{ "url": "https://api.example.org" }
+{ "url": "https://staging.example.org" }
 ```
 
-`400` when `url` is missing or not an http or https URL; `409 cloud_pairing_failed` when the service cannot be reached
-or refuses, with the reason in the message. Once claimed, the address and the token are saved into the plugin
+`400` when `url` is given but empty or not an http or https URL; `409 cloud_pairing_failed` when the service cannot be
+reached or refuses, with the reason in the message. Once claimed, the address and the token are saved into the plugin
 configuration and the backup turns on.
 
 ### `DELETE /cloud-sync/pairing` — admin

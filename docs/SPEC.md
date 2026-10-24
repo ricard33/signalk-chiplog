@@ -879,21 +879,22 @@ webhook.
   (`POST /cloud-sync`). A passage under way is sent as it stands and completed as it goes.
 - **Offline is normal at sea.** A service out of reach is retried with a growing delay, from one minute to an hour. A
   token the service refuses is reported in the Signal K log and retried hourly.
-- **Pairing by a short code.** The Export page asks for the service's address and gets a code from it (`POST /pairings`,
-  eight letters and digits such as `K7QF-3MXB`, valid 15 minutes), shown in large type with a link to the service's
-  claim page when it has a public address — and that link as a **QR code**, so the phone in someone's hand opens the
-  service with the code already filled in while the plugin's page stays on the chart table. The QR code is made on board
-  (`lib/qr.js`: byte mode, level M, versions 1 to 6), with no dependency and nothing asked of the network. The owner
-  enters the code on the service, signed in, and attaches it to a boat. Meanwhile the plugin polls with a secret only it
-  holds; once the code is claimed it collects its **device token** — handed over once, never stored by the service — and
-  saves it, with the address, into the plugin configuration (`app.savePluginOptions`) as if typed in the admin, keeping
-  every other setting. The backup turns on at once, without a restart. A dropped connection while waiting is retried as
-  long as the code lives. The token can still be pasted by hand in the plugin configuration.
+- **Pairing by a short code.** The Export page gets a code from the service (`POST /pairings`, eight letters and digits
+  such as `K7QF-3MXB`, valid 15 minutes), shown in large type with a link to the service's claim page when it has a
+  public address — and that link as a **QR code**, so the phone in someone's hand opens the service with the code
+  already filled in while the plugin's page stays on the chart table. The QR code is made on board (`lib/qr.js`: byte
+  mode, level M, versions 1 to 6), with no dependency and nothing asked of the network. The owner enters the code on the
+  service, signed in, and attaches it to a boat. Meanwhile the plugin polls with a secret only it holds; once the code
+  is claimed it collects its **device token** — handed over once, never stored by the service — and saves it, with the
+  address, into the plugin configuration (`app.savePluginOptions`) as if typed in the admin, keeping every other
+  setting. The backup turns on at once, without a restart. A dropped connection while waiting is retried as long as the
+  code lives. The token can still be pasted by hand in the plugin configuration.
 - **Authentication**: the device token, sent as a bearer token. A reinstalled plugin pairs again; the owner attaches it
   to the same boat, and its new logbook sits beside the old one.
 - **The Export page** shows the backup: where it goes, the run under way, the last success and the last failure, a
   **Back up now** button, and pairing.
-- **Off by default**, and inert until the service address and the token are set.
+- **Off by default**, and inert until the token is set. The service address is `https://app.tibord.com` unless the
+  plugin configuration names another — for testing and development only; the Export page never asks for it.
 - **Restoring into an empty logbook.** After a lost SD card or on a new computer, the plugin starts with an empty
   logbook and a new identity. Once paired with the same boat, the Export page offers the earlier logbooks the service
   holds for it (passages, first and last dates) and a **Restore this logbook** button. The plugin then reads the logbook

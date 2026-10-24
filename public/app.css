@@ -1153,12 +1153,6 @@ button.preset-on {
   margin-bottom: 1rem;
 }
 
-.pairing-form label {
-  display: grid;
-  gap: 0.25rem;
-  flex: 1 1 16rem;
-}
-
 .pairing-code .code {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 2rem;
