@@ -6,6 +6,16 @@ All notable changes to Chiplog are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **Helm entry beside the chart.** Chartplotters supporting the Plotter Extensions API can open Chiplog from a toolbar
+  button. The iframe panel keeps drafts while hidden and follows the plotter's night mode when available. The standalone
+  tablet app and its offline queue remain available.
+
+### Fixed
+
+- Event and crew deletion confirmations work inside sandboxed plotter panels.
+
 ## [2.11.0] - 2026-10-24
 
 ### Added

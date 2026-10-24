@@ -63,7 +63,7 @@ export function AccessGate({ onGranted }) {
                 ${t('access.request')}
               </button>`
         }
-        <a class="big-button" href="/admin/#/login">${t('access.signIn')}</a>
+        <a class="big-button" data-standalone-link href="/admin/#/login">${t('access.signIn')}</a>
       </div>
     </section>
   `;

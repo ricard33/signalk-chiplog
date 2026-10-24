@@ -749,6 +749,32 @@ input {
   border-radius: var(--radius);
 }
 
+.confirmation-dialog {
+  width: min(40rem, calc(100% - 2rem));
+  max-height: calc(100% - 2rem);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.confirmation-dialog::backdrop {
+  background: rgb(0 0 0 / 55%);
+}
+
+.confirmation-dialog .sheet {
+  width: 100%;
+}
+
+:root[data-plotter-extension='true'] [data-standalone-link] {
+  display: none;
+}
+
+:root[data-plotter-extension='true'] .entry-main {
+  padding: 0.75rem 0.75rem 9rem;
+}
+
 .sail-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));

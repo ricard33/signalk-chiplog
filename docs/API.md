@@ -59,6 +59,14 @@ timestamp is accepted in requests and normalised to millisecond precision.
 The server registers plugin routes once and never removes them, so they keep answering while the plugin is disabled —
 with `503` until it is started again.
 
+## Plotter extension discovery
+
+On servers supporting `app.registerResourceProvider`, Chiplog contributes a read-only `signalk-chiplog` manifest to
+`/signalk/v2/api/resources/plotterExtensions`. It declares API version `1`, requires `panels.iframe` and `buttons`, and
+optionally uses `nightMode`. The `helm-entry` iframe panel uses `/signalk-chiplog/entry/?plotterExtension=1` with
+`keepAlive`; `open-helm-entry` toggles it from `mapToolbar`. The resource is unavailable while Chiplog is stopped, and
+writes/deletes are rejected. This does not change the REST endpoints or permissions below.
+
 ## Plugin state
 
 ### `GET /state` — `readonly`

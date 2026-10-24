@@ -13,6 +13,8 @@ const SHELL = [
   'icons/icon-512.png',
   'icons/apple-touch-icon.png',
   'js/main.mjs',
+  'js/confirm.mjs',
+  'js/plotter.mjs',
   'js/access.mjs',
   'js/clock.mjs',
   'js/journal.mjs',
@@ -43,7 +45,8 @@ const SHELL = [
   '../js/view-memory.mjs',
   '../js/components/common.mjs',
   '../js/components/Timeline.mjs',
-  '../vendor/preact-htm.mjs'
+  '../vendor/preact-htm.mjs',
+  '../vendor/plotterext.mjs'
 ];
 
 const shellUrls = () => new Set(SHELL.map((file) => new URL(file, self.registration.scope).href));

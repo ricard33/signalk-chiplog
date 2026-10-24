@@ -30,9 +30,10 @@ function createPluginRouter() {
   return { router, permissions };
 }
 
-async function startServer({ config = {}, self = {} } = {}) {
+async function startServer({ config = {}, self = {}, resourceProviders = true } = {}) {
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chiplog-test-'));
   const errors = [];
+  const providers = new Map();
   const savedOptions = [];
   const app = {
     getDataDirPath: () => dataDir,
@@ -47,6 +48,9 @@ async function startServer({ config = {}, self = {} } = {}) {
     }
   };
 
+  if (resourceProviders) {
+    app.registerResourceProvider = (provider) => providers.set(provider.type, provider);
+  }
   const plugin = createPlugin(app);
   const { router, permissions } = createPluginRouter();
   plugin.registerWithRouter(router);
@@ -106,6 +110,7 @@ async function startServer({ config = {}, self = {} } = {}) {
     plugin,
     router,
     permissions,
+    providers,
     errors,
     savedOptions,
     self,

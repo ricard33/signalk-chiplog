@@ -81,6 +81,7 @@
     "mediabunny": "1.58.0",
     "preact": "^10.29.8",
     "prettier": "^3.9.6",
+    "signalk-plotterext-bus": "^0.21.0",
     "three": "0.186.0"
   }
 }

@@ -1,6 +1,7 @@
 import { html, useState } from '../../../vendor/preact-htm.mjs';
 import { useLocale } from '../../../js/context.mjs';
 import { PencilIcon, TrashIcon } from './Icons.mjs';
+import { confirmAction } from '../confirm.mjs';
 
 // .big-button is a row flex container, so a bare <br/> between its children
 // would not stack them -- wrap name and role in their own column instead.
@@ -83,7 +84,7 @@ export function CrewDialog({
   };
 
   const removeMember = async (member) => {
-    if (!confirm(t('entry.deleteCrewMemberConfirm', { name: member.name }))) {
+    if (!(await confirmAction(t('entry.deleteCrewMemberConfirm', { name: member.name }), t))) {
       return;
     }
     const removed = await onDeleteMember(member.id);

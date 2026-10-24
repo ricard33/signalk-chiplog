@@ -8,6 +8,7 @@ const root = path.join(__dirname, '..');
 const vendor = path.join(root, 'public', 'vendor');
 
 const files = [
+  ['node_modules/signalk-plotterext-bus/LICENSE', 'plotterext-LICENSE'],
   ['node_modules/htm/preact/standalone.module.js', 'preact-htm.mjs'],
   ['node_modules/htm/LICENSE', 'htm-LICENSE'],
   // The htm standalone build bundles Preact.
@@ -31,6 +32,18 @@ for (const [source, target] of files) {
   fs.mkdirSync(path.dirname(destination), { recursive: true });
   fs.cpSync(path.join(root, source), destination, { recursive: true });
 }
+
+// The extension client ships split modules: bundle it for the offline tablet.
+require('esbuild').buildSync({
+  stdin: {
+    contents: "export { connectExtension, windowPort } from 'signalk-plotterext-bus/extension'",
+    resolveDir: root
+  },
+  bundle: true,
+  format: 'esm',
+  minify: true,
+  outfile: path.join(vendor, 'plotterext.mjs')
+});
 
 // three.js ships as a split build with add-ons that import the bare specifier
 // 'three', so it cannot be copied as it is. Bundle the few parts the 3D

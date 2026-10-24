@@ -437,6 +437,18 @@ Logging needs read/write access. The first time, the app shows **This tablet nee
 To revoke it, delete the device under **Security → Devices**: the tablet asks for access again. **Sign in instead** uses
 a regular Signal K user account.
 
+### From a chartplotter
+
+In a chartplotter supporting the Signal K Plotter Extensions API (such as Freeboard-SK), the **Chiplog** toolbar button
+opens the helm entry app in an iframe panel beside the chart. Closing and reopening it keeps notes and handwriting in
+progress; reloading the plotter still discards unsent drafts. The usual offline queue and Signal K access rights apply.
+The panel follows the plotter's night mode when available, and its night switch also changes the plotter's mode.
+Standalone tablet use remains available at the same address.
+
+The extension is advertised automatically while the plugin is enabled. A server without the resource-provider API can
+still run the standalone apps. Journal and login navigation links are hidden in the extension: sign in through the
+chartplotter, or use the panel's device access request.
+
 ## Configuration 🔧
 
 In the Signal K admin, **Apps & Plugins → Configuration → Chiplog**.

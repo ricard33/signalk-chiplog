@@ -8,6 +8,7 @@ const { INFLUX_DEFAULTS } = require('./lib/influx-history');
 const { createLandmarkFinder, LANDMARK_DEFAULTS } = require('./lib/landmark-finder');
 const { OBSERVATION_DEFAULTS } = require('./lib/observation-recorder');
 const { createPlaceNamer, GEOCODING_DEFAULTS } = require('./lib/place-names');
+const { registerPlotterExtension } = require('./lib/plotter-extension');
 const { PROPULSION_DEFAULTS } = require('./lib/propulsion-detector');
 const { createReplayJob } = require('./lib/replay-job');
 const { createSummaryMailer, SUMMARY_MAIL_DEFAULTS } = require('./lib/summary-mailer');
@@ -705,6 +706,8 @@ module.exports = function (app) {
       app.setPluginError(`Cannot open the logbook database: ${err.message}`);
       throw err;
     }
+
+    registerPlotterExtension(app, () => database !== null);
 
     const readSelfPath = (path) => app.getSelfPath(path);
     detector = createPassageDetector({ db: database, readSelfPath, settings });
