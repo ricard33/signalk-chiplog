@@ -267,6 +267,27 @@ describe('POST and DELETE /cloud-sync/pairing', () => {
     assert.equal(body.url, 'https://app.tibord.com');
   });
 
+  it('removes the pairing: the token goes, the backup stops, the address stays', async () => {
+    ctx = await startServer({
+      config: {
+        cloudSyncEnabled: true,
+        cloudSyncUrl: 'https://service.test',
+        cloudSyncToken: 'ma_old'
+      }
+    });
+
+    const removed = await ctx.request('DELETE', '/cloud-sync/token');
+
+    assert.equal(removed.status, 200);
+    assert.equal(removed.body.enabled, false);
+    assert.equal(removed.body.configured, false);
+    assert.equal(removed.body.problem, 'no device token');
+    const saved = ctx.savedOptions.at(-1);
+    assert.equal(saved.cloudSyncEnabled, false);
+    assert.equal(saved.cloudSyncUrl, 'https://service.test');
+    assert.equal('cloudSyncToken' in saved, false);
+  });
+
   it('refuses a malformed address, and cancels on request', async () => {
     ctx = await startServer();
 

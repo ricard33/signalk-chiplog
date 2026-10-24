@@ -593,6 +593,28 @@ module.exports = function (app) {
     });
   }
 
+  // Forgets the pairing from the Export page: the token leaves the plugin configuration and the
+  // backup turns off; the service address stays. What the service holds stays there.
+  function removePairing() {
+    const next = { ...savedConfig, cloudSyncEnabled: false };
+    delete next.cloudSyncToken;
+    return new Promise((resolve, reject) => {
+      app.savePluginOptions(next, (err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        savedConfig = next;
+        if (settings) {
+          settings.cloudSyncEnabled = false;
+          settings.cloudSyncToken = null;
+        }
+        cloudPairing?.cancel();
+        resolve();
+      });
+    });
+  }
+
   // Declares the link costly or cheap from the Export page, saved like the rest of the
   // configuration. Back to cheap, a run starts at once: full passages have been waiting.
   function saveCostlyLink(costly) {
@@ -889,6 +911,7 @@ module.exports = function (app) {
           cloudSync,
           nudgeCloudSync: () => cloudSchedule?.nudge(),
           saveCostlyLink,
+          removePairing,
           cloudPairing,
           cloudRestore,
           replayJob,

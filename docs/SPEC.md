@@ -892,7 +892,8 @@ webhook.
 - **Authentication**: the device token, sent as a bearer token. A reinstalled plugin pairs again; the owner attaches it
   to the same boat, and its new logbook sits beside the old one.
 - **The Export page** shows the backup: where it goes, the run under way, the last success and the last failure, a
-  **Back up now** button, and pairing.
+  **Back up now** button, pairing, and removing the pairing (after a confirmation: the token is forgotten and the backup
+  turns off; what the service holds stays there).
 - **Off by default**, and inert until the token is set. The service address is `https://app.tibord.com` unless the
   plugin configuration names another — for testing and development only; the Export page never asks for it.
 - **Restoring into an empty logbook.** After a lost SD card or on a new computer, the plugin starts with an empty

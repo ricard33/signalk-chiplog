@@ -912,6 +912,12 @@ empty.
 reached or refuses, with the reason in the message. Once claimed, the address and the token are saved into the plugin
 configuration and the backup turns on.
 
+### `DELETE /cloud-sync/token` — admin
+
+Removes the pairing: the device token leaves the plugin configuration and the backup turns off; the service address
+stays. Answers the state as `GET /cloud-sync`. The service keeps what it holds, and the device until it is revoked
+there. `409 cloud_sync_save_failed` when the configuration could not be saved.
+
 ### `DELETE /cloud-sync/pairing` — admin
 
 Stops waiting for the code to be claimed; answers the `pairing` state.

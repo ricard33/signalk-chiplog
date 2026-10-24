@@ -269,6 +269,17 @@ export function CloudBackup() {
         />`
       }
       ${
+        status?.configured &&
+        html`<button
+          type="button"
+          class="danger"
+          disabled=${busy}
+          onClick=${() => confirm(t('cloud.unpairConfirm')) && act('DELETE', '/cloud-sync/token')}
+        >
+          ${t('cloud.unpair')}
+        </button>`
+      }
+      ${
         status?.pairing &&
         html`<${PairingState}
           pairing=${status.pairing}

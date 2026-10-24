@@ -15,6 +15,11 @@ All notable changes to Chiplog are documented here. The format follows
 - **Pairing no longer asks for the service address.** It is `https://app.tibord.com` for a new plugin; another one, for
   testing or development, is set in the plugin configuration.
 
+### Added
+
+- **Remove the pairing** from the Export page, after a confirmation: the plugin forgets its token and the backup stops.
+  What is already on the service stays there.
+
 ## [2.12.0] - 2026-10-24
 
 ### Added

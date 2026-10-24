@@ -453,6 +453,9 @@ export const MESSAGES = {
     'cloud.restoreRefused': '{count} could not be written; see the server log.',
     'cloud.restoreFailed': 'The restore stopped: {message}',
     'cloud.pairAgain': 'Pair with another account',
+    'cloud.unpair': 'Remove the pairing',
+    'cloud.unpairConfirm':
+      'Remove the pairing? The backup stops and this plugin forgets its token. What is already on Ti Bord stays there; revoke the device from your account to stop it for good.',
     'cloud.pairIntro':
       'Ask for a code, then enter it on Ti Bord, signed in to your account. The backup turns on as soon as it is claimed.',
     'cloud.learnMore': 'More about the backups, and about sharing your passages and voyages:',
@@ -1037,6 +1040,9 @@ export const MESSAGES = {
     'cloud.restoreRefused': '{count} n’ont pas pu être écrites ; voir le journal du serveur.',
     'cloud.restoreFailed': 'La restauration s’est arrêtée : {message}',
     'cloud.pairAgain': 'Appairer avec un autre compte',
+    'cloud.unpair': 'Supprimer l’appairage',
+    'cloud.unpairConfirm':
+      'Supprimer l’appairage ? La sauvegarde s’arrête et ce plugin oublie son jeton. Ce qui est déjà sur Ti Bord y reste ; révoquez l’appareil depuis votre compte pour l’arrêter définitivement.',
     'cloud.pairIntro':
       'Demandez un code, puis saisissez-le sur Ti Bord, connecté à votre compte. La sauvegarde s’active dès qu’il est utilisé.',
     'cloud.learnMore':
