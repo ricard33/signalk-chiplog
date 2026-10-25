@@ -395,6 +395,36 @@ describe('instrument snapshot with a manoeuvre', () => {
     );
   });
 
+  it('goes when the event is deleted', async () => {
+    const { body: event } = await ctx.request('POST', `/entries/${entryId}/events`, {
+      type: 'text_annotation',
+      comment: 'Dolphins'
+    });
+    assert.equal((await observations()).total, 1);
+
+    assert.equal((await ctx.request('DELETE', `/events/${event.id}`)).status, 204);
+
+    assert.equal((await observations()).total, 0);
+  });
+
+  it('stays when the event is deleted but another still stands at that time', async () => {
+    const { body: event } = await ctx.request('POST', `/entries/${entryId}/events`, {
+      type: 'manoeuvre',
+      subtype: 'reef_in'
+    });
+    insert(ctx.db, 'events', {
+      entry_id: entryId,
+      time: event.time,
+      type: 'propulsion_change',
+      source: 'auto',
+      created_at: event.time
+    });
+
+    await ctx.request('DELETE', `/events/${event.id}`);
+
+    assert.equal((await observations()).total, 1);
+  });
+
   it('stays when another event of the passage still stands at that time', async () => {
     const { body: event } = await ctx.request('POST', `/entries/${entryId}/events`, {
       type: 'manoeuvre',

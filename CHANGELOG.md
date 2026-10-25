@@ -6,6 +6,16 @@ All notable changes to Chiplog are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **Edit the crew from the webapp.** The crew card of a passage has an Edit button: tick or untick names from the crew
+  list, add a new one with an optional role, and save.
+
+### Fixed
+
+- **Deleting a logbook line also deletes its instrument reading.** A note or manoeuvre logged live took a snapshot that
+  stayed in the logbook, and in the PDF, after the line was deleted.
+
 ## [2.13.0] - 2026-10-24
 
 ### Added

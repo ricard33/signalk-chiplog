@@ -582,6 +582,9 @@ logged in it, deletes that passage too: this is how a mistaken "Cast off" is und
 pairs — the notification reaching `alarm`/`emergency`, and the one that later cleared it — so deleting either takes the
 other with it; an escalation from `alarm` to `emergency` is not a pair (both are critical) and is left alone.
 
+The instrument snapshot taken when the event was logged (an observation with reason `event`) is deleted with it, unless
+another event of the passage still stands at the same time.
+
 ## Places
 
 ### `GET /places` — `readonly`

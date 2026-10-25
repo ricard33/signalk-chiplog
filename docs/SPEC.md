@@ -206,7 +206,8 @@ wrong times. Keep the clock set from GPS (e.g. with the `signalk-set-system-time
   the future, and the departure manoeuvre that opened a passage is corrected through the passage's own departure time
   instead. Since such an entry was not made where it happened, its position comes from the track at that time, and is
   left empty when the track has nothing within 2 minutes of it; the instrument snapshot of the moment the button was
-  pressed goes with it (§4.1).
+  pressed goes with it (§4.1). So it does when the entry is deleted, unless another event of the passage still stands at
+  that time.
 - **Departure manoeuvres open the passage.** Casting off or weighing anchor with no passage open opens one at that
   moment — the crew knows it is leaving before the boat moves. The passage starts stopped: detection carries it on when
   the vessel gets under way, and closes it at the cast-off if it has not moved within the tolerance
@@ -604,8 +605,9 @@ reconstruction is the same passage whichever source it came from.
   the main screen itself shows a compact, non-editable list to save space.
 - **Carried over.** A new passage — opened automatically or by casting off — starts with the same crew as the passage
   immediately before it, still adjustable from the dialog.
-- **Visible read-only** on the consultation webapp's passage page and in the PDF logbook's departure line, alongside the
-  place name.
+- **Shown on the consultation webapp's passage page** and in the PDF logbook's departure line, alongside the place name.
+  The webapp's crew card can also edit it (read/write access): tick or untick names from the roster, or type a new one,
+  and save. The roster itself is corrected from the tablet.
 - **Recorded as it stood at the time.** Correcting or deleting a roster member does not change what a past passage
   already recorded — the same denormalisation principle as a place name (§4.8, [DATA_MODEL.md](DATA_MODEL.md)).
 

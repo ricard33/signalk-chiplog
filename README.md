@@ -217,12 +217,12 @@ Open **Chiplog** from the Signal K webapps, or `/signalk-chiplog/`. Reading need
   counter at departure and arrival and the hours run, and the tank levels and battery charge, voltage and current noted
   at departure), and the log: every reading and event in order, including handwritten notes. A passage in progress
   refreshes every minute. Each line's comment can be edited (read/write access); a manoeuvre or note the crew logged
-  themselves can also be **redated** and deleted — automatic lines (alarms, autopilot, weather, corrections) can only be
-  annotated. Correcting a time reads the position back from the track at that time, and leaves it empty when the track
-  has nothing within 2 minutes of it, since the entry was not made where it happened. A time outside the passage, or in
-  the future, is refused, and the departure manoeuvre that opened a passage is moved by changing that passage's
-  departure time in **Corrections** below. Under each position, in grey, its bearing and distance from the nearest
-  landmark.
+  themselves can also be **redated** and deleted (with the instrument reading taken when it was logged) — automatic
+  lines (alarms, autopilot, weather, corrections) can only be annotated. Correcting a time reads the position back from
+  the track at that time, and leaves it empty when the track has nothing within 2 minutes of it, since the entry was not
+  made where it happened. A time outside the passage, or in the future, is refused, and the departure manoeuvre that
+  opened a passage is moved by changing that passage's departure time in **Corrections** below. Under each position, in
+  grey, its bearing and distance from the nearest landmark.
 - **Corrections** (read/write access):
   - rename the departure, or the arrival once the passage is closed — a passage in progress has none yet to rename;
   - switch an engine period to sail or back;
@@ -360,6 +360,9 @@ opens a dialog to tick names on or off from the crew list, and to add a new name
 dialog, including one just added, carries its own pencil to correct it and a trash icon to remove it from the list for
 good; a removal asks to confirm first, and past passages that recorded the name keep it. A new passage starts with the
 same crew as the one before it, ready to adjust rather than re-enter from scratch.
+
+The consultation webapp edits it too: the **Crew** card of a passage has an Edit button to tick or untick names from the
+list and add a new one, then save (read/write access).
 
 ### Logging a manoeuvre
 

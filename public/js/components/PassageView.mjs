@@ -355,6 +355,11 @@ export function PassageView({ id }) {
       await request('DELETE', `/entries/${id}`);
       location.hash = '#/';
     });
+  const setCrew = (members) =>
+    act(async () => {
+      await request('PUT', `/entries/${id}/crew`, { members });
+      reload();
+    });
   const editEvent = (event, patch) =>
     act(async () => {
       await request('PATCH', `/events/${event.id}`, patch);
@@ -520,7 +525,7 @@ export function PassageView({ id }) {
 
       <${BoatState} entry=${entry} observations=${data.observations} active=${active} />
 
-      <${CrewCard} crew=${entry.crew} />
+      <${CrewCard} crew=${entry.crew} busy=${busy} onSave=${setCrew} />
     </div>
 
     <section class="card">

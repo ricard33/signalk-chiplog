@@ -809,6 +809,19 @@ main {
   gap: 0.4rem;
 }
 
+.crew-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.crew-choice {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
 .crew-role {
   color: var(--muted);
   font-size: 0.9rem;
