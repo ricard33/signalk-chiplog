@@ -6,6 +6,8 @@ All notable changes to Chiplog are documented here. The format follows
 
 ## [Unreleased]
 
+## [2.14.0] - 2026-10-25
+
 ### Added
 
 - **Edit the crew from the webapp.** The crew card of a passage has an Edit button: tick or untick names from the crew
@@ -521,7 +523,8 @@ First release.
 - REST API under `/plugins/signalk-chiplog/api`, documented in [docs/API.md](docs/API.md).
 - Single SQLite database through Node's built-in `node:sqlite`: no native module to build.
 
-[Unreleased]: https://github.com/ricard33/signalk-chiplog/compare/v2.13.0...HEAD
+[Unreleased]: https://github.com/ricard33/signalk-chiplog/compare/v2.14.0...HEAD
+[2.14.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.13.0...v2.14.0
 [2.13.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.12.0...v2.13.0
 [2.12.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.11.0...v2.12.0
 [2.11.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.10.0...v2.11.0
