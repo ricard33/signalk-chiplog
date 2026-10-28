@@ -8,6 +8,8 @@ All notable changes to Chiplog are documented here. The format follows
 
 ### Added
 
+- **Link to the passage in the summary emails.** A new **Server address for the summary link** setting; each summary
+  then ends with a link that opens the passage in the webapp. Without it, no link.
 - **Hour scale on the tide graph**: the passage page's curve is graduated every three hours, in the logbook's time zone.
 
 ## [2.14.0] - 2026-10-25

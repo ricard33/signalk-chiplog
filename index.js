@@ -261,6 +261,12 @@ module.exports = function (app) {
         title: 'SMTP password',
         format: 'password'
       },
+      summaryMailServerUrl: {
+        type: 'string',
+        title: 'Server address for the summary link',
+        description:
+          'The address the server is reached at from the recipients’ side, e.g. https://boat.example.org or http://192.168.1.10:3000. Each summary then links to its passage in the logbook; empty leaves the link out'
+      },
       summaryMailTileUrl: {
         type: 'string',
         title: 'Map tiles for the summary',
@@ -673,6 +679,7 @@ module.exports = function (app) {
           : SUMMARY_MAIL_DEFAULTS.smtpSecurity,
         smtpUsername: config.smtpUsername || null,
         smtpPassword: config.smtpPassword || null,
+        summaryMailServerUrl: config.summaryMailServerUrl || null,
         summaryMailTileUrl:
           config.summaryMailTileUrl === undefined
             ? SUMMARY_MAIL_DEFAULTS.summaryMailTileUrl

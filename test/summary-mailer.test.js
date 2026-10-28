@@ -359,6 +359,35 @@ describe('what a passage summary says', () => {
     assert.match(bodyOf(mail.message), /src="cid:passage-map"/);
   });
 
+  it('links to the passage in the webapp when a server address is configured', async () => {
+    const linked = setup({ settings: { summaryMailServerUrl: 'https://boat.test/' } });
+    try {
+      const id = passage(linked.db);
+      await linked.mailer.resolveNext();
+
+      const body = bodyOf(linked.sent[0].message);
+      const url = `https://boat.test/signalk-chiplog/#/passages/${id}`;
+      assert.ok(body.includes(`Open the passage in the logbook: ${url}`));
+      assert.ok(body.includes(`<a href="${url}">Open the passage in the logbook</a>`));
+    } finally {
+      linked.close();
+    }
+  });
+
+  it('leaves the link out without a usable server address', async () => {
+    for (const summaryMailServerUrl of [null, '', 'boat.test', 'javascript:alert(1)']) {
+      const bare = setup({ settings: { summaryMailServerUrl } });
+      try {
+        passage(bare.db);
+        await bare.mailer.resolveNext();
+
+        assert.doesNotMatch(bodyOf(bare.sent[0].message), /Open the passage|signalk-chiplog/);
+      } finally {
+        bare.close();
+      }
+    }
+  });
+
   it('is written in the configured language and ship’s time', async () => {
     const french = setup({
       settings: { logbookLanguage: 'fr', logbookTimeZone: 'Europe/Paris' }

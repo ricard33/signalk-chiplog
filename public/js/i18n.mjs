@@ -219,6 +219,7 @@ export const MESSAGES = {
     'mail.subjectVessel': '{vessel} — {route}',
     'mail.when': '{date} ({zone})',
     'mail.mapAlt': 'The track of the passage on the map',
+    'mail.link': 'Open the passage in the logbook',
     'mail.footer': 'Sent automatically by Chiplog, this vessel’s logbook.',
 
     'map.seamarks': 'Seamarks',
@@ -801,6 +802,7 @@ export const MESSAGES = {
     'mail.subjectVessel': '{vessel} — {route}',
     'mail.when': 'Le {date} ({zone})',
     'mail.mapAlt': 'La trace de la navigation sur la carte',
+    'mail.link': 'Ouvrir la navigation dans le journal',
     'mail.footer': 'Envoyé automatiquement par Chiplog, le journal de bord de ce navire.',
 
     'map.seamarks': 'Balisage',

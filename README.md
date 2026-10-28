@@ -482,6 +482,7 @@ In the Signal K admin, **Apps & Plugins → Configuration → Chiplog**.
 | SMTP port                                                        | 587                                              | 587 for submission with STARTTLS, 465 for implicit TLS, 25 for a local relay.                                                                                                                                |
 | SMTP security                                                    | STARTTLS                                         | STARTTLS, TLS, or none for a relay on the boat itself.                                                                                                                                                       |
 | SMTP user name / password                                        | —                                                | Leave empty if the relay needs no authentication.                                                                                                                                                            |
+| Server address for the summary link                              | —                                                | The address the server is reached at by whoever reads the summary, e.g. `https://boat.example.org`. Each summary then links to its passage in the webapp. Empty leaves the link out.                         |
 | Map tiles for the summary                                        | `https://tile.openstreetmap.org/{z}/{x}/{y}.png` | The tiles the summary map is drawn over, e.g. a self-hosted server. Empty draws the track on a plain background.                                                                                             |
 | Logbook language (PDF and summary emails)                        | en                                               | Language of the PDF logbooks on the USB drive and of the summary emails (English or French).                                                                                                                 |
 | Ship's time zone (PDF and summary emails)                        | the server's                                     | Time zone of the PDF logbooks on the USB drive and of the summary emails, e.g. `Europe/Paris`.                                                                                                               |
@@ -595,6 +596,10 @@ summary of every passage once it is over for good.
   distance, the duration, the time under way, the time under engine and under sail, the average and maximum speed, and
   the maximum wind — the same figures and wording as the passage page, in the **logbook language** and **ship's time
   zone** set below.
+- **A link to the passage.** Set **Server address for the summary link** to the address the server is reached at
+  (`https://boat.example.org`, or a LAN address if the readers are aboard) and each summary ends with a link that opens
+  the passage in the webapp. Without it the summary carries no link, as the plugin cannot know its own address from
+  outside.
 - **The map** is drawn on the server and travels inside the message, so it shows up in the mail rather than as an
   attachment to open. Tiles come from OpenStreetMap by default; set your own tile server, or clear the setting to get
   the track drawn on a plain background and send nothing to a tile server.

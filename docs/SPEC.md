@@ -822,6 +822,10 @@ the day's run without opening the webapp.
   and the maximum wind. The wording, the units and the figures are the webapp's own (`public/js/i18n.mjs`,
   `format.mjs`), as the PDF logbook's are, so all three say the same thing; the language and the ship's time zone are
   those of the PDF logbook.
+- **A link to the passage.** When `summaryMailServerUrl` — the address the server is reached at from the recipients'
+  side — is set, the mail ends with a link to `<address>/signalk-chiplog/#/passages/<id>`, in both the HTML and the
+  plain-text part. The plugin cannot know its own external address, so with none configured (or one that is not
+  `http(s)://`) the link is left out.
 - **The map** is drawn server-side as a PNG and carried inside the message (`multipart/related`), not attached: the
   track over raster tiles fetched from a configurable tile server, OpenStreetMap by default, framed on the passage with
   the departure marked green and the arrival red, in the colours of the passage page's map. A tile that does not come
