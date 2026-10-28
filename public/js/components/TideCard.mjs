@@ -1,10 +1,12 @@
 import { html } from '../../vendor/preact-htm.mjs';
 import { useLocale } from '../context.mjs';
-import { smoothPath, tideExtremes } from '../tide.mjs';
+import { hourTicks, smoothPath, tideExtremes } from '../tide.mjs';
 
 const CHART_WIDTH = 600;
-const CHART_HEIGHT = 160;
-const PADDING = { top: 16, right: 12, bottom: 12, left: 12 };
+const CHART_HEIGHT = 180;
+// The bottom margin holds the hour scale.
+const PADDING = { top: 16, right: 12, bottom: 32, left: 12 };
+const TICK_LENGTH = 4;
 
 // Pixel coordinates for the curve, an area fill down to the baseline, and the
 // scales used to place the high/low markers at the same spots.
@@ -37,6 +39,7 @@ export function TideCard({ tide, placeName }) {
   }
   const chart = layout(points);
   const extremes = tideExtremes(points);
+  const ticks = hourTicks(points, format.time);
 
   return html`
     <section class="card tide-card">
@@ -57,6 +60,21 @@ export function TideCard({ tide, placeName }) {
           y2=${chart.baseline}
           class="tide-baseline"
         />
+        ${ticks.map(
+          (tick) =>
+            html`<g key=${tick.time}>
+              <line
+                x1=${chart.x(tick.time)}
+                y1=${chart.baseline}
+                x2=${chart.x(tick.time)}
+                y2=${chart.baseline + TICK_LENGTH}
+                class="tide-tick"
+              />
+              <text x=${chart.x(tick.time)} y=${chart.baseline + TICK_LENGTH + 13} class="tide-hour">
+                ${tick.label}
+              </text>
+            </g>`
+        )}
         <path d=${chart.areaPath} class="tide-area" />
         <path d=${chart.linePath} class="tide-line" />
         ${extremes.map(

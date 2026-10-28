@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { smoothPath, tideExtremes } from '../public/js/tide.mjs';
+import { hourTicks, smoothPath, tideExtremes } from '../public/js/tide.mjs';
 
 const at = (hour) => `2026-09-13T${String(hour).padStart(2, '0')}:00:00.000Z`;
 
@@ -80,5 +80,34 @@ describe('smooth path', () => {
 
   it('is empty with no points', () => {
     assert.equal(smoothPath([]), '');
+  });
+});
+
+describe('hour ticks', () => {
+  const points = Array.from({ length: 25 }, (_, hour) => ({
+    time: new Date(Date.UTC(2026, 8, 13, hour)).toISOString(),
+    height: 0
+  }));
+  const label = (time) => time.slice(11, 16);
+
+  it('keeps the samples on a multiple of three hours, labelled by the formatter', () => {
+    const ticks = hourTicks(points, label);
+    assert.deepEqual(
+      ticks.map((tick) => tick.label),
+      ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00', '00:00']
+    );
+    assert.equal(ticks[1].time, points[3].time);
+  });
+
+  it('follows the local clock rather than UTC', () => {
+    const local = (time) => label(new Date(Date.parse(time) + 2 * 3600e3).toISOString());
+    assert.deepEqual(
+      hourTicks(points, local, 6).map((tick) => tick.label),
+      ['06:00', '12:00', '18:00', '00:00']
+    );
+  });
+
+  it('has none for an empty curve', () => {
+    assert.deepEqual(hourTicks([], label), []);
   });
 });

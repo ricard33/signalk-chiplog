@@ -17,6 +17,17 @@ export function tideExtremes(points) {
   return extremes;
 }
 
+// The hour scale under the curve: the samples whose local hour is a multiple of
+// `step`, labelled by `label` (the formatter's `time`, so the zone and the
+// 24-hour clock are the reader's). Samples are used as they are rather than
+// recomputed from the clock, so a zone that is not on a whole hour still lines
+// up with the curve.
+export function hourTicks(points, label, step = 3) {
+  return points
+    .map((point) => ({ time: point.time, label: label(point.time) }))
+    .filter((tick) => Number(tick.label.slice(0, 2)) % step === 0);
+}
+
 // A smoothed SVG path through the points, quadratic Bezier segments via
 // midpoints -- simple, and hourly samples are dense enough that it reads as
 // a real tide curve rather than a jagged line.

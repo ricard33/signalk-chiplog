@@ -6,6 +6,10 @@ All notable changes to Chiplog are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **Hour scale on the tide graph**: the passage page's curve is graduated every three hours, in the logbook's time zone.
+
 ## [2.14.0] - 2026-10-25
 
 ### Added

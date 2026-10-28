@@ -300,7 +300,8 @@ detection cycle, not only when a snapshot is due, so a sensor that died during t
 ### 4.5.2 Tide forecast
 
 When a passage opens, the plugin fetches the predicted water height near the departure position for the next 24 hours,
-and shows it on the passage page: the departure's place name, the high/low tide times and heights, and the height curve.
+and shows it on the passage page: the departure's place name, the high/low tide times and heights, and the height curve
+with an hour scale (a graduation every three hours, on the logbook's clock).
 
 As implemented (`lib/tide-forecaster.js`):
 

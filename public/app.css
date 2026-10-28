@@ -735,6 +735,17 @@ main {
   stroke-width: 1;
 }
 
+.tide-tick {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.tide-hour {
+  fill: var(--muted);
+  font-size: 11px;
+  text-anchor: middle;
+}
+
 .tide-area {
   fill: var(--accent);
   opacity: 0.12;
