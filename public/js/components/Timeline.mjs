@@ -2,6 +2,7 @@ import { html, useEffect, useRef, useState } from '../../vendor/preact-htm.mjs';
 import { useLocale } from '../context.mjs';
 import { dayKey } from '../days.mjs';
 import { landmarkLine } from '../landmarks.mjs';
+import { IconButton } from './common.mjs';
 import { EDITABLE_EVENT_TYPES, buildRows, describeEvent } from '../log-lines.mjs';
 
 // A dot — the stroke of an i or a full stop — has a single point, which a
@@ -68,10 +69,9 @@ export function EventRemark({ event, manoeuvreLabels }) {
 // the comment on anything the plugin logged itself (SPEC: "an edited comment");
 // what the crew logged (`EDITABLE_EVENT_TYPES`) can also be redated, which makes
 // the server re-read its position from the track. Deleting is offered for what
-// the crew themselves logged (`source: "manual"`) and for an alarm (`sk_alarm`)
-// — which takes its paired line, the raise or the clearing, with it
-// (lib/events.js `pairedAlarmEvent`); other automatic lines (autopilot, weather,
-// corrections) can only be annotated.
+// every line — an alarm (`sk_alarm`) takes its paired line, the raise or the
+// clearing, with it (lib/events.js `pairedAlarmEvent`). The server decides who
+// may: an administrator for a reading, whoever has write access for a line.
 function EventLine({ event, bounds, manoeuvreLabels, busy, onEditEvent, onDelete }) {
   const { t, format } = useLocale();
   const [editing, setEditing] = useState(false);
@@ -143,25 +143,19 @@ function EventLine({ event, bounds, manoeuvreLabels, busy, onEditEvent, onDelete
   return html`
     <${EventRemark} event=${event} manoeuvreLabels=${manoeuvreLabels} />
     <div class="timeline-actions">
-      <button
-        type="button"
-        class="link-button"
+      <${IconButton}
+        icon="edit"
+        label=${t('common.edit')}
         disabled=${busy}
         onClick=${() => setEditing(true)}
-      >
-        ${t('common.edit')}
-      </button>
-      ${
-        (event.source === 'manual' || event.type === 'sk_alarm') &&
-        html`<button
-          type="button"
-          class="link-button danger"
-          disabled=${busy}
-          onClick=${() => onDelete(event)}
-        >
-          ${t('common.delete')}
-        </button>`
-      }
+      />
+      <${IconButton}
+        icon="delete"
+        label=${t('common.delete')}
+        danger
+        disabled=${busy}
+        onClick=${() => onDelete(event)}
+      />
     </div>
   `;
 }
@@ -174,7 +168,8 @@ export function Timeline({
   manoeuvreLabels,
   busy,
   onEditEvent,
-  onDelete
+  onDelete,
+  onDeleteReading
 }) {
   const { t, format } = useLocale();
   const rows = buildRows(events, observations);
@@ -260,7 +255,16 @@ export function Timeline({
                           onEditEvent=${onEditEvent}
                           onDelete=${onDelete}
                         />`
-                      : html`<span class="muted">${t(`observation.${readings.reason}`)}</span>`
+                      : html`<span class="muted">${t(`observation.${readings.reason}`)}</span>
+                          <div class="timeline-actions">
+                            <${IconButton}
+                              icon="delete"
+                              label=${t('common.delete')}
+                              danger
+                              disabled=${busy}
+                              onClick=${() => onDeleteReading(readings)}
+                            />
+                          </div>`
                   }
                 </td>
               </tr>

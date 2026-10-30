@@ -373,6 +373,12 @@ export function PassageView({ id }) {
       await request('DELETE', `/events/${event.id}`);
       reload();
     });
+  const deleteReading = (reading) =>
+    confirm(t('timeline.deleteReadingConfirm')) &&
+    act(async () => {
+      await request('DELETE', `/observations/${reading.id}`);
+      reload();
+    });
 
   const sameDay =
     entry.endTime && dayKey(new Date(entry.startTime)) === dayKey(new Date(entry.endTime));
@@ -539,6 +545,7 @@ export function PassageView({ id }) {
         busy=${busy}
         onEditEvent=${editEvent}
         onDelete=${deleteEvent}
+        onDeleteReading=${deleteReading}
       />
     </section>
 

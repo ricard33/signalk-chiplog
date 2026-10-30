@@ -375,6 +375,13 @@ The instrument snapshots behind the facsimile PDF, oldest first. Paginated. `rea
 (`{ "port": 2924700, "starboard": 2873220 }`), or `null` with no counter; `engineRuntime` is the main (or first)
 engine's, as before. Snapshots recorded before migration 5 only have `engineRuntime`.
 
+### `DELETE /observations/:id` — admin
+
+`204`; `404` for an unknown id. Deletes one instrument snapshot, whatever its `reason` — a periodic reading, the
+`entry_start`/`entry_end` ones, or one taken for an event, which then stays in the log without readings. Nothing else is
+recomputed. On an open passage, deleting the most recent snapshot lets the next periodic one be taken as soon as the
+last remaining one is a slot old, dated at that moment rather than on the clock boundary.
+
 ### `GET /entries/:id/propulsion` — `readonly`
 
 The engine/sail segments, oldest first. Paginated. They cover only time under way, so a stop leaves a gap; the ongoing

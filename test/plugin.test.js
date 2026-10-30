@@ -118,6 +118,7 @@ describe('plugin', () => {
     assert.equal(level('PATCH', '/api/propulsion/:id'), 'readwrite');
     assert.equal(level('DELETE', '/api/entries/:id'), 'admin');
     assert.equal(level('DELETE', '/api/places/:id'), 'admin');
+    assert.equal(level('DELETE', '/api/observations/:id'), 'admin');
     assert.equal(level('POST', '/api/manoeuvre-types'), 'admin');
     assert.equal(level('POST', '/api/export/usb'), 'admin');
     assert.equal(level('GET', '/api/crew'), 'readonly');

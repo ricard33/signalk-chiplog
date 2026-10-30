@@ -217,12 +217,13 @@ Open **Chiplog** from the Signal K webapps, or `/signalk-chiplog/`. Reading need
   counter at departure and arrival and the hours run, and the tank levels and battery charge, voltage and current noted
   at departure), and the log: every reading and event in order, including handwritten notes. A passage in progress
   refreshes every minute. Each line's comment can be edited (read/write access); a manoeuvre or note the crew logged
-  themselves can also be **redated** and deleted (with the instrument reading taken when it was logged) — automatic
-  lines (alarms, autopilot, weather, corrections) can only be annotated. Correcting a time reads the position back from
-  the track at that time, and leaves it empty when the track has nothing within 2 minutes of it, since the entry was not
-  made where it happened. A time outside the passage, or in the future, is refused, and the departure manoeuvre that
-  opened a passage is moved by changing that passage's departure time in **Corrections** below. Under each position, in
-  grey, its bearing and distance from the nearest landmark.
+  themselves can also be **redated** — automatic lines (alarms, autopilot, weather, corrections) can only be annotated.
+  Any line can be deleted (with the instrument reading taken when it was logged), and so can a reading on its own, which
+  needs an administrator. Correcting a time reads the position back from the track at that time, and leaves it empty
+  when the track has nothing within 2 minutes of it, since the entry was not made where it happened. A time outside the
+  passage, or in the future, is refused, and the departure manoeuvre that opened a passage is moved by changing that
+  passage's departure time in **Corrections** below. Under each position, in grey, its bearing and distance from the
+  nearest landmark.
 - **Corrections** (read/write access):
   - rename the departure, or the arrival once the passage is closed — a passage in progress has none yet to rename;
   - switch an engine period to sail or back;

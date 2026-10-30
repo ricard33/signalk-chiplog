@@ -378,13 +378,13 @@ As implemented (`lib/event-watcher.js`, checked every second):
   of paths to maintain, and an alarm from a plugin nobody anticipated is still logged. The log records it when raised
   (with an instrument snapshot), on escalation, and when it clears or disappears. `warn` and `alert` are not logged.
   After a restart, the log itself says what was already recorded: an alarm still open is not repeated, and one that
-  cleared meanwhile is closed. Unlike the other automatic lines, an alarm can be deleted from the webapp: deleting
-  either the raise or the clearing takes its pair with it, so a false alarm leaves no orphan line (an escalation is not
-  a pair and is unaffected). `alarmsEnabled` (on by default) turns alarm logging off altogether, and `ignoredAlarms`
-  lists paths never logged, `*` standing for any run of characters (dots included) and the leading `notifications.`
-  optional — for an instrument that keeps raising meaningless alarms, such as `notifications.chartplotter.unknown*`.
-  Either one stops new raises and escalations only: an alarm already in the log is still closed when it clears, so the
-  raise keeps its pair.
+  cleared meanwhile is closed. Like any other line, an alarm can be deleted from the webapp (as can an instrument
+  reading on its own, by an administrator): deleting either the raise or the clearing takes its pair with it, so a false
+  alarm leaves no orphan line (an escalation is not a pair and is unaffected). `alarmsEnabled` (on by default) turns
+  alarm logging off altogether, and `ignoredAlarms` lists paths never logged, `*` standing for any run of characters
+  (dots included) and the leading `notifications.` optional — for an instrument that keeps raising meaningless alarms,
+  such as `notifications.chartplotter.unknown*`. Either one stops new raises and escalations only: an alarm already in
+  the log is still closed when it clears, so the raise keeps its pair.
 - **Autopilot.** Engagement, disengagement, and mode changes while engaged, from `steering.autopilot.engaged` and
   `.mode` (the server's Autopilot API) or, for older autopilot plugins, `steering.autopilot.state` (`standby` meaning
   disengaged), each with an instrument snapshot. The target heading or wind angle goes with it. Only during a passage:

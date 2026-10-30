@@ -306,6 +306,7 @@ export const MESSAGES = {
     'timeline.timeFromTrack': 'Changing the time reads the position back from the track.',
     'timeline.deleteConfirm': 'Delete this log line? This cannot be undone.',
     'timeline.deleteAlarmConfirm': 'Delete this alarm and its resolution? This cannot be undone.',
+    'timeline.deleteReadingConfirm': 'Delete this instrument reading? This cannot be undone.',
 
     // Where the position is from the landmark, the way a logbook gives it.
     'landmark.bearing': '{distance} {cardinal} ({bearing}) — {name}',
@@ -890,6 +891,7 @@ export const MESSAGES = {
     'timeline.timeFromTrack': 'Changer l’heure relit la position dans la trace.',
     'timeline.deleteConfirm': 'Supprimer cette ligne du journal ? C’est irréversible.',
     'timeline.deleteAlarmConfirm': 'Supprimer cette alarme et sa résolution ? C’est irréversible.',
+    'timeline.deleteReadingConfirm': 'Supprimer ce relevé des instruments ? C’est irréversible.',
 
     // Le relèvement inverse : où se trouve le bateau par rapport à l’amer.
     // Sans préposition, qui varierait avec l’aire de vent (au NE, à l’E).

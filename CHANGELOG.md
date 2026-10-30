@@ -8,6 +8,9 @@ All notable changes to Chiplog are documented here. The format follows
 
 ### Added
 
+- **Delete an instrument reading.** An administrator can delete any reading from a passage's journal (**Delete** on its
+  row), including those taken at departure and arrival. Any log line, automatic ones included, can now be deleted from
+  the journal too.
 - **Link to the passage in the summary emails.** A new **Server address for the summary link** setting; each summary
   then ends with a link that opens the passage in the webapp. Without it, no link.
 - **Hour scale on the tide graph**: the passage page's curve is graduated every three hours, in the logbook's time zone.

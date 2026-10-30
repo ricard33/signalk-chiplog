@@ -9,6 +9,37 @@ export function SignInLink({ label }) {
   return html`<a href="/admin/#/login" target="_blank" rel="noopener">${label}</a>`;
 }
 
+const ICON_PATHS = {
+  edit: 'M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z',
+  delete: 'M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10v6M14 10v6'
+};
+
+// A button drawn as an icon, named for screen readers and as a tooltip.
+export function IconButton({ icon, label, danger, disabled, onClick }) {
+  return html`<button
+    type="button"
+    class=${`link-button icon-button${danger ? ' danger' : ''}`}
+    disabled=${disabled}
+    title=${label}
+    aria-label=${label}
+    onClick=${onClick}
+  >
+    <svg
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d=${ICON_PATHS[icon]} />
+    </svg>
+  </button>`;
+}
+
 // Failed actions waiting for the link to come back, so the toast can say, once
 // it does, that there is something to do again.
 const unfinished = new Set();

@@ -1,5 +1,6 @@
 const assert = require('node:assert/strict');
 const { describe, it, afterEach } = require('node:test');
+const { startServer, insert, insertEntry, T0: ISO_T0 } = require('./helpers');
 const { createBoat, iso, BERTH, KNOT, MINUTE, T0 } = require('./boat');
 
 const INSTRUMENTS = {
@@ -306,5 +307,34 @@ describe('instrument snapshots', () => {
 
     assert.equal(boat.entries()[0].state, 'closed');
     assert.ok(boat.observations().every((o) => o.reason !== 'entry_end'));
+  });
+});
+
+describe('DELETE /observations/:id', () => {
+  let ctx;
+
+  afterEach(() => ctx.close());
+
+  it('deletes one reading, and answers 404 for an unknown one', async () => {
+    ctx = await startServer();
+    const entryId = insertEntry(ctx.db, { state: 'closed' });
+    const keep = insert(ctx.db, 'observations', {
+      entry_id: entryId,
+      time: ISO_T0,
+      reason: 'periodic'
+    });
+    const drop = insert(ctx.db, 'observations', {
+      entry_id: entryId,
+      time: ISO_T0,
+      reason: 'entry_end'
+    });
+
+    assert.equal((await ctx.request('DELETE', `/observations/${drop}`)).status, 204);
+    assert.equal((await ctx.request('DELETE', `/observations/${drop}`)).status, 404);
+    const { body } = await ctx.request('GET', `/entries/${entryId}/observations`);
+    assert.deepEqual(
+      body.items.map((o) => o.id),
+      [keep]
+    );
   });
 });

@@ -78,6 +78,16 @@ button.link-button {
   padding: 0.2rem 0.4rem;
 }
 
+button.icon-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem;
+}
+
+button.icon-button.danger {
+  border: none;
+}
+
 button.danger {
   background: none;
   color: var(--danger);
