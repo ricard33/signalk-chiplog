@@ -6,13 +6,16 @@ All notable changes to Chiplog are documented here. The format follows
 
 ## [Unreleased]
 
+## [2.15.0] - 2026-10-30
+
 ### Added
 
-- **Delete an instrument reading.** An administrator can delete any reading from a passage's journal (**Delete** on its
+- **Delete an instrument reading.** An administrator can delete any reading from a passage's journal (trash icon on its
   row), including those taken at departure and arrival. Any log line, automatic ones included, can now be deleted from
   the journal too.
 - **Link to the passage in the summary emails.** A new **Server address for the summary link** setting; each summary
   then ends with a link that opens the passage in the webapp. Without it, no link.
+- **Icon buttons in the journal**: edit and delete are a pencil and a bin instead of words.
 - **Hour scale on the tide graph**: the passage page's curve is graduated every three hours, in the logbook's time zone.
 
 ## [2.14.0] - 2026-10-25
@@ -532,7 +535,8 @@ First release.
 - REST API under `/plugins/signalk-chiplog/api`, documented in [docs/API.md](docs/API.md).
 - Single SQLite database through Node's built-in `node:sqlite`: no native module to build.
 
-[Unreleased]: https://github.com/ricard33/signalk-chiplog/compare/v2.14.0...HEAD
+[Unreleased]: https://github.com/ricard33/signalk-chiplog/compare/v2.15.0...HEAD
+[2.15.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.14.0...v2.15.0
 [2.14.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.13.0...v2.14.0
 [2.13.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.12.0...v2.13.0
 [2.12.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.11.0...v2.12.0
