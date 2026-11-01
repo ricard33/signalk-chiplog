@@ -6,6 +6,28 @@ All notable changes to Chiplog are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **An API for companion apps**, such as Chiplog Skipper, described in [docs/API.md](docs/API.md):
+  - **Versioned**: the public routes are also served under `/plugins/signalk-chiplog/api/v1`, described by an OpenAPI
+    document (`GET /api/v1/openapi.json`, also listed by the Signal K server). `GET /state` now says `apiVersions`,
+    `pluginVersion`, `features` and the `logbookId`.
+  - **Planned passages** (`/plans`): departure, arrival, Signal K route and fallback points, criteria, crew and watches;
+    linking a plan to the passage that opens puts the planned crew aboard.
+  - **Defects** (`/defects`), with severity, status and links to the passage, plan or journal line they came from.
+  - **Tanks at arrival** (`endTanks`): noted as a passage closes, by detection or by the crew, beside those noted at
+    departure; both can be set by hand with `PATCH /entries/:id`, and imported with `POST /entries`.
+  - **A changes feed** (`GET /changes?since=`), listing the passages, events, crew, plans and defects changed since a
+    cursor, deletions included.
+  - Every new route is open to read/write users; none needs admin.
+- **Plans and defects in the online backup**, sent whole like the places to a service that keeps them, and brought back
+  by a restore.
+
+### Changed
+
+- The first backup run after the update sends every passage's content again, without its track: a passage now carries
+  its tanks at arrival.
+
 ## [2.15.0] - 2026-10-30
 
 ### Added

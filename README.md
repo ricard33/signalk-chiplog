@@ -33,6 +33,7 @@ English and French, chosen from the browser's language.
 - [Passage summary emails](#passage-summary-emails-)
 - [Retrospective analysis](#retrospective-analysis-)
 - [Importing from PostgSail](#importing-from-postgsail-)
+- [Companion apps](#companion-apps-)
 - [Privacy and online services](#privacy-and-online-services-)
 - [Troubleshooting](#troubleshooting-)
 - [Limitations](#limitations-)
@@ -681,6 +682,23 @@ node scripts/import-postgsail.js PostgSail_Trip.geojson --url http://boat.local:
 - Place names come as PostgSail has them. Passages near a place Chiplog already knows are named the same; the countries
   and landmarks are then looked up in the background, like for any passage. Tide and weather forecasts are not fetched
   for passages this old.
+
+## Companion apps 🧭
+
+Chiplog keeps what happened. A companion app, such as Chiplog Skipper on a tablet, can add what was planned and decided
+around it, through the plugin's REST API — nothing to set up in the plugin:
+
+- **Planned passages**: departure, arrival, the Signal K route and fallback points, the crew and the watches. Once the
+  passage opens, the planned crew is the one recorded aboard.
+- **Defects** noticed under way or after, with their severity and whether they are fixed.
+- **Tanks at arrival**, noted as a passage ends next to those noted at departure, so that what a passage used can be
+  worked out. A boat without tank sensors can have them typed in.
+- **Decisions, check-lists, briefings and signatures** appear in the passage's journal as notes.
+
+The app connects with a Signal K device access request, like the tablet entry app, and needs read/write access, never
+admin. Plans and defects go to the [online backup](#online-backup-) with the rest of the logbook, when the service keeps
+them. For developers: the API is versioned (`/plugins/signalk-chiplog/api/v1`) and described by an OpenAPI document,
+listed in the Signal K admin under **Documentation**, and in [docs/API.md](docs/API.md).
 
 ## Privacy and online services 🔒
 

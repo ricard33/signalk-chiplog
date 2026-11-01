@@ -65,6 +65,27 @@ describe('instrument snapshots', () => {
     assert.ok(observations.every((o) => o.entry_id === entry.id));
   });
 
+  it('note the tanks again as the passage ends, and forget them if it carries on', () => {
+    const tanks = (level) => ({ ...INSTRUMENTS, 'tanks.fuel.0.currentLevel': level });
+    boat = createBoat()
+      .start()
+      .sail(5, { sog: 0, instruments: tanks(0.8) })
+      .sail(5, { sog: 5, instruments: tanks(0.8) })
+      .sail(65, { sog: 5, instruments: tanks(0.7) });
+    assert.equal(boat.entries()[0].end_tanks, null, 'not while under way');
+
+    boat.sail(5, { sog: 0, instruments: tanks(0.6) });
+    const [entry] = boat.entries();
+    assert.equal(entry.state, 'closed');
+    assert.deepEqual(JSON.parse(entry.end_tanks), [{ type: 'fuel', id: '0', level: 0.6 }]);
+    assert.deepEqual(JSON.parse(entry.start_tanks), [{ type: 'fuel', id: '0', level: 0.8 }]);
+
+    // Off again within stopClosureMinutes: the same passage goes on, and has not ended yet.
+    boat.sail(10, { sog: 5, instruments: tanks(0.55) });
+    assert.equal(boat.entries().length, 1);
+    assert.equal(boat.entries()[0].end_tanks, null);
+  });
+
   it('take no arrival reading for a passage that ended while the plugin was off', () => {
     boat = createBoat()
       .start()

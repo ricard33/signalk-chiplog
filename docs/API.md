@@ -6,12 +6,40 @@ The plugin registers its routes through `registerWithRouter`, so everything belo
 /plugins/signalk-chiplog/api
 ```
 
+and, except for the webapp's own maintenance routes, a second time under the versioned prefix that other clients use
+(see [Versioning](#versioning)):
+
+```text
+/plugins/signalk-chiplog/api/v1
+```
+
 The `/api` prefix keeps the plugin's routes clear of `GET /plugins/signalk-chiplog` and
 `GET`/`POST /plugins/signalk-chiplog/config`, which the Signal K server reserves. The tablet PWA is a static webapp at
 `/signalk-chiplog/entry/` and uses this API.
 
 Implemented in [`lib/api.js`](../lib/api.js); the behaviour described here is covered by the tests in
 [`test/`](../test).
+
+## Versioning
+
+The API is versioned so that a client and the plugin can be updated apart — a companion app through its stores, the
+plugin through the Signal K appstore.
+
+- **`/api/v1` is the contract.** Every route below is mounted there too, except the online backup (`/cloud-sync…`), the
+  USB copy (`/export/usb`), the summary email (`/summary-mail`, `/entries/:id/summary-mail`) and the retrospective
+  analysis (`/replay…`), which only the plugin's webapp uses. The access level of a route is the same under both
+  prefixes.
+- **`/api` without a version** is the webapp's: it serves the same routes today, but may change with the webapp, freely.
+- **Evolution.** A field or a route added stays in `v1`; a breaking change makes a `v2`, with `v1` kept alongside for a
+  transition period.
+- **Discovery.** [`GET /state`](#get-state--readonly) gives `apiVersions` (`[1]`), `pluginVersion` and `features`:
+  `plans`, `defects`, `changes`, `endTanks` — what was added to `v1` after it first shipped (2.15). `schemaVersion`
+  stays the database's migration level, not an API version.
+- **Unknown fields** are still refused with `400`. A client therefore sends a field or calls a route of a feature only
+  once `features` names it, and reads a response field it does not know as optional. Against an older plugin, a feature
+  missing from `features` stays on the client's side, with a word to the user, rather than failing.
+- **Machine-readable description.** [`GET /openapi.json`](#get-openapijson--readonly) is the OpenAPI 3 document of `v1`,
+  which the Signal K server also lists among its API documents (`getOpenApi`). A client is generated from it.
 
 ## Conventions
 
@@ -48,13 +76,14 @@ timestamp is accepted in requests and normalised to millisecond precision.
 { "error": { "code": "entry_already_closed", "message": "Entry 42 is already closed" } }
 ```
 
-| Status | When                                                               | Codes                                                                                                                                                                                                                                                      |
-| ------ | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `400`  | Malformed request                                                  | `invalid_request`, `unknown_manoeuvre_type`                                                                                                                                                                                                                |
-| `404`  | Unknown resource                                                   | `entry_not_found`, `event_not_found`, `place_not_found`, `propulsion_segment_not_found`, `manoeuvre_type_not_found`, `crew_member_not_found`, `tide_not_found`, `weather_not_found`                                                                        |
-| `409`  | The request conflicts with current state                           | `no_passage`, `entry_active`, `entry_already_closed`, `entry_overlaps`, `entries_not_consecutive`, `manoeuvre_type_exists`, `builtin_manoeuvre_type`, `usb_export_not_configured`, `usb_export_unavailable`, `summary_mail_failed`, `constraint_violation` |
-| `500`  | Unexpected failure — detail goes to the server log, not the client | `internal_error`                                                                                                                                                                                                                                           |
-| `503`  | The plugin is disabled or stopped                                  | `plugin_not_started`                                                                                                                                                                                                                                       |
+| Status | When                                                               | Codes                                                                                                                                                                                                                                                                        |
+| ------ | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `400`  | Malformed request                                                  | `invalid_request`, `unknown_manoeuvre_type`                                                                                                                                                                                                                                  |
+| `404`  | Unknown resource                                                   | `entry_not_found`, `event_not_found`, `place_not_found`, `propulsion_segment_not_found`, `manoeuvre_type_not_found`, `crew_member_not_found`, `plan_not_found`, `defect_not_found`, `tide_not_found`, `weather_not_found`                                                    |
+| `409`  | The request conflicts with current state                           | `no_passage`, `entry_active`, `entry_already_closed`, `entry_overlaps`, `entries_not_consecutive`, `entry_has_plan`, `manoeuvre_type_exists`, `builtin_manoeuvre_type`, `usb_export_not_configured`, `usb_export_unavailable`, `summary_mail_failed`, `constraint_violation` |
+| `410`  | A changes cursor this logbook never gave                           | `cursor_expired`                                                                                                                                                                                                                                                             |
+| `500`  | Unexpected failure — detail goes to the server log, not the client | `internal_error`                                                                                                                                                                                                                                                             |
+| `503`  | The plugin is disabled or stopped                                  | `plugin_not_started`                                                                                                                                                                                                                                                         |
 
 The server registers plugin routes once and never removes them, so they keep answering while the plugin is disabled —
 with `503` until it is started again.
@@ -80,7 +109,11 @@ What the UI needs to render its header, in one call.
   "motion": "underway",
   "propulsion": "engine",
   "stateIssue": null,
-  "schemaVersion": 4
+  "schemaVersion": 24,
+  "logbookId": "37ff7ef8-28e8-4a28-9277-c34df9391976",
+  "apiVersions": [1],
+  "pluginVersion": "2.16.0",
+  "features": ["plans", "defects", "changes", "endTanks"]
 }
 ```
 
@@ -98,6 +131,18 @@ As of the last detection cycle, at most 15 seconds old:
   as signalk-autostate publishes while starting), `stale` (not updated for 20 minutes) or `unrecognised` (a value such
   as `default`). `source` is the Signal K source reference, `null` when the server gives none. When signalk-autostate is
   among several sources of `navigation.state`, its value is the one used.
+
+`logbookId` identifies this logbook (the one the online backup files it under, SPEC §4.17): a client that keeps a copy
+tells by it that it is talking to another logbook — a reinstalled plugin, another boat — and starts again.
+`apiVersions`, `pluginVersion` and `features` are described under [Versioning](#versioning).
+
+### `GET /openapi.json` — `readonly`
+
+The OpenAPI 3.0 document of `v1` ([`lib/openapi.js`](../lib/openapi.js)): every `v1` route with its parameters, bodies
+and responses, its Signal K access level as `x-signalk-access`, and `servers` set to `/plugins/signalk-chiplog/api/v1`.
+Request bodies are described closed (`additionalProperties: false`), as the server refuses unknown fields; responses
+open, as a field may be added within `v1`. `test/openapi.test.js` fails when a `v1` route is missing from it, or
+described at another access level.
 
 ## Entries
 
@@ -204,6 +249,7 @@ One entry, with the counts the detail view needs:
   "openedByEventId": null,
   "startTanks": [{ "type": "fuel", "id": "0", "level": 0.8, "volume": 0.096, "capacity": 0.12 }],
   "startBatteries": [{ "id": "house", "voltage": 12.8, "current": -3.2, "stateOfCharge": 0.86 }],
+  "endTanks": [{ "type": "fuel", "id": "0", "level": 0.65, "volume": 0.078, "capacity": 0.12 }],
   "createdAt": "2026-09-13T06:12:00.000Z",
   "updatedAt": "2026-09-13T15:47:30.000Z",
   "previousEntryId": 41,
@@ -230,6 +276,12 @@ by `maxWindApparent` — only for a passage with no true-wind reading at all; `n
 (SPEC §4.5.1): ratios, m³, V, A (negative discharging), K, a field absent when not published. `null` when the boat
 published none, for a passage opened after the fact (a queued tablet entry, a retrospective replay), or one opened
 before migration 11.
+
+`endTanks` (feature `endTanks`) is the tanks again as the passage ended, shaped like `startTanks`: what it consumed is
+the difference. Noted as detection closes the passage, or as the crew closes it with
+[close](#post-entriesidclose--readwrite); `null` while the passage is under way, when the boat published none, for a
+closure detection only noticed after a restart, and for passages closed before 2.16. Both can be noted by hand with
+[`PATCH /entries/:id`](#patch-entriesid--readwrite).
 
 `startPlacePending`/`endPlacePending` mean the name was generated from coordinates (`"46.1234N 1.5678W"`) and online
 geocoding has not answered yet (SPEC §4.8); the name may still change on its own. A UI can show it as provisional.
@@ -273,6 +325,7 @@ uses it to bring in a PostgSail export. One passage per request, all or nothing:
   and place names, `distance` in metres, and the three lists.
 - `startTanks` are the tanks as noted at departure, shaped as in `startTanks` of `GET /entries/:id`: `type`, `id`, and a
   `level` (ratio) or a `volume` (m³), with optionally a `name` and a `capacity` (m³).
+- `endTanks` (feature `endTanks`) are the tanks as noted at arrival, shaped like `startTanks`.
 - `startBatteries` are the batteries as noted at departure, shaped as in `startBatteries` of `GET /entries/:id`: an `id`
   and, of `voltage` (V), `current` (A, negative discharging), `stateOfCharge` (ratio) and `temperature` (K), at least
   one, with optionally a `name`.
@@ -298,7 +351,12 @@ another starts does not. That makes an import safe to repeat: what is already th
 
 ### `PATCH /entries/:id` — `readwrite`
 
-Accepts `startTime`, `endTime`, `startPosition`, `endPosition`, `startPlaceName`, `endPlaceName`, `distance`.
+Accepts `startTime`, `endTime`, `startPosition`, `endPosition`, `startPlaceName`, `endPlaceName`, `distance`, and
+(feature `endTanks`) `startTanks`, `endTanks`.
+
+- `startTanks` and `endTanks` are the tanks noted by hand, for a boat that publishes none — shaped as in
+  [`POST /entries`](#post-entries--admin); `null` or `[]` clears them. `endTanks` is refused with `409 entry_active` on
+  an entry still in progress.
 
 - `endTime` can only be set on a closed entry — `409 entry_active` otherwise; use
   [close](#post-entriesidclose--readwrite). An end before the start is `400`.
@@ -320,8 +378,8 @@ Accepts `startTime`, `endTime`, `startPosition`, `endPosition`, `startPlaceName`
 Closes an open entry, with no request body — confirming an arrival, or ending a passage detection has not ended. If
 detection has already seen the vessel stop (`stoppedSince`), that is the end time; otherwise it is now. The end position
 is the one detection recorded, or failing that the vessel's current position. Unless the arrival already has a name, it
-is named as detection would name it: after a known place, or from its coordinates pending geocoding.
-`409 entry_already_closed` if it is already closed.
+is named as detection would name it: after a known place, or from its coordinates pending geocoding. The tanks are noted
+as `endTanks`. `409 entry_already_closed` if it is already closed.
 
 A closed entry is final: detection does not reopen it, whether the boat is still moving or leaves again soon after — the
 next passage starts at the next real departure. An entry detection closed, by contrast, is reopened by a departure
@@ -559,6 +617,12 @@ A stroke's `color` (`"#rrggbb"`), `tool` (`"pen"` or `"highlighter"`) and `width
 scaling) are optional — a note drawn before the tablet's toolbar existed has none, and is shown in the current text
 colour at a default width. `tool: "highlighter"` is the only one drawn translucent, wherever the note is later shown.
 
+**Companion app records.** A companion app logs what it adds to the journal — a go/no-go decision, a reroute, a
+check-list, a briefing, a threshold crossed, a debriefing — as `text_annotation` with a `subtype` of its own, prefixed
+`companion.` (`companion.go_decision`, `companion.briefing`, …), a readable `comment` and its structured detail in
+`payload`; a signature is `payload.strokes`, shaped as above. The plugin stores them like any annotation and needs no
+change for a new one.
+
 ### `POST /entries/:id/events` — `readwrite`
 
 The same as [`POST /events`](#post-events--readwrite), for a given entry — open or closed — with no attachment rule.
@@ -690,6 +754,176 @@ place.
 starts with the same crew as the one immediately before it, still adjustable here.
 
 Not a separate read endpoint: an entry's crew is included in [`GET /entries/:id`](#get-entriesid--readonly) as `crew`.
+
+## Plans
+
+Feature `plans` (SPEC §4.18). A planned passage, prepared by a companion app before anything moves, then linked to the
+log entry that sails it. Every route is `readwrite` at most: preparing and sailing a passage needs no admin login.
+
+```json
+{
+  "id": 3,
+  "clientRef": "0b7f3a1e-5c2d-4e8f-9a6b-1c2d3e4f5a6b",
+  "title": "La Rochelle – Île d'Yeu",
+  "status": "ready",
+  "departureTime": "2026-09-14T06:00:00.000Z",
+  "departurePlaceName": "La Rochelle",
+  "departurePosition": { "lat": 46.15, "lon": -1.17 },
+  "arrivalTime": "2026-09-14T15:00:00.000Z",
+  "arrivalPlaceName": "Port-Joinville",
+  "arrivalPosition": null,
+  "routeRef": "/resources/routes/6f1b2c3d-0000-4000-8000-000000000001",
+  "fallbackRefs": ["/resources/waypoints/aaaa", "/resources/waypoints/bbbb"],
+  "criteria": { "maxWindSpeed": 12.9 },
+  "crew": [{ "crewMemberId": 3, "name": "Alex Martin", "role": "skipper" }],
+  "watches": [
+    {
+      "start": "2026-09-14T06:00:00.000Z",
+      "end": "2026-09-14T09:00:00.000Z",
+      "crewMemberId": 3,
+      "name": "Alex Martin",
+      "role": "skipper"
+    }
+  ],
+  "entryId": null,
+  "createdAt": "2026-09-12T18:20:00.000Z",
+  "updatedAt": "2026-09-12T18:20:00.000Z"
+}
+```
+
+- `status` is `draft`, `ready`, `active`, `done` or `cancelled`, set by the client; the plugin only changes it when a
+  plan is linked to its passage (below).
+- `routeRef` and `fallbackRefs` are Signal K resource hrefs — `/resources/routes/<id>` and `/resources/waypoints/<id>`.
+  The route and the fallback points are Signal K resources, which a chart plotter such as Freeboard-SK shows; the plan
+  only refers to them, and nothing checks that they still exist.
+- `criteria` is any JSON object: the no-go criteria the client applied, copied as they stood.
+- `crew` and `watches` are lists of at most 100. In a request, each member is either `{ "crewMemberId" }` — a roster
+  member, `404 crew_member_not_found` if unknown — or `{ "name" }`, a name for this plan alone; either may take a
+  `role`. A watch adds `start` and `end`, `end` after `start`. The plan stores names and roles as they stand, like a
+  passage's crew: correcting the roster later does not rewrite a plan.
+- Times are ISO 8601; `arrivalTime` before `departureTime` is `400`.
+
+### `GET /plans` — `readonly`
+
+Planned departure (creation when there is none) newest first. Optional `status` and `entryId` filters — `entryId` finds
+the plan of a passage. Paginated.
+
+### `GET /plans/:id` — `readonly`
+
+One plan. `404 plan_not_found`.
+
+### `POST /plans` — `readwrite`
+
+`title` is required; every other field above but `id`, `createdAt`, `updatedAt` is optional. `status` defaults to
+`draft`, or `active` when `entryId` is given. `clientRef` (1–100 characters) is an idempotency key, as for events: a
+plan made offline and replayed answers `200` with the plan already made, unchanged. `201` otherwise.
+
+### `PATCH /plans/:id` — `readwrite`
+
+Accepts the same fields, but `clientRef`; only those sent change.
+
+**Linking the plan to its passage.** The client logs the departure with [`POST /events`](#post-events--readwrite) — the
+answer says `openedEntry` and `entryId` — and then sets `entryId` here. Then:
+
+- the planned `crew`, when there is one, replaces the passage's crew (carried over from the previous passage, SPEC
+  §4.11), as [`PUT /entries/:id/crew`](#put-entriesidcrew--readwrite) would — a roster member deleted since is added
+  again by name;
+- a `draft` or `ready` plan becomes `active`, unless the request sets `status` itself;
+- `404 entry_not_found` for an unknown entry, `409 entry_has_plan` when another plan already has it.
+
+`"entryId": null` unlinks it. Deleting the passage unlinks it too; merging two passages carries the later one's plan to
+the survivor, unless that one has its own.
+
+### `DELETE /plans/:id` — `readwrite`
+
+`204`. The passage it was linked to is untouched; defects that named it lose the link.
+
+## Defects
+
+Feature `defects` (SPEC §4.18). What broke or needs fixing, noticed under way or after.
+
+```json
+{
+  "id": 7,
+  "clientRef": "a3d1…",
+  "title": "Bilge pump",
+  "description": "Runs every ten minutes",
+  "severity": "major",
+  "status": "open",
+  "time": "2026-09-14T10:12:00.000Z",
+  "fixedAt": null,
+  "entryId": 42,
+  "planId": 3,
+  "eventId": 811,
+  "createdAt": "2026-09-14T10:12:00.000Z",
+  "updatedAt": "2026-09-14T10:12:00.000Z"
+}
+```
+
+- `severity` is `minor` (the default), `major` or `critical`; `status` `open` (the default) or `fixed`.
+- `time` is when it was noticed, now by default. `fixedAt` is when it was fixed: set to now when `status` becomes
+  `fixed` unless given, cleared when it goes back to `open`, and refused with `400` on an open defect.
+- `entryId`, `planId` and `eventId` say where it came from, each optional and `404` when unknown. `eventId` is the
+  journal line that reported it: the defect takes that line's passage unless `entryId` is given, and `400` if it names
+  another. Deleting any of them leaves the defect, without the link.
+
+### `GET /defects` — `readonly`
+
+Newest first, by `time`. Optional `status`, `entryId` and `planId` filters. Paginated.
+
+### `GET /defects/:id` — `readonly`
+
+One defect. `404 defect_not_found`.
+
+### `POST /defects` — `readwrite`
+
+`title` is required. `clientRef` makes the call idempotent, as for plans: `200` with the defect already made, `201`
+otherwise.
+
+### `PATCH /defects/:id` — `readwrite`
+
+Accepts the fields above but `clientRef`. Setting `eventId` without `entryId` moves the defect to that line's passage.
+
+## Changes feed
+
+### `GET /changes` — `readonly`
+
+Feature `changes` (SPEC §4.18). What changed after a cursor, for a client keeping a copy of the logbook — offline, on a
+tablet — to catch up without reading it all again:
+
+```json
+{
+  "logbookId": "37ff7ef8-28e8-4a28-9277-c34df9391976",
+  "cursor": 1289,
+  "more": false,
+  "items": [
+    {
+      "seq": 1288,
+      "resource": "event",
+      "id": 811,
+      "changedAt": "2026-09-14T10:12:00.512Z",
+      "deleted": false,
+      "item": { "id": 811, "entryId": 42, "type": "text_annotation", "…": "…" }
+    },
+    { "seq": 1289, "resource": "plan", "id": 2, "changedAt": "…", "deleted": true, "item": null }
+  ]
+}
+```
+
+- Query: `since`, the `cursor` of the previous answer, `0` (the default) for everything; `limit` from 1 to 500 (default
+  200). Ask again with the new `cursor` while `more` is `true`.
+- Followed resources: `entry` (as in [`GET /entries`](#get-entries--readonly), without the figures of
+  `GET /entries/:id`), `event`, `crewMember` (the roster), `entryCrew` (`id` is the entry's, `item` is
+  `{ entryId, crew }`, who was aboard), `plan` and `defect`. Track points, instrument snapshots, propulsion segments and
+  places are not followed: an `entry` change says the passage moved on, read what is needed of it then.
+- **Each object once, as it stands now.** An object changed several times since the cursor appears once, at the place of
+  its last change, with its current state. A deleted object appears with `"deleted": true` and `item` `null`, whatever
+  deleted it — the API, detection, a merge, a cascade.
+- Every write counts, the plugin's own included: an entry under way changes every detection cycle (distance, end
+  position), and so shows again each time it is asked for.
+- `410 cursor_expired` for a cursor beyond the last change: one from another logbook, or from before the database was
+  replaced by an older copy. Start again from `0`. `logbookId`, the same as in [`GET /state`](#get-state--readonly),
+  tells a client the logbook changed.
 
 ## Export
 
@@ -851,7 +1085,9 @@ nothing here is needed for the backup to happen.
     "waiting": 0,
     "deleted": 0,
     "held": 57,
-    "places": false
+    "places": false,
+    "plans": false,
+    "defects": false
   },
   "lastError": null,
   "pairing": { "state": "idle" },
@@ -873,9 +1109,10 @@ nothing here is needed for the backup to happen.
 - `costlyLink` says the link is declared costly: passages go as light copies (SPEC §4.17). `lastSuccess.light` counts
   those sent that way by the last run, `lastSuccess.waiting` the passages the service does not hold in full yet.
 - `inProgress` counts the passages to send or delete in the run under way, `null` between runs.
-- `lastSuccess` gives the passages sent and deleted by the last complete run, those on board, and whether the list of
-  places was sent; `lastError` is `{ at, message, code }`, `code` being the service's error code when it answered one.
-  Both are kept in memory and start empty when the plugin starts.
+- `lastSuccess` gives the passages sent and deleted by the last complete run, those on board, and whether the lists of
+  places, plans and defects were sent — plans and defects go, whole like the places, only to a service that says it
+  keeps them; `lastError` is `{ at, message, code }`, `code` being the service's error code when it answered one. Both
+  are kept in memory and start empty when the plugin starts.
 
 - `pairing` follows the last pairing since the plugin started: `{ "state": "idle" }`;
   `{ "state": "waiting", "url", "code", "claimUrl", "claimQr", "expiresAt" }` while the code waits to be claimed
@@ -1045,8 +1282,3 @@ purpose (SPEC §4.10).
 Stops the reconstruction in progress, whether it is still scanning history or already replaying; `204`. The range
 already reconstructed up to that point stays on record — cancelling does not roll it back. `409 replay_not_running` with
 nothing to cancel.
-
-## Not yet provided
-
-- **`getOpenApi()`**, the machine-readable version of this document, which the Signal K server can surface. Worth adding
-  once the API has settled, so the two do not have to be kept in step while it still moves.

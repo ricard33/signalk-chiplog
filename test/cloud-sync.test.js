@@ -30,6 +30,11 @@ function fakeService() {
   const passages = new Map();
   // What the service holds of the logbook's places; `knowsPlaces` off is an older service.
   const places = { hash: null, list: [], knowsPlaces: true };
+  // Plans and defects, which only a newer service keeps (`known`).
+  const lists = {
+    plans: { hash: null, list: [], known: false },
+    defects: { hash: null, list: [], known: false }
+  };
   const requests = [];
   // `historyFrom`: the first moment the boat's plan keeps, said in the sync state when set.
   const control = { down: false, status: null, historyFrom: undefined };
@@ -51,7 +56,7 @@ function fakeService() {
     }
     const payload = body ? JSON.parse(zlib.gunzipSync(body)) : undefined;
     const match =
-      /^\/v1\/logbooks\/([^/]+)(?:\/passages\/(\d+)(?:\/track\/(\d+))?|\/sync-state|\/places)$/.exec(
+      /^\/v1\/logbooks\/([^/]+)(?:\/passages\/(\d+)(?:\/track\/(\d+))?|\/sync-state|\/places|\/plans|\/defects)$/.exec(
         route
       );
     assert.ok(match, `unexpected route ${route}`);
@@ -69,6 +74,11 @@ function fakeService() {
           light: p.light
         })),
         ...(places.knowsPlaces ? { placesHash: places.hash } : {}),
+        ...Object.fromEntries(
+          Object.entries(lists)
+            .filter(([, held]) => held.known)
+            .map(([name, held]) => [`${name}Hash`, held.hash])
+        ),
         ...(control.historyFrom !== undefined ? { historyFrom: control.historyFrom } : {})
       });
     }
@@ -77,6 +87,15 @@ function fakeService() {
       places.hash = payload.hash;
       places.list = payload.places;
       return reply(204);
+    }
+    for (const name of Object.keys(lists)) {
+      if (route.endsWith(`/${name}`)) {
+        assert.ok(lists[name].known, `${name} sent to a service that does not keep them`);
+        assert.equal(jsonHash(payload[name]), payload.hash);
+        lists[name].hash = payload.hash;
+        lists[name].list = payload[name];
+        return reply(204);
+      }
     }
     if (method === 'DELETE') {
       passages.delete(originId);
@@ -114,7 +133,7 @@ function fakeService() {
     return reply(204);
   }
 
-  return { fetch, passages, places, requests, control };
+  return { fetch, passages, places, lists, requests, control };
 }
 
 function point(n) {
@@ -371,7 +390,9 @@ describe('online backup', () => {
         waiting: 0,
         deleted: 0,
         held: 1,
-        places: false
+        places: false,
+        plans: false,
+        defects: false
       },
       lastError: null
     });
@@ -617,7 +638,9 @@ describe('online backup over a costly link', () => {
       waiting: 1,
       deleted: 0,
       held: 1,
-      places: false
+      places: false,
+      plans: false,
+      defects: false
     });
 
     const sent = service.requests
@@ -803,5 +826,74 @@ describe('costly link API', () => {
     const response = await server.request('POST', '/cloud-sync/costly-link', { costly: 'yes' });
 
     assert.equal(response.status, 400);
+  });
+});
+
+describe('online backup of plans and defects', () => {
+  let dataDir;
+  let db;
+  let service;
+
+  const sync = (settings = {}) =>
+    createCloudSync({
+      db,
+      settings: { ...SETTINGS, ...settings },
+      userAgent: 'signalk-chiplog/2.16.0',
+      log: () => {},
+      fetch: service.fetch
+    });
+  const methods = () => service.requests.map((r) => `${r.method} ${r.route.split('/').pop()}`);
+
+  beforeEach(() => {
+    dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chiplog-cloud-plans-'));
+    ({ db } = openDatabase(dataDir));
+    service = fakeService();
+  });
+
+  afterEach(() => {
+    db.close();
+    fs.rmSync(dataDir, { recursive: true, force: true });
+  });
+
+  const addPlan = (title) => insert(db, 'plans', { title, created_at: T0, updated_at: T0 });
+  const addDefect = (title, planId = null) =>
+    insert(db, 'defects', { title, plan_id: planId, time: T0, created_at: T0, updated_at: T0 });
+
+  it('sends them whole to a service that keeps them, and again only when they change', async () => {
+    service.lists.plans.known = true;
+    service.lists.defects.known = true;
+    const planId = addPlan('Day sail');
+    addDefect('Bilge pump', planId);
+    const cloud = sync();
+
+    assert.equal((await cloud.resolveNext()).outcome, 'sent');
+    assert.deepEqual(
+      service.lists.plans.list.map((plan) => plan.title),
+      ['Day sail']
+    );
+    assert.equal(service.lists.defects.list[0].planId, planId);
+    assert.equal(cloud.status().lastSuccess.plans, true);
+    assert.equal(cloud.status().lastSuccess.defects, true);
+
+    service.requests.length = 0;
+    assert.equal((await cloud.resolveNext()).outcome, 'idle');
+    assert.deepEqual(methods(), ['GET sync-state']);
+
+    db.prepare("UPDATE defects SET status = 'fixed', fixed_at = ?").run(T0);
+    service.requests.length = 0;
+    await cloud.resolveNext();
+    assert.deepEqual(methods(), ['GET sync-state', 'PUT defects']);
+    assert.equal(service.lists.defects.list[0].status, 'fixed');
+  });
+
+  it('sends none to a service that says nothing of them, nor over a costly link', async () => {
+    addPlan('Day sail');
+    await sync().resolveNext();
+    assert.ok(!methods().includes('PUT plans'));
+
+    service.lists.plans.known = true;
+    service.requests.length = 0;
+    await sync({ cloudSyncCostlyLink: true }).resolveNext();
+    assert.ok(!methods().includes('PUT plans'), 'they wait for a cheap link');
   });
 });

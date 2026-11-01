@@ -59,6 +59,12 @@ after the fact:
 They are written by detection as it opens the entry, or, for an entry the crew opens by hand, as the departure manoeuvre
 is logged live. Merging keeps the earlier entry's, its departure being the merged passage's.
 
+`end_tanks` (migration 23) is the tanks again as the passage ends, shaped like `start_tanks`: what a consumption is
+worked out from. Written by detection as it closes the entry (not for a closure it only notices after a restart, like
+the `entry_end` reading), or as the crew closes it through the API; cleared when detection reopens the entry, since the
+passage goes on. Merging keeps the later entry's, its arrival being the merged passage's. Both columns can also be set
+by hand (`PATCH /entries/:id`), for a boat that publishes no tanks.
+
 `opened_by_event_id` (migration 4) points to the departure manoeuvre — cast off or anchor up — that opened the entry by
 hand before the vessel moved (SPEC §4.3). Such an entry starts with `stopped_since` equal to `start_time` and
 `last_moving_at` null: detection sees a stopped passage, resumes it on the first movement and closes it like any long
@@ -325,8 +331,53 @@ logbook. Nothing about what was sent is stored: the service reports what it hold
 of the logbook restored, but not all its passages are written yet. The backup does not run while it is set — it would
 report the missing passages as deleted on board — and a restore cut short is carried on with at the next start.
 Restoring writes rows under the ids they had (`log_entries`, `events`, `observations`, `propulsion_segments`,
-`log_entry_crew`, `places`), which is what makes a restored passage hash as the original did; it raises
-`sqlite_sequence` for `log_entries` first, so a passage logged meanwhile cannot take the id of one still to come.
+`log_entry_crew`, `places`, and once the passages are written `plans` and `defects`), which is what makes a restored
+passage hash as the original did; it raises `sqlite_sequence` for `log_entries` first, so a passage logged meanwhile
+cannot take the id of one still to come.
+
+### `plans` (migration 21)
+
+A planned passage (SPEC §4.18), prepared by a companion app before anything moves, then linked to its log entry
+(`entry_id`) once the passage opens. `status` is `draft`, `ready`, `active`, `done` or `cancelled`; the plugin only
+moves it itself when a plan not yet started is linked to its passage (to `active`).
+
+- The departure and arrival are flat columns like an entry's (`departure_time`, `departure_place_name`,
+  `departure_lat`/`departure_lon`, same for `arrival_*`), all optional.
+- `route_ref` and `fallback_refs` (a JSON array) are Signal K resource hrefs — `/resources/routes/<id>`,
+  `/resources/waypoints/<id>`. The route and its fallback points live in Signal K, where a chart plotter shows them; the
+  plan only points at them, and nothing checks the resource still exists.
+- `criteria` is JSON, whatever the companion app's no-go criteria were as it applied them — a copy, not a reference, so
+  a criteria set edited later does not rewrite what the decision was made on.
+- `crew` and `watches` are JSON arrays: `[{ crewMemberId, name, role }]`, and the same with `start` and `end` for a
+  watch (one row per member and period). `name` and `role` are **denormalised** like `log_entry_crew`'s, and
+  `crewMemberId` is not a foreign key: a plan records who was planned, whatever the roster says later. Linking the plan
+  to its entry replaces that entry's crew (carried over from the previous passage) with the planned one.
+- `client_ref` is an idempotency key, as on `events`: a plan made offline and replayed is not made twice.
+- A partial unique index lets one entry carry one plan at most. `entry_id` is `ON DELETE SET NULL`: deleting a passage
+  leaves its plan. Merging two entries moves the later one's plan to the survivor, unless it has its own.
+
+### `defects` (migration 22)
+
+What broke or needs fixing (SPEC §4.18). `severity` is `minor`, `major` or `critical`; `status` `open` or `fixed`, with
+`fixed_at` set only when fixed (a CHECK). `time` is when it was noticed. Optional links to where it came from —
+`entry_id`, `plan_id`, `event_id` (the journal line that reported it, whose passage it takes by default) — are all
+`ON DELETE SET NULL`: a defect still needs fixing once its passage is deleted. Merging moves the later entry's defects
+to the survivor, like its other rows. `client_ref` as on `plans`.
+
+### `changes` (migration 24)
+
+The change feed behind `GET /changes` (SPEC §4.18): one row per object that changed, `(resource, resource_id)` unique,
+`seq` the cursor clients keep (`AUTOINCREMENT`, so a number is never given twice). Triggers on `log_entries`, `events`,
+`crew_members`, `log_entry_crew`, `plans` and `defects` keep it, so every write counts — the API's, detection's, a
+merge, an import, a restore, a foreign-key cascade — without the code that makes it knowing. Each write deletes the
+object's row and inserts it again, which moves it to the head of the feed; the table never grows beyond the logbook's
+size, deleted objects keeping theirs, which is how a client learns of a deletion. `log_entry_crew` is reported as one
+`entryCrew` resource per entry (`resource_id` is the entry id), and a row moved to another entry touches both. The
+migration enters every row already there, so a client starting from 0 gets the whole logbook.
+
+**Rebuilding a followed table drops its triggers**: a later migration that rebuilds one (to change a CHECK, as
+`addHeadingChangeEventType` did for `events`) must create them again — `changeFeedTriggers` in `lib/database.js` writes
+them — and a table the feed should follow needs triggers of its own, added by a new migration.
 
 ## Migrations
 

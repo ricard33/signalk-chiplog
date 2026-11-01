@@ -473,6 +473,15 @@ describe('the plugin and its summary emails', () => {
       const latest = before.prepare('PRAGMA user_version').get().user_version;
       // Back to the version before migration 18, which brought summary emails,
       // undoing it and every migration since.
+      for (const { name } of before
+        .prepare("SELECT name FROM sqlite_master WHERE type = 'trigger'")
+        .all()) {
+        before.exec(`DROP TRIGGER ${name}`);
+      }
+      before.exec('DROP TABLE changes');
+      before.exec('ALTER TABLE log_entries DROP COLUMN end_tanks');
+      before.exec('DROP TABLE defects');
+      before.exec('DROP TABLE plans');
       before.exec('DROP TABLE logbook_identity');
       before.exec('DROP TABLE passage_summary_mails');
       before.exec('PRAGMA user_version = 17');

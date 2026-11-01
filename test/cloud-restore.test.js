@@ -4,7 +4,9 @@ const os = require('node:os');
 const path = require('node:path');
 const { describe, it, beforeEach, afterEach } = require('node:test');
 const { openDatabase } = require('../lib/database');
-const { createCloudRestore } = require('../lib/cloud-restore');
+const { createCloudRestore, restorePlansAndDefects } = require('../lib/cloud-restore');
+const { allDefects } = require('../lib/defects');
+const { allPlans } = require('../lib/plans');
 const {
   createCloudSync,
   CLOUD_SYNC_DEFAULTS,
@@ -159,6 +161,7 @@ function sailedLogbook(db) {
     engine_duration: 1800,
     sail_duration: 12600,
     start_tanks: JSON.stringify([{ name: 'fuel', level: 0.8 }]),
+    end_tanks: JSON.stringify([{ name: 'fuel', level: 0.6 }]),
     start_batteries: JSON.stringify([{ name: 'house', voltage: 12.7 }])
   });
   for (let n = 0; n < 5; n += 1) {
@@ -519,6 +522,88 @@ describe('restoring from the online backup', () => {
     assert.equal(entries(db).length, 2);
     assert.equal(allTrackPoints(db, 1).length, 0);
     assert.equal(allTrackPoints(db, 2).length, 1);
+  });
+});
+
+describe('restoring plans and defects', () => {
+  let dataDir;
+  let db;
+
+  beforeEach(() => {
+    dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chiplog-restore-plans-'));
+    ({ db } = openDatabase(dataDir));
+  });
+
+  afterEach(() => {
+    db.close();
+    fs.rmSync(dataDir, { recursive: true, force: true });
+  });
+
+  it('writes them back under their ids, dropping links to what did not come back', () => {
+    const entryId = insertEntry(db);
+    const eventId = insert(db, 'events', {
+      entry_id: entryId,
+      time: T0,
+      type: 'text_annotation',
+      comment: 'Pump',
+      created_at: T0
+    });
+    const plans = [
+      {
+        id: 4,
+        clientRef: 'p-4',
+        title: 'Sailed',
+        status: 'done',
+        departureTime: T0,
+        departurePlaceName: 'La Rochelle',
+        departurePosition: { lat: 46.15, lon: -1.17 },
+        arrivalTime: at(4),
+        arrivalPlaceName: null,
+        arrivalPosition: null,
+        routeRef: '/resources/routes/r1',
+        fallbackRefs: ['/resources/waypoints/w1'],
+        criteria: { maxWindSpeed: 12 },
+        crew: [{ crewMemberId: null, name: 'Jo', role: null }],
+        watches: [],
+        entryId,
+        createdAt: T0,
+        updatedAt: T0
+      },
+      { id: 5, title: 'Of a passage the plan did not keep', status: 'done', entryId: 99 }
+    ];
+    const defects = [
+      {
+        id: 7,
+        clientRef: 'd-7',
+        title: 'Pump',
+        description: null,
+        severity: 'major',
+        status: 'fixed',
+        time: T0,
+        fixedAt: at(30),
+        entryId,
+        planId: 4,
+        eventId,
+        createdAt: T0,
+        updatedAt: T0
+      },
+      { id: 8, title: 'Lost links', severity: 'minor', status: 'open', time: T0, eventId: 1234 }
+    ];
+
+    restorePlansAndDefects(db, { plans, defects }, at(50));
+
+    const [sailed, orphan] = allPlans(db);
+    assert.deepEqual(sailed, { ...plans[0] });
+    assert.equal(orphan.id, 5);
+    assert.equal(orphan.entryId, null);
+    const [pump, lost] = allDefects(db);
+    assert.deepEqual(pump, defects[0]);
+    assert.equal(lost.eventId, null);
+    assert.equal(lost.createdAt, at(50));
+
+    // A plan made again from a companion app's queue meanwhile is left as it is.
+    restorePlansAndDefects(db, { plans: [{ ...plans[0], id: 40, title: 'Again' }] }, at(50));
+    assert.equal(allPlans(db).length, 2);
   });
 });
 

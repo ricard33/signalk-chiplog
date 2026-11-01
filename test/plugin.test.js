@@ -21,7 +21,7 @@ describe('plugin', () => {
       assert.equal(body.detection, 'autostate');
       assert.equal(body.motion, 'underway');
       assert.equal(body.propulsion, 'sail');
-      assert.equal(body.schemaVersion, 20);
+      assert.equal(body.schemaVersion, 24);
       const entry = await ctx.request('GET', `/entries/${body.activeEntryId}`);
       assert.equal(entry.body.state, 'active');
     });
@@ -44,7 +44,11 @@ describe('plugin', () => {
           value: 'sailing',
           updatedAt: '2026-01-01T00:00:00.000Z'
         },
-        schemaVersion: 20
+        schemaVersion: 24,
+        logbookId: ctx.db.prepare('SELECT id FROM logbook_identity').get().id,
+        apiVersions: [1],
+        pluginVersion: require('../package.json').version,
+        features: ['plans', 'defects', 'changes', 'endTanks']
       });
     });
 

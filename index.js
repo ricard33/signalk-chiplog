@@ -1,4 +1,5 @@
 const { registerRoutes } = require('./lib/api');
+const { getOpenApi } = require('./lib/openapi');
 const { openDatabase } = require('./lib/database');
 const { createPassageDetector, DETECTION_DEFAULTS, TICK_INTERVAL_MS } = require('./lib/detection');
 const { ApiError } = require('./lib/errors');
@@ -894,6 +895,10 @@ module.exports = function (app) {
     }
   };
 
+  // The versioned API's description, which the server lists with its own (Signal K admin,
+  // Documentation > OpenAPI).
+  plugin.getOpenApi = () => getOpenApi();
+
   // The server registers routes once, before start() and even while the plugin
   // is disabled, and never removes them: every request must check the database.
   plugin.registerWithRouter = function (router) {
@@ -913,6 +918,7 @@ module.exports = function (app) {
           vesselPosition: () => readVesselPosition(app),
           observeEvent: (entryId, time) => detector.observeEvent(entryId, time),
           noteDeparture: (entryId) => detector.noteDeparture(entryId),
+          noteArrival: (entryId) => detector.noteArrival(entryId),
           usbExport,
           summaryMailer,
           cloudSync,

@@ -58,6 +58,18 @@ modules, and maps errors to responses. The resource modules (`entries`, `events`
 `camelCase` objects, and throw `ApiError` (`lib/errors.js`) for not-found and conflict cases. Unit conversion to
 nautical units happens only in `lib/formats.js`, for human-facing exports.
 
+Routes are registered through `versioned()` in `lib/api.js`, which mounts each public route under both `/api` (the
+webapp's, free to change) and `/api/v1` (the contract, docs/API.md "Versioning"); the webapp's maintenance routes
+(online backup, USB copy, summary email, replay) use `internalReadonly`/`internalAdmin` and stay out of `v1`.
+`lib/openapi.js` describes every `v1` route — `test/openapi.test.js` fails when a route is missing there or has another
+access level, so add a route to both. A field added to a request body is refused by older plugins: give it a name in
+`FEATURES` (and `GET /state`) when it starts a feature a client must check for.
+
+`lib/plans.js` and `lib/defects.js` hold the companion-app objects (SPEC §4.18), shaped like the other resource modules;
+`lib/changes.js` reads the change feed, which SQLite triggers on the followed tables keep (`changeFeedTriggers` in
+`lib/database.js`, migration 24). A migration that rebuilds a followed table (`events`, to widen its CHECK) drops its
+triggers and must create them again; a newly followed table needs its own migration.
+
 `lib/passage-import.js` adds a finished passage recorded elsewhere (`POST /entries`, SPEC §4.15): one transaction,
 refused when it overlaps a passage on record. `scripts/import-postgsail.js` is its client for PostgSail GeoJSON exports
 — a plain Node script that reaches the logbook only through the API, so it works against a remote server; keep it that
@@ -263,8 +275,9 @@ Signal K callbacks are expected.
 identity and writes every row under the id it had, so each passage hashes as it did when sent and the backup has nothing
 to send again — `test/cloud-restore.test.js` checks the round trip to the letter. A column added to a table a passage
 carries (`log_entries`, `events`, `observations`, `propulsion_segments`, `log_entry_crew`, the forecasts) must be added
-to `restorePassage` as well as to the serialiser that sends it, or it is lost on the way back. `jsonHash` sorts keys:
-the service's database does not keep their order.
+to `restorePassage` as well as to the serialiser that sends it, or it is lost on the way back. Plans and defects travel
+whole like the places (`synchronise` in `lib/cloud-sync.js`, `restorePlansAndDefects` in `lib/cloud-restore.js`).
+`jsonHash` sorts keys: the service's database does not keep their order.
 
 `lib/qr.js` makes the QR code of the pairing link itself (byte mode, level M, versions 1 to 6, so no version blocks and
 one alignment pattern). `test/qr.test.js` reads every length back with `jsqr`, a development dependency: change the

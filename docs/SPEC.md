@@ -865,6 +865,9 @@ webhook.
   place renamed, deleted or given its country needs no message of its own — and it is what lets the service tell the
   countries visited. Nothing is sent to a service that does not report a places hash, nor an empty list to one that
   holds none.
+- **Plans and defects too** (§4.18), each list whole like the places, so that they follow the logbook: only to a service
+  whose answer carries a `plansHash` or a `defectsHash`, and not over a costly link. A restore writes them back once the
+  passages are, under the ids they had, dropping a link to a passage that did not come back.
 - **What is not sent**: the plugin configuration, the SMTP password, the gazetteer of landmarks.
 - **Working out what to send.** Each run asks the service what it holds of the logbook: per passage, a hash of its
   content, a hash of its chunk hashes, and whether every chunk arrived. The plugin works out the same hashes (SHA-256 of
@@ -940,6 +943,40 @@ webhook.
   - **Full passages follow** as soon as the option is turned off, or when **Back up now** is chosen: asking by hand is
     saying it is worth it, and that one run sends everything in full.
   - The page says how many passages wait to be backed up in full.
+
+### 4.18 Companion apps
+
+The logbook records what happened. A companion app — Chiplog Skipper, a tablet app sold apart — carries what was
+planned, checked and decided around it: it prepares a passage, follows it, and reports on it. The plugin gives it a
+stable API and keeps the few things that belong with the logbook; the app keeps its own tools (check-list templates,
+sets of no-go criteria) and never needs an admin login.
+
+- **A versioned API.** The app and the plugin are updated apart, so the public routes are also served under `/api/v1`,
+  described by an OpenAPI document (`getOpenApi`, `GET /api/v1/openapi.json`) from which the app's client is generated.
+  `GET /state` says `apiVersions`, `pluginVersion` and `features`; a client sends a field of a feature only when it is
+  listed, since unknown fields stay refused. The unversioned `/api` remains the webapp's, free to change. A breaking
+  change makes a `v2`, `v1` kept for a while.
+- **Plans.** A planned passage: title, status (`draft`, `ready`, `active`, `done`, `cancelled`), planned departure and
+  arrival (time, name, position), the Signal K route and fallback waypoints it follows (by href: they stay Signal K
+  resources, which the chart plotter shows), the no-go criteria applied (copied in), the planned crew and watches. The
+  app posts the departure manoeuvre (`POST /events`), then links the plan to the passage that opened; the planned crew
+  then goes aboard that passage in place of the one carried over (§4.11).
+- **Defects.** What broke or needs fixing: title, description, severity (`minor`, `major`, `critical`), status (`open`,
+  `fixed`, with the date of the repair), and where it came from — a passage, a plan, the journal line that reported it.
+  A defect outlives them all.
+- **Tanks at arrival.** The tanks are noted again as the passage ends (`endTanks`, beside `startTanks` from §4.5.1), so
+  the report can tell what it consumed; both can be noted by hand on a boat that publishes none.
+- **Records of the app's own** — a go/no-go decision, a reroute, a check-list, a briefing and its signatures, a
+  threshold, a debriefing — are journal annotations (`text_annotation`) with a `companion.*` subtype, a readable comment
+  and a structured payload. Signatures are vector strokes, like handwritten notes. No schema change is needed for a new
+  one, and the journal, the PDF and the exports show them as notes.
+- **A change feed.** `GET /changes?since=<cursor>` lists, for an app that keeps a copy offline, the passages, events,
+  crew, plans and defects changed since its last call, each once as it stands now, deletions included. Triggers in the
+  database keep it, so every write counts, whoever makes it.
+- **Offline first.** Every object the app makes carries a `clientRef`, as tablet entries do (§4.9): replayed from its
+  queue after a lost answer, it is not made twice.
+- **Not in the plugin**: PDF route plans and reports (the app makes them from the data, and keeps none), attachments,
+  check-list templates and criteria sets.
 
 ## 5. Data model and API
 
@@ -1022,6 +1059,7 @@ _(This MVP breakdown is a proposal — to be validated with you before committin
 | Passage summary email                              | One mail per passage once it has stayed closed past the reopening tolerance: the track as a PNG drawn server-side over OpenStreetMap tiles and carried inline, then the places, times, distance, durations, speeds and maximum wind in the logbook's language; a hand-rolled SMTP client, retried while offline, given up on after a week; off by default and nothing retroactive (§4.16) |
 | MP4 export                                         | WebCodecs H.264 plus a vendored Mediabunny (one self-contained ES module covering encoder and container, MPL-2.0, imported lazily); five shapes up to 1920×1080; `mp4-muxer` was set aside as deprecated and muxer-only; hidden when the browser has no WebCodecs (§4.12)                                                                                                                 |
 | 3D animation view                                  | A switch between the map and a 3D view of the same film: three.js bundled at install time and loaded on demand, tiles as textures on a flat sea, a procedural sailboat or the reader's own `.glb`, heel and sail trim derived from the wind; needs WebGL 2 and falls back to the map (§4.12)                                                                                              |
+| Companion apps                                     | A versioned API under `/api/v1` with an OpenAPI document, features listed in `GET /state`; plans, defects and tanks at arrival in the logbook; the app's own records as `companion.*` annotations; a change feed kept by database triggers; plans and defects in the online backup, whole like the places (§4.18)                                                                         |
 
 ### Remaining minor points (non-blocking for starting)
 
