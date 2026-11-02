@@ -6,6 +6,8 @@ All notable changes to Chiplog are documented here. The format follows
 
 ## [Unreleased]
 
+## [2.16.0] - 2026-11-02
+
 ### Added
 
 - **An API for companion apps**, such as Chiplog Skipper, described in [docs/API.md](docs/API.md):
@@ -557,7 +559,8 @@ First release.
 - REST API under `/plugins/signalk-chiplog/api`, documented in [docs/API.md](docs/API.md).
 - Single SQLite database through Node's built-in `node:sqlite`: no native module to build.
 
-[Unreleased]: https://github.com/ricard33/signalk-chiplog/compare/v2.15.0...HEAD
+[Unreleased]: https://github.com/ricard33/signalk-chiplog/compare/v2.16.0...HEAD
+[2.16.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.15.0...v2.16.0
 [2.15.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.14.0...v2.15.0
 [2.14.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.13.0...v2.14.0
 [2.13.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.12.0...v2.13.0
