@@ -967,12 +967,11 @@ sets of no-go criteria) and never needs an admin login.
   A defect outlives them all.
 - **Tanks at arrival.** The tanks are noted again as the passage ends (`endTanks`, beside `startTanks` from §4.5.1), so
   the report can tell what it consumed; both can be noted by hand on a boat that publishes none.
-- **Records of the app's own.** What belongs to the preparation — the go/no-go decision, the briefing and its
-  signatures, the preparation check-lists — stays with the plan, in its `companion` object, not in the journal. What
-  happens under way — a reroute, an event check-list, a threshold, a debriefing — is a journal annotation
-  (`text_annotation`) with a `companion.*` subtype, a readable comment and a structured payload. Signatures are vector
-  strokes, like handwritten notes. No schema change is needed for a new one, and the journal, the PDF and the exports
-  show them as notes.
+- **Records of the app's own.** What belongs to the preparation — the go/no-go decision, the briefing, the preparation
+  check-lists — stays with the plan, in its `companion` object, not in the journal. What happens under way — a reroute,
+  an event check-list, a threshold, a debriefing — is a journal annotation (`text_annotation`) with a `companion.*`
+  subtype, a readable comment and a structured payload. No schema change is needed for a new one, and the journal, the
+  PDF and the exports show them as notes.
 - **A change feed.** `GET /changes?since=<cursor>` lists, for an app that keeps a copy offline, the passages, events,
   crew, plans and defects changed since its last call, each once as it stands now, deletions included. Triggers in the
   database keep it, so every write counts, whoever makes it.

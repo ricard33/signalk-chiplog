@@ -693,8 +693,8 @@ around it, through the plugin's REST API — nothing to set up in the plugin:
 - **Defects** noticed under way or after, with their severity and whether they are fixed.
 - **Tanks at arrival**, noted as a passage ends next to those noted at departure, so that what a passage used can be
   worked out. A boat without tank sensors can have them typed in.
-- **The preparation**: the go/no-go decision, the briefing and the check-lists with their signatures stay with the plan,
-  so that another tablet or computer of the crew finds it whole.
+- **The preparation**: the go/no-go decision, the briefing and the check-lists stay with the plan, so that another
+  tablet or computer of the crew finds it whole.
 - **Check-lists at sea, reroutes and the debriefing** appear in the passage's journal as notes.
 
 The app connects with a Signal K device access request, like the tablet entry app, and needs read/write access, never

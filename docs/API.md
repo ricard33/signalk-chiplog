@@ -799,9 +799,9 @@ log entry that sails it. Every route is `readwrite` at most: preparing and saili
   only refers to them, and nothing checks that they still exist.
 - `criteria` is any JSON object: the no-go criteria the client applied, copied as they stood.
 - `companion` (feature `planCompanion`) is any JSON object, or `null`: what the companion app keeps on the plan for
-  itself — its own fields, the go/no-go decision, the briefing, the preparation check-lists and their signatures — so
-  that another device of the app finds the plan whole. Chiplog stores and returns it as sent, never reads it, and does
-  not show it; `null` clears it. A request without it leaves it as it was.
+  itself — its own fields, the go/no-go decision, the briefing, the preparation check-lists — so that another device of
+  the app finds the plan whole. Chiplog stores and returns it as sent, never reads it, and does not show it; `null`
+  clears it. A request without it leaves it as it was.
 - `crew` and `watches` are lists of at most 100. In a request, each member is either `{ "crewMemberId" }` — a roster
   member, `404 crew_member_not_found` if unknown — or `{ "name" }`, a name for this plan alone; either may take a
   `role`. A watch adds `start` and `end`, `end` after `start`. The plan stores names and roles as they stand, like a
