@@ -11,9 +11,9 @@ All notable changes to Chiplog are documented here. The format follows
 ### Added
 
 - **A companion app's own data on a plan** (`companion`, feature `planCompanion`): any JSON object the app keeps on the
-  plan and reads back — the kinds of passage, the go/no-go decision, the briefing and the preparation check-lists — so
-  that a plan prepared on one device is found whole on another. Chiplog stores it as sent, in the online backup too, and
-  never reads it.
+  plan and reads back — the kinds of passage, the go/no-go decision, the briefing, the preparation check-lists and the
+  debriefing — so that a plan prepared on one device is found whole on another. Chiplog stores it as sent, in the online
+  backup too, and never reads it.
 
 ## [2.16.0] - 2026-11-02
 

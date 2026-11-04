@@ -695,7 +695,7 @@ around it, through the plugin's REST API — nothing to set up in the plugin:
   worked out. A boat without tank sensors can have them typed in.
 - **The preparation**: the go/no-go decision, the briefing and the check-lists stay with the plan, so that another
   tablet or computer of the crew finds it whole.
-- **Check-lists at sea, reroutes and the debriefing** appear in the passage's journal as notes.
+- **Check-lists at sea and reroutes** appear in the passage's journal as notes; the debriefing stays with the plan.
 
 The app connects with a Signal K device access request, like the tablet entry app, and needs read/write access, never
 admin. Plans and defects go to the [online backup](#online-backup-) with the rest of the logbook, when the service keeps
