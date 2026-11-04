@@ -348,6 +348,8 @@ moves it itself when a plan not yet started is linked to its passage (to `active
   plan only points at them, and nothing checks the resource still exists.
 - `criteria` is JSON, whatever the companion app's no-go criteria were as it applied them — a copy, not a reference, so
   a criteria set edited later does not rewrite what the decision was made on.
+- `companion` (migration 25) is JSON the companion app writes and reads back for itself — its own fields, its decision,
+  briefing and preparation check-lists — and the plugin never interprets. `NULL` when the app wrote none.
 - `crew` and `watches` are JSON arrays: `[{ crewMemberId, name, role }]`, and the same with `start` and `end` for a
   watch (one row per member and period). `name` and `role` are **denormalised** like `log_entry_crew`'s, and
   `crewMemberId` is not a foreign key: a plan records who was planned, whatever the roster says later. Linking the plan

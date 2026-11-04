@@ -44,7 +44,7 @@ describe('the versioned API', () => {
   it('says which versions and features it serves', async () => {
     const { body } = await ctx.request('GET', '/v1/state');
     assert.deepEqual(body.apiVersions, [1]);
-    assert.deepEqual(body.features, ['plans', 'defects', 'changes', 'endTanks']);
+    assert.deepEqual(body.features, ['plans', 'defects', 'changes', 'endTanks', 'planCompanion']);
     assert.equal(body.pluginVersion, require('../package.json').version);
     assert.match(body.logbookId, /^[0-9a-f-]{36}$/);
   });
@@ -174,7 +174,9 @@ describe('plans', () => {
       { title: 'x', departureTime: at(5), arrivalTime: at(4) },
       { title: 'x', watches: [{ name: 'Jo', start: at(2), end: at(1) }] },
       { title: 'x', crew: [{ name: 'Jo', phone: '06' }] },
-      { title: 'x', colour: 'blue' }
+      { title: 'x', colour: 'blue' },
+      { title: 'x', companion: ['kinds'] },
+      { title: 'x', companion: 'offshore' }
     ]) {
       const { status } = await ctx.request('POST', '/v1/plans', JSON.parse(JSON.stringify(body)));
       assert.equal(status, 400, JSON.stringify(body));
@@ -185,6 +187,35 @@ describe('plans', () => {
       crew: [{ crewMemberId: 99 }]
     });
     assert.equal(unknownMember.status, 404);
+  });
+
+  it("keeps a companion app's own data as sent, and clears it on null", async () => {
+    const companion = {
+      v: 1,
+      kinds: ['offshore', 'night'],
+      decision: { decision: 'go', time: at(20), signature: { strokes: [{ points: [] }] } },
+      checklists: [{ clientRef: 'c-1', payload: { items: [] } }]
+    };
+    const created = await ctx.request('POST', '/v1/plans', { ...PLAN, companion });
+    assert.equal(created.status, 201);
+    assert.deepEqual(created.body.companion, companion);
+    const without = await ctx.request('POST', '/v1/plans', { title: 'Without' });
+    assert.equal(without.body.companion, null);
+
+    const id = created.body.id;
+    const edited = await ctx.request('PATCH', `/v1/plans/${id}`, {
+      companion: { ...companion, kinds: ['coastal'] }
+    });
+    assert.deepEqual(edited.body.companion.kinds, ['coastal']);
+    // Another field changed leaves it be.
+    const titled = await ctx.request('PATCH', `/v1/plans/${id}`, { title: 'Renamed' });
+    assert.deepEqual(titled.body.companion.kinds, ['coastal']);
+    const { body: feed } = await ctx.request('GET', '/v1/changes?since=0');
+    const change = feed.items.find((item) => item.resource === 'plan' && item.id === id);
+    assert.deepEqual(change.item.companion.kinds, ['coastal']);
+
+    const cleared = await ctx.request('PATCH', `/v1/plans/${id}`, { companion: null });
+    assert.equal(cleared.body.companion, null);
   });
 
   it('copies roster members in, and keeps typed names as typed', async () => {

@@ -33,8 +33,8 @@ plugin through the Signal K appstore.
 - **Evolution.** A field or a route added stays in `v1`; a breaking change makes a `v2`, with `v1` kept alongside for a
   transition period.
 - **Discovery.** [`GET /state`](#get-state--readonly) gives `apiVersions` (`[1]`), `pluginVersion` and `features`:
-  `plans`, `defects`, `changes`, `endTanks` — what was added to `v1` after it first shipped (2.15). `schemaVersion`
-  stays the database's migration level, not an API version.
+  `plans`, `defects`, `changes`, `endTanks` (2.16), `planCompanion` (2.17) — what was added to `v1` after it first
+  shipped (2.15). `schemaVersion` stays the database's migration level, not an API version.
 - **Unknown fields** are still refused with `400`. A client therefore sends a field or calls a route of a feature only
   once `features` names it, and reads a response field it does not know as optional. Against an older plugin, a feature
   missing from `features` stays on the client's side, with a word to the user, rather than failing.
@@ -109,11 +109,11 @@ What the UI needs to render its header, in one call.
   "motion": "underway",
   "propulsion": "engine",
   "stateIssue": null,
-  "schemaVersion": 24,
+  "schemaVersion": 25,
   "logbookId": "37ff7ef8-28e8-4a28-9277-c34df9391976",
   "apiVersions": [1],
-  "pluginVersion": "2.16.0",
-  "features": ["plans", "defects", "changes", "endTanks"]
+  "pluginVersion": "2.17.0",
+  "features": ["plans", "defects", "changes", "endTanks", "planCompanion"]
 }
 ```
 
@@ -775,6 +775,7 @@ log entry that sails it. Every route is `readwrite` at most: preparing and saili
   "routeRef": "/resources/routes/6f1b2c3d-0000-4000-8000-000000000001",
   "fallbackRefs": ["/resources/waypoints/aaaa", "/resources/waypoints/bbbb"],
   "criteria": { "maxWindSpeed": 12.9 },
+  "companion": { "v": 1, "kinds": ["coastal"] },
   "crew": [{ "crewMemberId": 3, "name": "Alex Martin", "role": "skipper" }],
   "watches": [
     {
@@ -797,6 +798,10 @@ log entry that sails it. Every route is `readwrite` at most: preparing and saili
   The route and the fallback points are Signal K resources, which a chart plotter such as Freeboard-SK shows; the plan
   only refers to them, and nothing checks that they still exist.
 - `criteria` is any JSON object: the no-go criteria the client applied, copied as they stood.
+- `companion` (feature `planCompanion`) is any JSON object, or `null`: what the companion app keeps on the plan for
+  itself — its own fields, the go/no-go decision, the briefing, the preparation check-lists and their signatures — so
+  that another device of the app finds the plan whole. Chiplog stores and returns it as sent, never reads it, and does
+  not show it; `null` clears it. A request without it leaves it as it was.
 - `crew` and `watches` are lists of at most 100. In a request, each member is either `{ "crewMemberId" }` — a roster
   member, `404 crew_member_not_found` if unknown — or `{ "name" }`, a name for this plan alone; either may take a
   `role`. A watch adds `start` and `end`, `end` after `start`. The plan stores names and roles as they stand, like a

@@ -563,6 +563,7 @@ describe('restoring plans and defects', () => {
         routeRef: '/resources/routes/r1',
         fallbackRefs: ['/resources/waypoints/w1'],
         criteria: { maxWindSpeed: 12 },
+        companion: { v: 1, kinds: ['coastal'] },
         crew: [{ crewMemberId: null, name: 'Jo', role: null }],
         watches: [],
         entryId,
