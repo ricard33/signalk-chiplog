@@ -1,0 +1,40 @@
+{
+  "description": "navigation.state has the final say; transitions are dated from speed, despite its lag.",
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "navigation.state": "moored"
+      }
+    },
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 2.5722,
+        "navigation.state": "moored"
+      }
+    },
+    {
+      "sail": 1,
+      "values": {
+        "navigation.speedOverGround": 2.5722,
+        "navigation.state": "sailing"
+      }
+    },
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "navigation.state": "sailing"
+      }
+    },
+    {
+      "sail": 1,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "navigation.state": "moored"
+      }
+    }
+  ]
+}

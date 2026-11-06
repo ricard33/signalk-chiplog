@@ -1,0 +1,15 @@
+{
+  "steps": [
+    {
+      "mode": "fallback",
+      "motion": "stopped",
+      "propulsion": null,
+      "activePassage": null
+    }
+  ],
+  "passages": [],
+  "track": [],
+  "segments": [],
+  "events": [],
+  "observations": []
+}

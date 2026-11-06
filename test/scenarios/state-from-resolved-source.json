@@ -1,0 +1,29 @@
+{
+  "description": "Detection follows the source the server resolved navigation.state to, the last one published.",
+  "steps": [
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 0
+      },
+      "sources": {
+        "navigation.state": {
+          "nmea0183.AI": "motoring",
+          "signalk-autostate.XX": "moored"
+        }
+      }
+    },
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 0
+      },
+      "sources": {
+        "navigation.state": {
+          "signalk-autostate.XX": "moored",
+          "nmea0183.AI": "motoring"
+        }
+      }
+    }
+  ]
+}

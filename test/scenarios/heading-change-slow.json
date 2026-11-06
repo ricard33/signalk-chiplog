@@ -1,0 +1,39 @@
+{
+  "description": "Below 2 kn a turn is neither started nor kept building.",
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "navigation.headingTrue": 0.1745
+      }
+    },
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "navigation.headingTrue": 0.1745
+      }
+    },
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 0.7717,
+        "navigation.headingTrue": 1.5708
+      }
+    },
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "navigation.headingTrue": 0.1745
+      }
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    }
+  ]
+}

@@ -18,6 +18,7 @@ npm run lint:fix      # eslint . --fix
 npm run format        # prettier --write .
 npm run format:check  # prettier --check .
 node scripts/vendor.js  # refresh public/vendor/ (also run by `prepare` on npm install)
+npm run scenarios     # record test/scenarios/*.result.json after changing a logbook rule (see its README)
 npm run demo:seed -- <data dir>  # four demo passages around La Rochelle, dated relative to now
 npm run import:postgsail -- <trips.geojson> --url <server> [--token <token>]  # PostgSail GeoJSON export, through the API
 ```

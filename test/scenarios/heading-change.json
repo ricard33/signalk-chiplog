@@ -1,0 +1,40 @@
+{
+  "description": "A new heading held for a minute is logged with the mean of the hold; another one within 5 minutes is not.",
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "navigation.headingTrue": 0.1745
+      }
+    },
+    {
+      "sail": 30,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "navigation.headingTrue": [
+          0.1745, 0.1745, 0.1745, 0.1745, 0.1745, 0.1745, 0.1745, 0.1745, 0.1745, 0.1745, 1.0472,
+          1.0472, 1.0472, 1.0472, 1.0472, 1.7453, 1.7453, 1.7453, 1.7453, 1.7453, 1.7453, 1.7453,
+          1.7453, 1.7453, 1.7453, 1.7453, 1.7453, 1.7453, 1.7453, 1.7453
+        ]
+      }
+    },
+    {
+      "sail": 30,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "navigation.headingTrue": [
+          1.7453, 1.7453, 1.7453, 1.7453, 1.7453, 2.9671, 2.9671, 2.9671, 2.9671, 2.9671, 2.9671,
+          2.9671, 2.9671, 2.9671, 2.9671, 2.9671, 2.9671, 2.9671, 2.9671, 2.9671, 2.9671, 2.9671,
+          2.9671, 2.9671, 2.9671, 2.9671, 2.9671, 2.9671, 2.9671, 2.9671
+        ]
+      }
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    }
+  ]
+}

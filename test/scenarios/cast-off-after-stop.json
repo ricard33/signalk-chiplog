@@ -1,0 +1,47 @@
+{
+  "description": "Casting off soon after an arrival carries the passage on, with the stop as a stopover.",
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    },
+    {
+      "sail": 20,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    },
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    },
+    {
+      "crew": {
+        "type": "manoeuvre",
+        "subtype": "cast_off"
+      }
+    },
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    },
+    {
+      "sail": 15,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    }
+  ]
+}

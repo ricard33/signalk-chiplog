@@ -1,0 +1,33 @@
+{
+  "description": "With no engine data, navigation.state motoring or sailing decides.",
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "navigation.state": "moored"
+      }
+    },
+    {
+      "sail": 20,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "navigation.state": "motoring"
+      }
+    },
+    {
+      "sail": 20,
+      "values": {
+        "navigation.speedOverGround": 2.5722,
+        "navigation.state": "sailing"
+      }
+    },
+    {
+      "sail": 15,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "navigation.state": "moored"
+      }
+    }
+  ]
+}

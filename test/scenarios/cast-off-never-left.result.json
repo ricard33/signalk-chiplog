@@ -1,0 +1,102 @@
+{
+  "steps": [
+    {
+      "mode": "fallback",
+      "motion": "stopped",
+      "propulsion": null,
+      "activePassage": null
+    },
+    {
+      "mode": "fallback",
+      "motion": "stopped",
+      "propulsion": null,
+      "activePassage": 0
+    },
+    {
+      "mode": "fallback",
+      "motion": "stopped",
+      "propulsion": null,
+      "activePassage": null
+    }
+  ],
+  "passages": [
+    {
+      "state": "closed",
+      "startTime": "2026-09-13T08:05:00.000Z",
+      "endTime": "2026-09-13T08:05:00.000Z",
+      "start": [
+        46.1466,
+        -1.1686
+      ],
+      "end": [
+        46.1466,
+        -1.1686
+      ],
+      "startPlace": "46.1466N 1.1686W",
+      "startPlacePending": true,
+      "endPlace": "46.1466N 1.1686W",
+      "endPlacePending": true,
+      "closedBy": "detection",
+      "lastMovingAt": null,
+      "stoppedSince": null,
+      "distance": 0,
+      "engineDuration": 0,
+      "sailDuration": 0,
+      "openedByCrew": true,
+      "startTanks": null,
+      "startBatteries": null,
+      "endTanks": null,
+      "crew": []
+    }
+  ],
+  "track": [
+    {
+      "passage": 0,
+      "points": 0,
+      "first": null,
+      "last": null
+    }
+  ],
+  "segments": [],
+  "events": [
+    {
+      "passage": 0,
+      "time": "2026-09-13T08:05:00.000Z",
+      "type": "manoeuvre",
+      "subtype": "cast_off",
+      "position": [
+        46.1466,
+        -1.1686
+      ],
+      "comment": null,
+      "payload": null,
+      "source": "manual"
+    }
+  ],
+  "observations": [
+    {
+      "passage": 0,
+      "time": "2026-09-13T08:05:00.000Z",
+      "reason": "event",
+      "position": [
+        46.1466,
+        -1.1686
+      ],
+      "values": {
+        "sog": 0
+      }
+    },
+    {
+      "passage": 0,
+      "time": "2026-09-13T08:05:00.000Z",
+      "reason": "entry_end",
+      "position": [
+        46.1466,
+        -1.1686
+      ],
+      "values": {
+        "sog": 0
+      }
+    }
+  ]
+}

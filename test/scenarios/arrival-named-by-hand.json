@@ -1,0 +1,23 @@
+{
+  "description": "An arrival name typed by the crew before the passage closed is kept.",
+  "steps": [
+    {
+      "sail": 20,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    },
+    {
+      "addPlace": "Detected"
+    },
+    {
+      "nameArrival": "Typed by crew"
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    }
+  ]
+}

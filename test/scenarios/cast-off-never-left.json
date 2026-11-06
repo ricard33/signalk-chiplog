@@ -1,0 +1,23 @@
+{
+  "description": "A cast-off followed by no departure closes like any long stop.",
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    },
+    {
+      "crew": {
+        "type": "manoeuvre",
+        "subtype": "cast_off"
+      }
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    }
+  ]
+}

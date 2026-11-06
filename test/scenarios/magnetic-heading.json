@@ -1,0 +1,28 @@
+{
+  "description": "A magnetic heading with the variation gives the true heading of readings and track.",
+  "start": "2026-09-13T08:50:00.000Z",
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "navigation.headingMagnetic": 0.1745,
+        "navigation.magneticVariation": -0.0349
+      }
+    },
+    {
+      "sail": 20,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "navigation.headingMagnetic": 0.1745,
+        "navigation.magneticVariation": -0.0349
+      }
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "description": "The crew of a passage goes on to the next one.",
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    },
+    {
+      "sail": 15,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    },
+    {
+      "crewMembers": ["Alex", "Sam"]
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    },
+    {
+      "sail": 15,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    }
+  ]
+}

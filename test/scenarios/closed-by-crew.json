@@ -1,0 +1,32 @@
+{
+  "description": "A passage closed by hand while moving is not reopened; a real departure opens the next one.",
+  "steps": [
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    },
+    {
+      "close": true
+    },
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    },
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    },
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    }
+  ]
+}

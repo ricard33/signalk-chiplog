@@ -1,0 +1,33 @@
+{
+  "description": "A 5 min tolerance and a 3 kn under-way speed.",
+  "settings": {
+    "stopClosureMinutes": 5,
+    "fallbackUnderwaySpeed": 3
+  },
+  "steps": [
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 1.0289
+      }
+    },
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 2.0578
+      }
+    },
+    {
+      "sail": 8,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    },
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 2.0578
+      }
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "description": "A second change of heading less than 5 minutes after one logged is not logged; the reference still follows it.",
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "navigation.headingTrue": 0.1745
+      }
+    },
+    {
+      "sail": 20,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "navigation.headingTrue": [
+          0.1745, 0.1745, 0.1745, 0.1745, 0.1745, 1.2217, 1.2217, 1.2217, 2.2689, 2.2689, 2.2689,
+          2.2689, 2.2689, 2.2689, 2.2689, 2.2689, 2.2689, 2.2689, 2.2689, 2.2689
+        ]
+      }
+    },
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "navigation.headingTrue": [
+          2.2689, 2.2689, 2.2689, 3.4907, 3.4907, 3.4907, 3.4907, 3.4907, 3.4907, 3.4907
+        ]
+      }
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "description": "Detection neither opens nor ends a passage while data is missing.",
+  "steps": [
+    {
+      "sail": 60
+    },
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    },
+    {
+      "sail": 90
+    }
+  ]
+}

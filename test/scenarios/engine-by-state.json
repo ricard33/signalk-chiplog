@@ -1,0 +1,32 @@
+{
+  "description": "Without revolutions, an engine's started or stopped state decides.",
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "propulsion.port.state": "stopped"
+      }
+    },
+    {
+      "sail": 20,
+      "values": {
+        "navigation.speedOverGround": 2.5722,
+        "propulsion.port.state": "started"
+      }
+    },
+    {
+      "sail": 20,
+      "values": {
+        "navigation.speedOverGround": 2.5722,
+        "propulsion.port.state": "stopped"
+      }
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    }
+  ]
+}

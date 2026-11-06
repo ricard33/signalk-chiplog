@@ -1,0 +1,12 @@
+{
+  "description": "An unrecognised navigation.state counts as absent: speed decides.",
+  "steps": [
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 2.5722,
+        "navigation.state": "not defined (example)"
+      }
+    }
+  ]
+}

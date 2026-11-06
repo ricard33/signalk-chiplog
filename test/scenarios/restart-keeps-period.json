@@ -1,0 +1,41 @@
+{
+  "description": "After a short restart the engine period goes on; a corrected one is not undone.",
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    },
+    {
+      "sail": 15,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    },
+    {
+      "correct": "engine"
+    },
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    },
+    {
+      "restart": 1
+    },
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    }
+  ]
+}

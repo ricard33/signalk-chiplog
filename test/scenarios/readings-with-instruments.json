@@ -1,0 +1,68 @@
+{
+  "description": "Readings at departure, on the hour and at arrival hold every current instrument value.",
+  "start": "2026-09-13T08:40:00.000Z",
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "environment.wind.speedTrue": 7.2022,
+        "environment.wind.directionTrue": 4.3633,
+        "environment.wind.speedApparent": 8.7456,
+        "environment.wind.angleApparent": -0.6981,
+        "navigation.headingTrue": 0.0873,
+        "navigation.speedThroughWater": 2.8294,
+        "environment.depth.belowTransducer": 12.4,
+        "environment.outside.pressure": 101320,
+        "environment.outside.temperature": 291.15,
+        "environment.water.temperature": 288.65,
+        "navigation.courseOverGroundTrue": 0.0349
+      }
+    },
+    {
+      "sail": 90,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "environment.wind.speedTrue": 7.2022,
+        "environment.wind.directionTrue": 4.3633,
+        "environment.wind.speedApparent": 8.7456,
+        "environment.wind.angleApparent": -0.6981,
+        "navigation.headingTrue": 0.0873,
+        "navigation.speedThroughWater": 2.8294,
+        "environment.depth.belowTransducer": 12.4,
+        "environment.outside.pressure": 101320,
+        "environment.outside.temperature": 291.15,
+        "environment.water.temperature": 288.65,
+        "navigation.courseOverGroundTrue": 0.0349,
+        "navigation.log": [
+          1852000, 1852185, 1852370, 1852555, 1852740, 1852925, 1853110, 1853295, 1853480, 1853665,
+          1853850, 1854035, 1854220, 1854405, 1854590, 1854775, 1854960, 1855145, 1855330, 1855515,
+          1855700, 1855885, 1856070, 1856255, 1856440, 1856625, 1856810, 1856995, 1857180, 1857365,
+          1857550, 1857735, 1857920, 1858105, 1858290, 1858475, 1858660, 1858845, 1859030, 1859215,
+          1859400, 1859585, 1859770, 1859955, 1860140, 1860325, 1860510, 1860695, 1860880, 1861065,
+          1861250, 1861435, 1861620, 1861805, 1861990, 1862175, 1862360, 1862545, 1862730, 1862915,
+          1863100, 1863285, 1863470, 1863655, 1863840, 1864025, 1864210, 1864395, 1864580, 1864765,
+          1864950, 1865135, 1865320, 1865505, 1865690, 1865875, 1866060, 1866245, 1866430, 1866615,
+          1866800, 1866985, 1867170, 1867355, 1867540, 1867725, 1867910, 1868095, 1868280, 1868465
+        ]
+      }
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "environment.wind.speedTrue": 7.2022,
+        "environment.wind.directionTrue": 4.3633,
+        "environment.wind.speedApparent": 8.7456,
+        "environment.wind.angleApparent": -0.6981,
+        "navigation.headingTrue": 0.0873,
+        "navigation.speedThroughWater": 2.8294,
+        "environment.depth.belowTransducer": 12.4,
+        "environment.outside.pressure": 101320,
+        "environment.outside.temperature": 291.15,
+        "environment.water.temperature": 288.65,
+        "navigation.courseOverGroundTrue": 0.0349
+      }
+    }
+  ]
+}

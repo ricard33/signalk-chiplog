@@ -1,0 +1,29 @@
+{
+  "description": "A change of speed of 1 kn adds a point between interval points.",
+  "settings": {
+    "trackIntervalSeconds": 60
+  },
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    },
+    {
+      "sail": 12,
+      "values": {
+        "navigation.speedOverGround": [
+          1.5433, 1.5433, 2.315, 2.315, 3.0867, 3.0867, 3.8583, 3.8583, 2.5722, 2.5722, 1.5433,
+          1.5433
+        ]
+      }
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "description": "Detection falls back to speed once navigation.state stops being refreshed.",
+  "steps": [
+    {
+      "sail": 1,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "navigation.state": "moored"
+      }
+    },
+    {
+      "sail": 25,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    },
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    }
+  ]
+}

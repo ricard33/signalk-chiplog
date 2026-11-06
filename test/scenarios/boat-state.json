@@ -1,0 +1,44 @@
+{
+  "description": "Tanks and batteries are noted at departure, the tanks again at arrival; engine hours go with each reading.",
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "tanks.fuel.0.currentLevel": 0.8,
+        "tanks.fuel.0.capacity": 0.12,
+        "tanks.freshWater.0.currentLevel": 0.9,
+        "electrical.batteries.house.voltage": 12.8,
+        "electrical.batteries.house.capacity.stateOfCharge": 0.93,
+        "propulsion.main.runTime": 3600000,
+        "propulsion.main.revolutions": 0
+      }
+    },
+    {
+      "sail": 30,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "tanks.fuel.0.currentLevel": [
+          0.8, 0.795, 0.79, 0.785, 0.78, 0.775, 0.77, 0.765, 0.76, 0.755, 0.75, 0.745, 0.74,
+          0.7350000000000001, 0.73, 0.7250000000000001, 0.7200000000000001, 0.7150000000000001,
+          0.7100000000000001, 0.7050000000000001, 0.7000000000000001, 0.6950000000000001,
+          0.6900000000000001, 0.685, 0.68, 0.675, 0.67, 0.665, 0.66, 0.655
+        ],
+        "electrical.batteries.house.voltage": 13.6,
+        "propulsion.main.runTime": [
+          3600000, 3600060, 3600120, 3600180, 3600240, 3600300, 3600360, 3600420, 3600480, 3600540,
+          3600600, 3600660, 3600720, 3600780, 3600840, 3600900, 3600960, 3601020, 3601080, 3601140,
+          3601200, 3601260, 3601320, 3601380, 3601440, 3601500, 3601560, 3601620, 3601680, 3601740
+        ],
+        "propulsion.main.revolutions": 36
+      }
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "propulsion.main.revolutions": 0
+      }
+    }
+  ]
+}

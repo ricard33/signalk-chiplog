@@ -1,0 +1,97 @@
+{
+  "description": "Casting off opens a passage before the boat moves, with the boat's state noted; it resumes when the boat gets going, and the crew closes it under way.",
+  "places": [
+    {
+      "name": "Les Minimes",
+      "lat": 46.1466,
+      "lon": -1.1686
+    }
+  ],
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "environment.wind.speedTrue": 7.2022,
+        "environment.wind.directionTrue": 4.3633,
+        "environment.wind.speedApparent": 8.7456,
+        "environment.wind.angleApparent": -0.6981,
+        "navigation.headingTrue": 0.0873,
+        "navigation.speedThroughWater": 2.8294,
+        "environment.depth.belowTransducer": 12.4,
+        "environment.outside.pressure": 101320,
+        "environment.outside.temperature": 291.15,
+        "environment.water.temperature": 288.65,
+        "navigation.courseOverGroundTrue": 0.0349,
+        "tanks.fuel.0.currentLevel": 0.7,
+        "tanks.fuel.0.capacity": 0.1
+      }
+    },
+    {
+      "crew": {
+        "type": "manoeuvre",
+        "subtype": "cast_off"
+      }
+    },
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "environment.wind.speedTrue": 7.2022,
+        "environment.wind.directionTrue": 4.3633,
+        "environment.wind.speedApparent": 8.7456,
+        "environment.wind.angleApparent": -0.6981,
+        "navigation.headingTrue": 0.0873,
+        "navigation.speedThroughWater": 2.8294,
+        "environment.depth.belowTransducer": 12.4,
+        "environment.outside.pressure": 101320,
+        "environment.outside.temperature": 291.15,
+        "environment.water.temperature": 288.65,
+        "navigation.courseOverGroundTrue": 0.0349,
+        "tanks.fuel.0.currentLevel": 0.7,
+        "tanks.fuel.0.capacity": 0.1
+      }
+    },
+    {
+      "sail": 20,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "environment.wind.speedTrue": 7.2022,
+        "environment.wind.directionTrue": 4.3633,
+        "environment.wind.speedApparent": 8.7456,
+        "environment.wind.angleApparent": -0.6981,
+        "navigation.headingTrue": 0.0873,
+        "navigation.speedThroughWater": 2.8294,
+        "environment.depth.belowTransducer": 12.4,
+        "environment.outside.pressure": 101320,
+        "environment.outside.temperature": 291.15,
+        "environment.water.temperature": 288.65,
+        "navigation.courseOverGroundTrue": 0.0349,
+        "tanks.fuel.0.currentLevel": 0.7,
+        "tanks.fuel.0.capacity": 0.1
+      }
+    },
+    {
+      "close": true
+    },
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "environment.wind.speedTrue": 7.2022,
+        "environment.wind.directionTrue": 4.3633,
+        "environment.wind.speedApparent": 8.7456,
+        "environment.wind.angleApparent": -0.6981,
+        "navigation.headingTrue": 0.0873,
+        "navigation.speedThroughWater": 2.8294,
+        "environment.depth.belowTransducer": 12.4,
+        "environment.outside.pressure": 101320,
+        "environment.outside.temperature": 291.15,
+        "environment.water.temperature": 288.65,
+        "navigation.courseOverGroundTrue": 0.0349,
+        "tanks.fuel.0.currentLevel": 0.7,
+        "tanks.fuel.0.capacity": 0.1
+      }
+    }
+  ]
+}

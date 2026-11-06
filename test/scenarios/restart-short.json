@@ -1,0 +1,20 @@
+{
+  "description": "After a short restart, the same passage carries on.",
+  "steps": [
+    {
+      "sail": 30,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    },
+    {
+      "restart": 1
+    },
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "description": "Signal K timestamps three years behind the clock change nothing.",
+  "clockOffsetMinutes": -1576800,
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    },
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    }
+  ]
+}

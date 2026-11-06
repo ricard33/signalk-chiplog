@@ -1,0 +1,44 @@
+{
+  "description": "An entry after arrival, the boat still within a mile of it, goes to the last passage.",
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    },
+    {
+      "sail": 20,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    },
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    },
+    {
+      "sail": 2,
+      "values": {
+        "navigation.position": {
+          "latitude": 46.1766,
+          "longitude": -1.1686
+        }
+      }
+    },
+    {
+      "crew": {
+        "type": "manoeuvre",
+        "subtype": "anchor_down"
+      }
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    }
+  ]
+}

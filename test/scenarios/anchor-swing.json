@@ -1,0 +1,16 @@
+{
+  "description": "A speed spike while swinging at anchor opens nothing.",
+  "steps": [
+    {
+      "sail": 30,
+      "values": {
+        "navigation.speedOverGround": {
+          "cycle": [
+            0.1543, 0.1543, 0.1543, 0.1543, 0.1543, 0.1543, 0.1543, 0.1543, 0.1543, 0.1543, 2.0578,
+            0.1543, 0.1543, 0.1543, 0.1543, 0.1543, 0.1543, 0.1543, 0.1543, 0.1543
+          ]
+        }
+      }
+    }
+  ]
+}

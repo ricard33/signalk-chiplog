@@ -1,0 +1,20 @@
+{
+  "description": "Down for longer than the tolerance mid-passage, the log is split.",
+  "steps": [
+    {
+      "sail": 30,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    },
+    {
+      "restart": 180
+    },
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    }
+  ]
+}

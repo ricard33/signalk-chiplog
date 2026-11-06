@@ -1,0 +1,45 @@
+{
+  "description": "Departure and arrival are named after known places; elsewhere a name from coordinates waits for geocoding.",
+  "places": [
+    {
+      "name": "Les Minimes",
+      "lat": 46.1466,
+      "lon": -1.1686
+    }
+  ],
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    },
+    {
+      "sail": 30,
+      "values": {
+        "navigation.speedOverGround": 3.0867
+      }
+    },
+    {
+      "addPlace": "Île de Ré"
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    },
+    {
+      "sail": 30,
+      "values": {
+        "navigation.speedOverGround": 3.0867
+      }
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    }
+  ]
+}

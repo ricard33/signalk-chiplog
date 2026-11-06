@@ -1,0 +1,31 @@
+{
+  "description": "The true wind averaged over 2 minutes crossing 20 and 30 kn, and falling back below.",
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "environment.wind.speedTrue": 7.7167
+      }
+    },
+    {
+      "sail": 60,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "environment.wind.speedTrue": [
+          7.7167, 8.2311, 8.7456, 9.26, 9.7744, 10.2889, 10.8033, 11.3178, 11.8322, 12.3467,
+          12.8611, 13.3756, 13.89, 14.4044, 14.9189, 15.4333, 15.9478, 16.4622, 16.4622, 16.4622,
+          16.4622, 15.4333, 14.4044, 13.3756, 12.3467, 11.3178, 10.2889, 9.26, 8.7456, 8.2311,
+          7.7167
+        ]
+      }
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "environment.wind.speedTrue": 7.7167
+      }
+    }
+  ]
+}

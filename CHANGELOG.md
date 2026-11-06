@@ -6,6 +6,13 @@ All notable changes to Chiplog are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **Shared scenarios** (`test/scenarios/`, `npm run scenarios`): scenarios of a boat's data and its crew's actions,
+  played on the logbook engine, with the logbook it makes of each recorded next to them and checked by the tests. The
+  Chiplog Skipper app, which keeps the logbook itself on boats without a server, plays the same scenarios on its port of
+  these rules and compares.
+
 ## [2.17.0] - 2026-11-03
 
 ### Added

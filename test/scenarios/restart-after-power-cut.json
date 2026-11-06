@@ -1,0 +1,20 @@
+{
+  "description": "A passage left open by a power cut ends at its last recorded movement.",
+  "steps": [
+    {
+      "sail": 30,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    },
+    {
+      "restart": 2880
+    },
+    {
+      "sail": 1,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    }
+  ]
+}

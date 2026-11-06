@@ -1,0 +1,33 @@
+{
+  "description": "A navigation.state still null is pending: speed decides.",
+  "steps": [
+    {
+      "sail": 1,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    },
+    {
+      "sail": 1,
+      "values": {
+        "navigation.speedOverGround": 0
+      },
+      "sources": {
+        "navigation.state": {
+          "signalk-autostate.XX": null
+        }
+      }
+    },
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      },
+      "sources": {
+        "navigation.state": {
+          "signalk-autostate.XX": null
+        }
+      }
+    }
+  ]
+}

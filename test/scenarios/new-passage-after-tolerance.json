@@ -1,0 +1,23 @@
+{
+  "description": "Leaving after the tolerance opens a new passage, without a stopover.",
+  "steps": [
+    {
+      "sail": 20,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    },
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    }
+  ]
+}

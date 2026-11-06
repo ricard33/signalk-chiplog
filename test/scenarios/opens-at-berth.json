@@ -1,0 +1,17 @@
+{
+  "description": "With the speed fallback, a passage opens dated and placed where the vessel left its berth.",
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0.0514
+      }
+    },
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    }
+  ]
+}

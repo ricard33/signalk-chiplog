@@ -1,0 +1,40 @@
+{
+  "description": "Engine revolutions split the passage into sail and engine periods, with the average revolutions and an entry at each switch.",
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "propulsion.main.revolutions": 0
+      }
+    },
+    {
+      "sail": 20,
+      "values": {
+        "navigation.speedOverGround": 2.5722,
+        "propulsion.main.revolutions": 0
+      }
+    },
+    {
+      "sail": 30,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "propulsion.main.revolutions": [35, 35, 36, 36, 37, 37, 38]
+      }
+    },
+    {
+      "sail": 20,
+      "values": {
+        "navigation.speedOverGround": 2.5722,
+        "propulsion.main.revolutions": 0
+      }
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "propulsion.main.revolutions": 0
+      }
+    }
+  ]
+}

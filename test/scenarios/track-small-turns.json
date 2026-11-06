@@ -1,0 +1,30 @@
+{
+  "description": "A turn of 17° between interval points adds a point; one of 12° does not.",
+  "settings": {
+    "trackIntervalSeconds": 60
+  },
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "navigation.courseOverGroundTrue": 0
+      }
+    },
+    {
+      "sail": 12,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "navigation.courseOverGroundTrue": {
+          "cycle": [0, 0, 0.2967, 0.2967, 0.2967, 0.5061, 0.5061, 0.5061]
+        }
+      }
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    }
+  ]
+}

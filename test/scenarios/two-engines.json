@@ -1,0 +1,35 @@
+{
+  "description": "Two engines: under engine while either runs, at the mean of the running ones' revolutions.",
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "propulsion.port.revolutions": 0,
+        "propulsion.starboard.revolutions": 0
+      }
+    },
+    {
+      "sail": 20,
+      "values": {
+        "navigation.speedOverGround": 3.6011,
+        "propulsion.port.revolutions": 40,
+        "propulsion.starboard.revolutions": 30
+      }
+    },
+    {
+      "sail": 20,
+      "values": {
+        "navigation.speedOverGround": 2.5722,
+        "propulsion.port.revolutions": 0,
+        "propulsion.starboard.revolutions": 32
+      }
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    }
+  ]
+}

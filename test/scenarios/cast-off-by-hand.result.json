@@ -1,0 +1,154 @@
+{
+  "steps": [
+    {
+      "mode": "fallback",
+      "motion": "stopped",
+      "propulsion": null,
+      "activePassage": null
+    },
+    {
+      "mode": "fallback",
+      "motion": "stopped",
+      "propulsion": null,
+      "activePassage": 0
+    },
+    {
+      "mode": "fallback",
+      "motion": "stopped",
+      "propulsion": null,
+      "activePassage": 0
+    },
+    {
+      "mode": "fallback",
+      "motion": "underway",
+      "propulsion": "sail",
+      "activePassage": 0
+    },
+    {
+      "mode": "fallback",
+      "motion": "underway",
+      "propulsion": "sail",
+      "activePassage": null
+    },
+    {
+      "mode": "fallback",
+      "motion": "stopped",
+      "propulsion": null,
+      "activePassage": null
+    }
+  ],
+  "passages": [
+    {
+      "state": "closed",
+      "startTime": "2026-09-13T08:05:00.000Z",
+      "endTime": "2026-09-13T08:30:00.000Z",
+      "start": [
+        46.1466,
+        -1.1686
+      ],
+      "end": [
+        46.179458,
+        -1.1686
+      ],
+      "startPlace": "Les Minimes",
+      "startPlacePending": false,
+      "endPlace": "46.1795N 1.1686W",
+      "endPlacePending": true,
+      "closedBy": "crew",
+      "lastMovingAt": "2026-09-13T08:29:45.000Z",
+      "stoppedSince": null,
+      "distance": 3653.6,
+      "engineDuration": 0,
+      "sailDuration": 1500,
+      "openedByCrew": true,
+      "startTanks": [
+        {
+          "type": "fuel",
+          "id": "0",
+          "level": 0.7,
+          "capacity": 0.1
+        }
+      ],
+      "startBatteries": null,
+      "endTanks": [
+        {
+          "type": "fuel",
+          "id": "0",
+          "level": 0.7,
+          "capacity": 0.1
+        }
+      ],
+      "crew": []
+    }
+  ],
+  "track": [
+    {
+      "passage": 0,
+      "points": 80,
+      "first": {
+        "time": "2026-09-13T08:10:15.000Z",
+        "position": [
+          46.147016,
+          -1.1686
+        ]
+      },
+      "last": {
+        "time": "2026-09-13T08:30:00.000Z",
+        "position": [
+          46.179874,
+          -1.1686
+        ]
+      }
+    }
+  ],
+  "segments": [
+    {
+      "passage": 0,
+      "type": "sail",
+      "startTime": "2026-09-13T08:05:00.000Z",
+      "endTime": "2026-09-13T08:30:00.000Z",
+      "source": "auto",
+      "averageRpm": null
+    }
+  ],
+  "events": [
+    {
+      "passage": 0,
+      "time": "2026-09-13T08:05:00.000Z",
+      "type": "manoeuvre",
+      "subtype": "cast_off",
+      "position": [
+        46.1466,
+        -1.1686
+      ],
+      "comment": null,
+      "payload": null,
+      "source": "manual"
+    }
+  ],
+  "observations": [
+    {
+      "passage": 0,
+      "time": "2026-09-13T08:05:00.000Z",
+      "reason": "event",
+      "position": [
+        46.1466,
+        -1.1686
+      ],
+      "values": {
+        "sog": 0,
+        "cog": 0.0349,
+        "heading": 0.0873,
+        "stw": 2.8294,
+        "twd": 4.3633,
+        "tws": 7.2022,
+        "awa": -0.6981,
+        "aws": 8.7456,
+        "depth": 12.4,
+        "pressure": 101320,
+        "airTemp": 291.15,
+        "waterTemp": 288.65
+      }
+    }
+  ]
+}

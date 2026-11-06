@@ -1,0 +1,24 @@
+{
+  "description": "A three-hour passage: readings at departure, on the hour and at arrival.",
+  "start": "2026-09-13T08:20:00.000Z",
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    },
+    {
+      "sail": 180,
+      "values": {
+        "navigation.speedOverGround": 3.0867
+      }
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    }
+  ]
+}

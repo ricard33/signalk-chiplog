@@ -1,0 +1,26 @@
+{
+  "description": "A motor boat with no engine data is under engine.",
+  "settings": {
+    "defaultPropulsion": "engine"
+  },
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    },
+    {
+      "sail": 30,
+      "values": {
+        "navigation.speedOverGround": 4.1156
+      }
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "steps": [
+    {
+      "mode": "fallback",
+      "motion": "stopped",
+      "propulsion": null,
+      "activePassage": null
+    },
+    {
+      "mode": "fallback",
+      "motion": "underway",
+      "propulsion": "sail",
+      "activePassage": 0
+    },
+    {
+      "mode": "fallback",
+      "motion": "stopped",
+      "propulsion": null,
+      "activePassage": null
+    }
+  ],
+  "passages": [
+    {
+      "state": "closed",
+      "startTime": "2026-09-13T08:05:15.000Z",
+      "endTime": "2026-09-13T08:17:15.000Z",
+      "start": [
+        46.1466,
+        -1.1686
+      ],
+      "end": [
+        46.162682,
+        -1.1686
+      ],
+      "startPlace": "46.1466N 1.1686W",
+      "startPlacePending": true,
+      "endPlace": "46.1627N 1.1686W",
+      "endPlacePending": true,
+      "closedBy": "detection",
+      "lastMovingAt": "2026-09-13T08:19:15.000Z",
+      "stoppedSince": null,
+      "distance": 1765.1,
+      "engineDuration": 0,
+      "sailDuration": 720,
+      "openedByCrew": false,
+      "startTanks": null,
+      "startBatteries": null,
+      "endTanks": null,
+      "crew": []
+    }
+  ],
+  "track": [
+    {
+      "passage": 0,
+      "points": 13,
+      "first": {
+        "time": "2026-09-13T08:05:15.000Z",
+        "position": [
+          46.146808,
+          -1.1686
+        ]
+      },
+      "last": {
+        "time": "2026-09-13T08:17:15.000Z",
+        "position": [
+          46.162682,
+          -1.1686
+        ]
+      }
+    }
+  ],
+  "segments": [
+    {
+      "passage": 0,
+      "type": "sail",
+      "startTime": "2026-09-13T08:05:15.000Z",
+      "endTime": "2026-09-13T08:17:15.000Z",
+      "source": "auto",
+      "averageRpm": null
+    }
+  ],
+  "events": [],
+  "observations": [
+    {
+      "passage": 0,
+      "time": "2026-09-13T08:06:15.000Z",
+      "reason": "entry_start",
+      "position": [
+        46.14764,
+        -1.1686
+      ],
+      "values": {
+        "sog": 1.5433
+      }
+    },
+    {
+      "passage": 0,
+      "time": "2026-09-13T08:17:15.000Z",
+      "reason": "entry_end",
+      "position": [
+        46.162682,
+        -1.1686
+      ],
+      "values": {
+        "sog": 0
+      }
+    }
+  ]
+}

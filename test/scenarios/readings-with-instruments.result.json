@@ -1,0 +1,181 @@
+{
+  "steps": [
+    {
+      "mode": "fallback",
+      "motion": "stopped",
+      "propulsion": null,
+      "activePassage": null
+    },
+    {
+      "mode": "fallback",
+      "motion": "underway",
+      "propulsion": "sail",
+      "activePassage": 0
+    },
+    {
+      "mode": "fallback",
+      "motion": "stopped",
+      "propulsion": null,
+      "activePassage": null
+    }
+  ],
+  "passages": [
+    {
+      "state": "closed",
+      "startTime": "2026-09-13T08:45:15.000Z",
+      "endTime": "2026-09-13T10:15:15.000Z",
+      "start": [
+        46.1466,
+        -1.1686
+      ],
+      "end": [
+        46.296332,
+        -1.1686
+      ],
+      "startPlace": "46.1466N 1.1686W",
+      "startPlacePending": true,
+      "endPlace": "46.2963N 1.1686W",
+      "endPlacePending": true,
+      "closedBy": "detection",
+      "lastMovingAt": "2026-09-13T10:17:45.000Z",
+      "stoppedSince": null,
+      "distance": 16603.2,
+      "engineDuration": 0,
+      "sailDuration": 5400,
+      "openedByCrew": false,
+      "startTanks": null,
+      "startBatteries": null,
+      "endTanks": null,
+      "crew": []
+    }
+  ],
+  "track": [
+    {
+      "passage": 0,
+      "points": 361,
+      "first": {
+        "time": "2026-09-13T08:45:15.000Z",
+        "position": [
+          46.147016,
+          -1.1686
+        ]
+      },
+      "last": {
+        "time": "2026-09-13T10:15:15.000Z",
+        "position": [
+          46.296332,
+          -1.1686
+        ]
+      }
+    }
+  ],
+  "segments": [
+    {
+      "passage": 0,
+      "type": "sail",
+      "startTime": "2026-09-13T08:45:15.000Z",
+      "endTime": "2026-09-13T10:15:15.000Z",
+      "source": "auto",
+      "averageRpm": null
+    }
+  ],
+  "events": [],
+  "observations": [
+    {
+      "passage": 0,
+      "time": "2026-09-13T08:45:45.000Z",
+      "reason": "entry_start",
+      "position": [
+        46.147848,
+        -1.1686
+      ],
+      "values": {
+        "sog": 3.0867,
+        "cog": 0.0349,
+        "heading": 0.0873,
+        "stw": 2.8294,
+        "twd": 4.3633,
+        "tws": 7.2022,
+        "awa": -0.6981,
+        "aws": 8.7456,
+        "depth": 12.4,
+        "pressure": 101320,
+        "airTemp": 291.15,
+        "waterTemp": 288.65,
+        "tripLog": 1852000
+      }
+    },
+    {
+      "passage": 0,
+      "time": "2026-09-13T09:00:00.000Z",
+      "reason": "periodic",
+      "position": [
+        46.171555,
+        -1.1686
+      ],
+      "values": {
+        "sog": 3.0867,
+        "cog": 0.0349,
+        "heading": 0.0873,
+        "stw": 2.8294,
+        "twd": 4.3633,
+        "tws": 7.2022,
+        "awa": -0.6981,
+        "aws": 8.7456,
+        "depth": 12.4,
+        "pressure": 101320,
+        "airTemp": 291.15,
+        "waterTemp": 288.65,
+        "tripLog": 1854590
+      }
+    },
+    {
+      "passage": 0,
+      "time": "2026-09-13T10:00:00.000Z",
+      "reason": "periodic",
+      "position": [
+        46.271377,
+        -1.1686
+      ],
+      "values": {
+        "sog": 3.0867,
+        "cog": 0.0349,
+        "heading": 0.0873,
+        "stw": 2.8294,
+        "twd": 4.3633,
+        "tws": 7.2022,
+        "awa": -0.6981,
+        "aws": 8.7456,
+        "depth": 12.4,
+        "pressure": 101320,
+        "airTemp": 291.15,
+        "waterTemp": 288.65,
+        "tripLog": 1865690
+      }
+    },
+    {
+      "passage": 0,
+      "time": "2026-09-13T10:15:15.000Z",
+      "reason": "entry_end",
+      "position": [
+        46.296332,
+        -1.1686
+      ],
+      "values": {
+        "sog": 0,
+        "cog": 0.0349,
+        "heading": 0.0873,
+        "stw": 2.8294,
+        "twd": 4.3633,
+        "tws": 7.2022,
+        "awa": -0.6981,
+        "aws": 8.7456,
+        "depth": 12.4,
+        "pressure": 101320,
+        "airTemp": 291.15,
+        "waterTemp": 288.65,
+        "tripLog": 1868465
+      }
+    }
+  ]
+}

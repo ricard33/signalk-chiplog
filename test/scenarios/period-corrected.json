@@ -1,0 +1,43 @@
+{
+  "description": "The crew corrects the period under way; the correction holds until the engine data changes.",
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "propulsion.main.revolutions": 0
+      }
+    },
+    {
+      "sail": 20,
+      "values": {
+        "navigation.speedOverGround": 2.5722,
+        "propulsion.main.revolutions": 0
+      }
+    },
+    {
+      "correct": "engine"
+    },
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 2.5722,
+        "propulsion.main.revolutions": 0
+      }
+    },
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "propulsion.main.revolutions": 36
+      }
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "propulsion.main.revolutions": 0
+      }
+    }
+  ]
+}

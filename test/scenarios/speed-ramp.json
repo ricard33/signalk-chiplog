@@ -1,0 +1,33 @@
+{
+  "description": "Speed changing minute by minute: leaving the berth slowly, then slowing down to a stop.",
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    },
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": [
+          0.1029, 0.2058, 0.3087, 0.4116, 0.5144, 0.7717, 1.0289, 1.5433, 2.0578, 2.5722
+        ]
+      }
+    },
+    {
+      "sail": 20,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    },
+    {
+      "sail": 15,
+      "values": {
+        "navigation.speedOverGround": [
+          2.0578, 1.5433, 1.0289, 0.7717, 0.5144, 0.4116, 0.2572, 0.1543, 0.0514, 0.0
+        ]
+      }
+    }
+  ]
+}

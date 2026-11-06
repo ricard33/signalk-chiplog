@@ -1,0 +1,17 @@
+{
+  "description": "The passage ends as soon as the stop is seen, dated and placed where the vessel stopped.",
+  "steps": [
+    {
+      "sail": 20,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    },
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    }
+  ]
+}

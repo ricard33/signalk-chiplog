@@ -1,3 +1,5 @@
 node_modules/
 package-lock.json
 public/vendor/
+# Written by npm run scenarios, compared parsed: left as JSON.stringify writes them.
+test/scenarios/*.result.json

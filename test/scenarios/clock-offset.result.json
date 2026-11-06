@@ -1,0 +1,91 @@
+{
+  "steps": [
+    {
+      "mode": "fallback",
+      "motion": "stopped",
+      "propulsion": null,
+      "activePassage": null
+    },
+    {
+      "mode": "fallback",
+      "motion": "underway",
+      "propulsion": "sail",
+      "activePassage": 0
+    }
+  ],
+  "passages": [
+    {
+      "state": "active",
+      "startTime": "2026-09-13T08:05:15.000Z",
+      "endTime": null,
+      "start": [
+        46.1466,
+        -1.1686
+      ],
+      "end": [
+        46.153185,
+        -1.1686
+      ],
+      "startPlace": "46.1466N 1.1686W",
+      "startPlacePending": true,
+      "endPlace": null,
+      "endPlacePending": false,
+      "closedBy": null,
+      "lastMovingAt": "2026-09-13T08:09:45.000Z",
+      "stoppedSince": null,
+      "distance": 732.3,
+      "engineDuration": 0,
+      "sailDuration": 285,
+      "openedByCrew": false,
+      "startTanks": null,
+      "startBatteries": null,
+      "endTanks": null,
+      "crew": []
+    }
+  ],
+  "track": [
+    {
+      "passage": 0,
+      "points": 20,
+      "first": {
+        "time": "2026-09-13T08:05:15.000Z",
+        "position": [
+          46.146947,
+          -1.1686
+        ]
+      },
+      "last": {
+        "time": "2026-09-13T08:10:00.000Z",
+        "position": [
+          46.153532,
+          -1.1686
+        ]
+      }
+    }
+  ],
+  "segments": [
+    {
+      "passage": 0,
+      "type": "sail",
+      "startTime": "2026-09-13T08:05:15.000Z",
+      "endTime": null,
+      "source": "auto",
+      "averageRpm": null
+    }
+  ],
+  "events": [],
+  "observations": [
+    {
+      "passage": 0,
+      "time": "2026-09-13T08:05:45.000Z",
+      "reason": "entry_start",
+      "position": [
+        46.14764,
+        -1.1686
+      ],
+      "values": {
+        "sog": 2.5722
+      }
+    }
+  ]
+}

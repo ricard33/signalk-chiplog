@@ -1,0 +1,217 @@
+{
+  "steps": [
+    {
+      "mode": "fallback",
+      "motion": "stopped",
+      "propulsion": null,
+      "activePassage": null
+    },
+    {
+      "mode": "fallback",
+      "motion": "underway",
+      "propulsion": "sail",
+      "activePassage": 0
+    },
+    {
+      "mode": "fallback",
+      "motion": "underway",
+      "propulsion": "sail",
+      "activePassage": 0
+    },
+    {
+      "mode": "fallback",
+      "motion": "stopped",
+      "propulsion": null,
+      "activePassage": null
+    }
+  ],
+  "passages": [
+    {
+      "state": "closed",
+      "startTime": "2026-09-13T08:05:15.000Z",
+      "endTime": "2026-09-13T09:05:15.000Z",
+      "start": [
+        46.1466,
+        -1.1686
+      ],
+      "end": [
+        46.246421,
+        -1.1686
+      ],
+      "startPlace": "46.1466N 1.1686W",
+      "startPlacePending": true,
+      "endPlace": "46.2464N 1.1686W",
+      "endPlacePending": true,
+      "closedBy": "detection",
+      "lastMovingAt": "2026-09-13T09:07:45.000Z",
+      "stoppedSince": null,
+      "distance": 11053.4,
+      "engineDuration": 0,
+      "sailDuration": 3600,
+      "openedByCrew": false,
+      "startTanks": null,
+      "startBatteries": null,
+      "endTanks": null,
+      "crew": []
+    }
+  ],
+  "track": [
+    {
+      "passage": 0,
+      "points": 241,
+      "first": {
+        "time": "2026-09-13T08:05:15.000Z",
+        "position": [
+          46.147016,
+          -1.1686
+        ]
+      },
+      "last": {
+        "time": "2026-09-13T09:05:15.000Z",
+        "position": [
+          46.246421,
+          -1.1686
+        ]
+      }
+    }
+  ],
+  "segments": [
+    {
+      "passage": 0,
+      "type": "sail",
+      "startTime": "2026-09-13T08:05:15.000Z",
+      "endTime": "2026-09-13T09:05:15.000Z",
+      "source": "auto",
+      "averageRpm": null
+    }
+  ],
+  "events": [
+    {
+      "passage": 0,
+      "time": "2026-09-13T08:16:15.000Z",
+      "type": "heading_change",
+      "subtype": null,
+      "position": [
+        46.165317,
+        -1.1686
+      ],
+      "comment": null,
+      "payload": {
+        "heading": 1.0472,
+        "previousHeading": 0.1745
+      },
+      "source": "auto"
+    },
+    {
+      "passage": 0,
+      "time": "2026-09-13T08:21:15.000Z",
+      "type": "heading_change",
+      "subtype": null,
+      "position": [
+        46.173635,
+        -1.1686
+      ],
+      "comment": null,
+      "payload": {
+        "heading": 1.7453,
+        "previousHeading": 1.0472
+      },
+      "source": "auto"
+    },
+    {
+      "passage": 0,
+      "time": "2026-09-13T08:41:15.000Z",
+      "type": "heading_change",
+      "subtype": null,
+      "position": [
+        46.206909,
+        -1.1686
+      ],
+      "comment": null,
+      "payload": {
+        "heading": 2.9671,
+        "previousHeading": 1.7453
+      },
+      "source": "auto"
+    }
+  ],
+  "observations": [
+    {
+      "passage": 0,
+      "time": "2026-09-13T08:05:45.000Z",
+      "reason": "entry_start",
+      "position": [
+        46.147848,
+        -1.1686
+      ],
+      "values": {
+        "sog": 3.0867,
+        "heading": 0.1745
+      }
+    },
+    {
+      "passage": 0,
+      "time": "2026-09-13T08:16:15.000Z",
+      "reason": "event",
+      "position": [
+        46.165317,
+        -1.1686
+      ],
+      "values": {
+        "sog": 3.0867,
+        "heading": 1.0472
+      }
+    },
+    {
+      "passage": 0,
+      "time": "2026-09-13T08:21:15.000Z",
+      "reason": "event",
+      "position": [
+        46.173635,
+        -1.1686
+      ],
+      "values": {
+        "sog": 3.0867,
+        "heading": 1.7453
+      }
+    },
+    {
+      "passage": 0,
+      "time": "2026-09-13T08:41:15.000Z",
+      "reason": "event",
+      "position": [
+        46.206909,
+        -1.1686
+      ],
+      "values": {
+        "sog": 3.0867,
+        "heading": 2.9671
+      }
+    },
+    {
+      "passage": 0,
+      "time": "2026-09-13T09:00:00.000Z",
+      "reason": "periodic",
+      "position": [
+        46.238103,
+        -1.1686
+      ],
+      "values": {
+        "sog": 3.0867,
+        "heading": 2.9671
+      }
+    },
+    {
+      "passage": 0,
+      "time": "2026-09-13T09:05:15.000Z",
+      "reason": "entry_end",
+      "position": [
+        46.246421,
+        -1.1686
+      ],
+      "values": {
+        "sog": 0
+      }
+    }
+  ]
+}

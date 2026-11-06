@@ -1,0 +1,116 @@
+{
+  "description": "Manoeuvres and notes of the crew go to the open passage, each with a reading.",
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "environment.wind.speedTrue": 7.2022,
+        "environment.wind.directionTrue": 4.3633,
+        "environment.wind.speedApparent": 8.7456,
+        "environment.wind.angleApparent": -0.6981,
+        "navigation.headingTrue": 0.0873,
+        "navigation.speedThroughWater": 2.8294,
+        "environment.depth.belowTransducer": 12.4,
+        "environment.outside.pressure": 101320,
+        "environment.outside.temperature": 291.15,
+        "environment.water.temperature": 288.65,
+        "navigation.courseOverGroundTrue": 0.0349
+      }
+    },
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "environment.wind.speedTrue": 7.2022,
+        "environment.wind.directionTrue": 4.3633,
+        "environment.wind.speedApparent": 8.7456,
+        "environment.wind.angleApparent": -0.6981,
+        "navigation.headingTrue": 0.0873,
+        "navigation.speedThroughWater": 2.8294,
+        "environment.depth.belowTransducer": 12.4,
+        "environment.outside.pressure": 101320,
+        "environment.outside.temperature": 291.15,
+        "environment.water.temperature": 288.65,
+        "navigation.courseOverGroundTrue": 0.0349
+      }
+    },
+    {
+      "crew": {
+        "type": "manoeuvre",
+        "subtype": "tack"
+      }
+    },
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "environment.wind.speedTrue": 7.2022,
+        "environment.wind.directionTrue": 4.3633,
+        "environment.wind.speedApparent": 8.7456,
+        "environment.wind.angleApparent": -0.6981,
+        "navigation.headingTrue": 0.0873,
+        "navigation.speedThroughWater": 2.8294,
+        "environment.depth.belowTransducer": 12.4,
+        "environment.outside.pressure": 101320,
+        "environment.outside.temperature": 291.15,
+        "environment.water.temperature": 288.65,
+        "navigation.courseOverGroundTrue": 0.0349
+      }
+    },
+    {
+      "crew": {
+        "type": "text_annotation",
+        "comment": "Grain au vent"
+      }
+    },
+    {
+      "crew": {
+        "type": "manoeuvre",
+        "subtype": "reef_in",
+        "clientRef": "5c2a1f0e-1111-4c1e-9d10-000000000001"
+      }
+    },
+    {
+      "crew": {
+        "type": "manoeuvre",
+        "subtype": "reef_in",
+        "clientRef": "5c2a1f0e-1111-4c1e-9d10-000000000001"
+      }
+    },
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "environment.wind.speedTrue": 7.2022,
+        "environment.wind.directionTrue": 4.3633,
+        "environment.wind.speedApparent": 8.7456,
+        "environment.wind.angleApparent": -0.6981,
+        "navigation.headingTrue": 0.0873,
+        "navigation.speedThroughWater": 2.8294,
+        "environment.depth.belowTransducer": 12.4,
+        "environment.outside.pressure": 101320,
+        "environment.outside.temperature": 291.15,
+        "environment.water.temperature": 288.65,
+        "navigation.courseOverGroundTrue": 0.0349
+      }
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "environment.wind.speedTrue": 7.2022,
+        "environment.wind.directionTrue": 4.3633,
+        "environment.wind.speedApparent": 8.7456,
+        "environment.wind.angleApparent": -0.6981,
+        "navigation.headingTrue": 0.0873,
+        "navigation.speedThroughWater": 2.8294,
+        "environment.depth.belowTransducer": 12.4,
+        "environment.outside.pressure": 101320,
+        "environment.outside.temperature": 291.15,
+        "environment.water.temperature": 288.65,
+        "navigation.courseOverGroundTrue": 0.0349
+      }
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "description": "Leaving again within the tolerance reopens the passage and keeps the stop as a stopover; the next stop closes it again.",
+  "steps": [
+    {
+      "sail": 20,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    },
+    {
+      "sail": 20,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    },
+    {
+      "sail": 10,
+      "values": {
+        "navigation.speedOverGround": 2.5722
+      }
+    },
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    }
+  ]
+}

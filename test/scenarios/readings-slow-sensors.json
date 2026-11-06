@@ -1,0 +1,143 @@
+{
+  "description": "A barometer publishing every 10 minutes stays current in the hourly readings; a wind sensor gone silent drops out.",
+  "start": "2026-09-13T08:46:00.000Z",
+  "steps": [
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 0,
+        "environment.wind.speedTrue": 6.1733
+      }
+    },
+    {
+      "sail": 5,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "environment.wind.speedTrue": 6.1733
+      }
+    },
+    {
+      "sail": 1,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "environment.outside.pressure": 101280
+      }
+    },
+    {
+      "sail": 9,
+      "values": {
+        "navigation.speedOverGround": 3.0867
+      }
+    },
+    {
+      "sail": 1,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "environment.outside.pressure": 101260
+      }
+    },
+    {
+      "sail": 9,
+      "values": {
+        "navigation.speedOverGround": 3.0867
+      }
+    },
+    {
+      "sail": 1,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "environment.outside.pressure": 101240
+      }
+    },
+    {
+      "sail": 9,
+      "values": {
+        "navigation.speedOverGround": 3.0867
+      }
+    },
+    {
+      "sail": 1,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "environment.outside.pressure": 101220
+      }
+    },
+    {
+      "sail": 9,
+      "values": {
+        "navigation.speedOverGround": 3.0867
+      }
+    },
+    {
+      "sail": 1,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "environment.outside.pressure": 101200
+      }
+    },
+    {
+      "sail": 9,
+      "values": {
+        "navigation.speedOverGround": 3.0867
+      }
+    },
+    {
+      "sail": 1,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "environment.outside.pressure": 101180
+      }
+    },
+    {
+      "sail": 9,
+      "values": {
+        "navigation.speedOverGround": 3.0867
+      }
+    },
+    {
+      "sail": 1,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "environment.outside.pressure": 101160
+      }
+    },
+    {
+      "sail": 9,
+      "values": {
+        "navigation.speedOverGround": 3.0867
+      }
+    },
+    {
+      "sail": 1,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "environment.outside.pressure": 101140
+      }
+    },
+    {
+      "sail": 9,
+      "values": {
+        "navigation.speedOverGround": 3.0867
+      }
+    },
+    {
+      "sail": 1,
+      "values": {
+        "navigation.speedOverGround": 3.0867,
+        "environment.outside.pressure": 101120
+      }
+    },
+    {
+      "sail": 9,
+      "values": {
+        "navigation.speedOverGround": 3.0867
+      }
+    },
+    {
+      "sail": 40,
+      "values": {
+        "navigation.speedOverGround": 0
+      }
+    }
+  ]
+}
