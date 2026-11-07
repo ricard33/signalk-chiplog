@@ -641,9 +641,9 @@ scaling) are optional — a note drawn before the tablet's toolbar existed has n
 colour at a default width. `tool: "highlighter"` is the only one drawn translucent, wherever the note is later shown.
 
 A `watch_change` manoeuvre may carry `payload.crew`: the names of the crew members on watch from its time on (as the
-crew list names them), an empty array once the watches have ended. The entry app and the Chiplog Skipper app log it so;
-the log reads it as "on watch: …", and the latest one among a passage's events says who is on watch now. Without
-`payload.crew` it is a plain watch change.
+crew list names them), an empty array once the watches have ended. The entry app and companion apps log it so; the log
+reads it as "on watch: …", and the latest one among a passage's events says who is on watch now. Without `payload.crew`
+it is a plain watch change.
 
 **Companion app records.** A companion app logs what it adds to the journal under way — a reroute, a check-list at sea,
 a threshold crossed — as `text_annotation` with a `subtype` of its own, prefixed `companion.` (`companion.reroute`,
@@ -651,11 +651,11 @@ a threshold crossed — as `text_annotation` with a `subtype` of its own, prefix
 than the passage (the go/no-go decision, the briefing, the debriefing) goes in the plan's `companion` object instead.
 The plugin stores them like any annotation and needs no change for a new one.
 
-`companion.observation` is a weather reading taken by hand, logged by the entry app and the Chiplog Skipper app: its
-`payload` holds any of `windForce` (Beaufort, 0–12), `windDirection` (radians, true, in steps of an eighth of a turn),
-`seaState` (Douglas, 0–9), `visibility` (`good`, `moderate`, `poor` or `fog`), `pressure` (pascals, as read on the
-boat's barometer) and `cloudCover` (oktas, 0–8); the `comment` says it in words. The `weather_observation` manoeuvre
-type is the shortcut that opens the form for it.
+`companion.observation` is a weather reading taken by hand, logged by the entry app and companion apps: its `payload`
+holds any of `windForce` (Beaufort, 0–12), `windDirection` (radians, true, in steps of an eighth of a turn), `seaState`
+(Douglas, 0–9), `visibility` (`good`, `moderate`, `poor` or `fog`), `pressure` (pascals, as read on the boat's
+barometer) and `cloudCover` (oktas, 0–8); the `comment` says it in words. The `weather_observation` manoeuvre type is
+the shortcut that opens the form for it.
 
 ### `POST /entries/:id/events` — `readwrite`
 

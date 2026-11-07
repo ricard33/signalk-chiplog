@@ -1,7 +1,7 @@
 // Plays every shared scenario (test/scenarios/*.json) on the plugin's logbook engine and
 // writes what it made of each next to it (<name>.result.json). Run it after changing a logbook
 // rule: the diff of the results shows what the change does, and test/scenarios.test.js keeps
-// them current. The Chiplog Skipper app copies scenarios and results to check its own port.
+// them current. A companion app can copy scenarios and results to check its own port.
 //
 //   npm run scenarios
 

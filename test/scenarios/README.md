@@ -1,8 +1,8 @@
 # Shared scenarios
 
 Scenarios of a boat's data and its crew's actions, played on the plugin's logbook engine. They are shared with the
-Chiplog Skipper app, which keeps the logbook itself on boats without a Signal K server and ports these rules: the app
-copies the scenarios and their results from a given version of the plugin and plays them on its own engine. A rule
+companion apps, such as one that keeps the logbook itself on boats without a Signal K server and ports these rules: the
+app copies the scenarios and their results from a given version of the plugin and plays them on its own engine. A rule
 changed here and not there, or the other way round, then shows in a test rather than at sea.
 
 - `<name>.json`: a scenario, written by hand.

@@ -286,7 +286,7 @@ textarea:focus-visible {
 }
 
 /* Controls on the left, the crew and the latest entries on the right once the screen is wide
-   enough, as in the Skipper app. */
+   enough, as in a tablet companion app. */
 .entry-columns,
 .entry-controls,
 .entry-side {

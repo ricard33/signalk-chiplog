@@ -24,10 +24,11 @@ All notable changes to Chiplog are documented here. The format follows
   default, under the bar and a summary of the hours and share of each.
 - **Watch change on the entry pad**: the `watch_change` shortcut opens a list of the crew (the passage's crew and the
   roster) to tick who is on watch from now, with the current watch ticked, and a button to end the watches. The entry
-  keeps the names in `payload.crew` (empty once the watches end), the log words it, and Chiplog Skipper logs the same.
+  keeps the names in `payload.crew` (empty once the watches end), the log words it, and a companion app can log the
+  same.
 - **Weather observation on the entry pad**: the new `weather_observation` shortcut opens a form for a reading taken by
   hand — wind force and direction, sea state, visibility, barometer pressure, cloud cover, each optional, one tap each —
-  and logs a `companion.observation` annotation, the one the Chiplog Skipper app logs (docs/API.md). The shortcut is a
+  and logs a `companion.observation` annotation, the one a companion app can log (docs/API.md). The shortcut is a
   built-in manoeuvre type, so it is ordered and turned on or off with the others. A logbook created before it gets the
   type from a migration, after the shortcuts it has.
 - **Shortcuts edited from the entry app**: a button over the manoeuvre pad opens the list of shortcuts, to reorder them,
@@ -41,9 +42,9 @@ All notable changes to Chiplog are documented here. The format follows
   segment under way and starts the other, held as manual until the engine data itself changes, and `engines` in
   `GET /state`.
 - **Shared scenarios** (`test/scenarios/`, `npm run scenarios`): scenarios of a boat's data and its crew's actions,
-  played on the logbook engine, with the logbook it makes of each recorded next to them and checked by the tests. The
-  Chiplog Skipper app, which keeps the logbook itself on boats without a server, plays the same scenarios on its port of
-  these rules and compares.
+  played on the logbook engine, with the logbook it makes of each recorded next to them and checked by the tests. The A
+  companion app that keeps the logbook itself on boats without a server can play the same scenarios on its port of these
+  rules and compare.
 
 ## [2.17.0] - 2026-11-03
 
@@ -58,7 +59,7 @@ All notable changes to Chiplog are documented here. The format follows
 
 ### Added
 
-- **An API for companion apps**, such as Chiplog Skipper, described in [docs/API.md](docs/API.md):
+- **An API for companion apps**, described in [docs/API.md](docs/API.md):
   - **Versioned**: the public routes are also served under `/plugins/signalk-chiplog/api/v1`, described by an OpenAPI
     document (`GET /api/v1/openapi.json`, also listed by the Signal K server). `GET /state` now says `apiVersions`,
     `pluginVersion`, `features` and the `logbookId`.

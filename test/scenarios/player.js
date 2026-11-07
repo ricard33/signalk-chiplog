@@ -1,5 +1,5 @@
 // Plays a shared scenario on the plugin's own logbook engine and describes the logbook it
-// leaves. The scenarios are shared with the Chiplog Skipper app, which keeps the logbook itself
+// leaves. The scenarios are shared with companion apps, such as one that keeps the logbook itself
 // on boats without a server: it plays the same files on its port of these rules and compares
 // with the results written here (`npm run scenarios`), so that a rule changed on one side only
 // shows in a test, not at sea. See README.md in this directory for the format.

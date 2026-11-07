@@ -947,10 +947,10 @@ webhook.
 
 ### 4.18 Companion apps
 
-The logbook records what happened. A companion app — Chiplog Skipper, a tablet app sold apart — carries what was
-planned, checked and decided around it: it prepares a passage, follows it, and reports on it. The plugin gives it a
-stable API and keeps the few things that belong with the logbook; the app keeps its own tools (check-list templates,
-sets of no-go criteria) and never needs an admin login.
+The logbook records what happened. A companion app — a separate app, typically on a tablet — carries what was planned,
+checked and decided around it: it prepares a passage, follows it, and reports on it. The plugin gives it a stable API
+and keeps the few things that belong with the logbook; the app keeps its own tools (check-list templates, sets of no-go
+criteria) and never needs an admin login.
 
 - **A versioned API.** The app and the plugin are updated apart, so the public routes are also served under `/api/v1`,
   described by an OpenAPI document (`getOpenApi`, `GET /api/v1/openapi.json`) from which the app's client is generated.

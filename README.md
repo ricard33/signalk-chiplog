@@ -685,8 +685,8 @@ node scripts/import-postgsail.js PostgSail_Trip.geojson --url http://boat.local:
 
 ## Companion apps 🧭
 
-Chiplog keeps what happened. A companion app, such as Chiplog Skipper on a tablet, can add what was planned and decided
-around it, through the plugin's REST API — nothing to set up in the plugin:
+Chiplog keeps what happened. A companion app, on a tablet for instance, can add what was planned and decided around it,
+through the plugin's REST API — nothing to set up in the plugin:
 
 - **Planned passages**: departure, arrival, the Signal K route and fallback points, the crew and the watches. Once the
   passage opens, the planned crew is the one recorded aboard.
