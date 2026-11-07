@@ -634,6 +634,11 @@ A stroke's `color` (`"#rrggbb"`), `tool` (`"pen"` or `"highlighter"`) and `width
 scaling) are optional — a note drawn before the tablet's toolbar existed has none, and is shown in the current text
 colour at a default width. `tool: "highlighter"` is the only one drawn translucent, wherever the note is later shown.
 
+A `watch_change` manoeuvre may carry `payload.crew`: the names of the crew members on watch from its time on (as the
+crew list names them), an empty array once the watches have ended. The entry app and the Chiplog Skipper app log it so;
+the log reads it as "on watch: …", and the latest one among a passage's events says who is on watch now. Without
+`payload.crew` it is a plain watch change.
+
 **Companion app records.** A companion app logs what it adds to the journal under way — a reroute, a check-list at sea,
 a threshold crossed — as `text_annotation` with a `subtype` of its own, prefixed `companion.` (`companion.reroute`,
 `companion.checklist`, …), a readable `comment` and its structured detail in `payload`. What belongs to the plan rather
