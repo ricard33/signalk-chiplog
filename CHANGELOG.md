@@ -8,6 +8,12 @@ All notable changes to Chiplog are documented here. The format follows
 
 ### Added
 
+- **Sails and engines on the entry pad**: the sail change opens a list to tick, several sails at once (mainsail +
+  genoa), starting from the sails up now, and logs one entry; unticking a sail brings it down. A new Engines button
+  lists the engines Signal K knows (or a single one) with one switch each, and logs one entry whatever the number of
+  engines changed. The server side is `POST /entries/:id/propulsion` (feature `propulsionSwitch`), which ends the
+  segment under way and starts the other, held as manual until the engine data itself changes, and `engines` in
+  `GET /state`.
 - **Shared scenarios** (`test/scenarios/`, `npm run scenarios`): scenarios of a boat's data and its crew's actions,
   played on the logbook engine, with the logbook it makes of each recorded next to them and checked by the tests. The
   Chiplog Skipper app, which keeps the logbook itself on boats without a server, plays the same scenarios on its port of

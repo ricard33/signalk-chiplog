@@ -38,6 +38,7 @@ describe('plugin', () => {
         detection: 'fallback',
         motion: 'unknown',
         propulsion: null,
+        engines: [],
         stateIssue: {
           reason: 'stale',
           source: null,
@@ -48,7 +49,7 @@ describe('plugin', () => {
         logbookId: ctx.db.prepare('SELECT id FROM logbook_identity').get().id,
         apiVersions: [1],
         pluginVersion: require('../package.json').version,
-        features: ['plans', 'defects', 'changes', 'endTanks', 'planCompanion']
+        features: ['plans', 'defects', 'changes', 'endTanks', 'planCompanion', 'propulsionSwitch']
       });
     });
 

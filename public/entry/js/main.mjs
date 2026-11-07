@@ -418,6 +418,27 @@ function App({ journal }) {
     }
   };
 
+  // The engines the crew can start or stop: those Signal K lists, or a single one when it lists
+  // none. Only on a server that can switch, and while a passage is under way.
+  const engines =
+    entry && state?.features?.includes('propulsionSwitch')
+      ? state.engines?.length > 0
+        ? state.engines.map(({ id, running }) => ({ name: id, running }))
+        : [{ name: t('entry.engine'), running: state.propulsion === 'engine' }]
+      : null;
+
+  const switchEngines = async (running) => {
+    try {
+      await request('POST', `/entries/${entry.id}/propulsion`, {
+        type: Object.values(running).some(Boolean) ? 'engine' : 'sail',
+        engines: running
+      });
+      refresh();
+    } catch (error) {
+      showFailure(error);
+    }
+  };
+
   const editTitle = editing?.what ?? t('entry.comment');
   const bounds = entry ? { start: entry.startTime, end: entry.endTime } : null;
 
@@ -478,6 +499,8 @@ function App({ journal }) {
           busy=${busy}
           onLog=${log}
           loadSails=${loadSails}
+          engines=${engines}
+          onSwitchEngines=${switchEngines}
         />
         <section class="panel writer ${tab === 'sketch' ? 'fullscreen' : ''}">
           <div class="tabs" role="tablist">

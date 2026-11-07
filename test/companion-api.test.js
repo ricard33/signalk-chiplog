@@ -44,7 +44,14 @@ describe('the versioned API', () => {
   it('says which versions and features it serves', async () => {
     const { body } = await ctx.request('GET', '/v1/state');
     assert.deepEqual(body.apiVersions, [1]);
-    assert.deepEqual(body.features, ['plans', 'defects', 'changes', 'endTanks', 'planCompanion']);
+    assert.deepEqual(body.features, [
+      'plans',
+      'defects',
+      'changes',
+      'endTanks',
+      'planCompanion',
+      'propulsionSwitch'
+    ]);
     assert.equal(body.pluginVersion, require('../package.json').version);
     assert.match(body.logbookId, /^[0-9a-f-]{36}$/);
   });

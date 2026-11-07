@@ -33,8 +33,8 @@ plugin through the Signal K appstore.
 - **Evolution.** A field or a route added stays in `v1`; a breaking change makes a `v2`, with `v1` kept alongside for a
   transition period.
 - **Discovery.** [`GET /state`](#get-state--readonly) gives `apiVersions` (`[1]`), `pluginVersion` and `features`:
-  `plans`, `defects`, `changes`, `endTanks` (2.16), `planCompanion` (2.17) — what was added to `v1` after it first
-  shipped (2.15). `schemaVersion` stays the database's migration level, not an API version.
+  `plans`, `defects`, `changes`, `endTanks` (2.16), `planCompanion` (2.17), `propulsionSwitch` — what was added to `v1`
+  after it first shipped (2.15). `schemaVersion` stays the database's migration level, not an API version.
 - **Unknown fields** are still refused with `400`. A client therefore sends a field or calls a route of a feature only
   once `features` names it, and reads a response field it does not know as optional. Against an older plugin, a feature
   missing from `features` stays on the client's side, with a word to the user, rather than failing.
@@ -108,12 +108,13 @@ What the UI needs to render its header, in one call.
   "detection": "autostate",
   "motion": "underway",
   "propulsion": "engine",
+  "engines": [{ "id": "port", "running": true }],
   "stateIssue": null,
   "schemaVersion": 25,
   "logbookId": "37ff7ef8-28e8-4a28-9277-c34df9391976",
   "apiVersions": [1],
   "pluginVersion": "2.17.0",
-  "features": ["plans", "defects", "changes", "endTanks", "planCompanion"]
+  "features": ["plans", "defects", "changes", "endTanks", "planCompanion", "propulsionSwitch"]
 }
 ```
 
@@ -125,6 +126,8 @@ As of the last detection cycle, at most 15 seconds old:
 - `motion` is `underway`, `stopped`, or `unknown` when there is no current data to decide.
 - `propulsion` is `engine` or `sail` while under way — from engine data, `navigation.state` or the configured default
   (SPEC §4.2) — and `null` otherwise.
+- `engines` lists the engines Signal K publishes (`propulsion.<id>`), each `running`, stopped (`false`), or `null` when
+  there is no fresh data; empty when the boat has none.
 - `activeEntryId` is `null` when no passage is open.
 - `stateIssue` says why `navigation.state` is not followed, and is `null` in `autostate` mode: `{ "reason": "absent" }`
   when nothing publishes it; otherwise `{ reason, source, value, updatedAt }` with `reason` `pending` (a `null` value,
@@ -444,6 +447,19 @@ last remaining one is a slot old, dated at that moment rather than on the clock 
 
 The engine/sail segments, oldest first. Paginated. They cover only time under way, so a stop leaves a gap; the ongoing
 segment has `endTime: null`.
+
+### `POST /entries/:id/propulsion` — `readwrite` (feature `propulsionSwitch`)
+
+```json
+{ "type": "engine", "engines": { "Port": true, "Starboard": false } }
+```
+
+The crew starts or stops an engine by hand: the passage is under `type` from now on. The segment under way ends now and
+one of that type begins, flagged `source: "manual"` so that it holds until the engine data itself changes. `engines`
+(optional, one to 20 names, each `true` or `false`) says which engine runs and is kept in the payload of the
+`propulsion_change` event this logs (source `manual`). With the type unchanged only the event is logged, which is how
+one of two engines stopping is recorded; with nothing changed and no `engines`, nothing happens. Answers the segment
+under way. `409` `entry_not_active` unless the passage is in progress, `entry_stopped` while it is stopped.
 
 ### `PATCH /propulsion/:id` — `readwrite`
 

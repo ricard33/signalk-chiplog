@@ -180,13 +180,23 @@ export function describeEvent(event, { t, format, manoeuvreLabels = {} }) {
           after: t(`type.${payload.after?.type}`)
         })
       };
-    case 'propulsion_change':
-      return {
-        ...line,
-        detail: t(
-          payload.after?.type === 'engine' ? 'status.underwayEngine' : 'status.underwaySail'
-        )
-      };
+    case 'propulsion_change': {
+      const engines =
+        payload.engines && typeof payload.engines === 'object' ? payload.engines : null;
+      const under = t(
+        payload.after?.type === 'engine' ? 'status.underwayEngine' : 'status.underwaySail'
+      );
+      // Engines started or stopped by hand say which one: "Port running, Starboard stopped".
+      const which = engines
+        ? Object.entries(engines)
+            .map(
+              ([name, running]) =>
+                `${name} ${t(running ? 'entry.engineRunning' : 'entry.engineStopped')}`
+            )
+            .join(', ')
+        : null;
+      return { ...line, detail: which ? `${under} (${which})` : under };
+    }
     case 'stopover': {
       // The plugin copies the place name into the comment, for the CSV; a
       // comment the crew changed is still shown.

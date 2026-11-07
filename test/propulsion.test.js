@@ -91,4 +91,85 @@ describe('propulsion', () => {
       400
     );
   });
+
+  describe('switching by hand', () => {
+    const active = (ctx) => insertEntry(ctx.db, { state: 'active' });
+    const open = (ctx, entryId, type = 'sail') =>
+      insert(ctx.db, 'propulsion_segments', {
+        entry_id: entryId,
+        type,
+        start_time: at(0)
+      });
+
+    it('ends the segment under way and starts the other, held as manual', async () => {
+      const entryId = active(ctx);
+      const first = open(ctx, entryId);
+
+      const { status, body } = await ctx.request('POST', `/entries/${entryId}/propulsion`, {
+        type: 'engine',
+        engines: { Port: true, Starboard: false }
+      });
+
+      assert.equal(status, 200);
+      assert.equal(body.type, 'engine');
+      assert.equal(body.source, 'manual');
+      assert.equal(body.endTime, null);
+      const ended = ctx.db.prepare('SELECT * FROM propulsion_segments WHERE id = ?').get(first);
+      assert.equal(
+        ended.end_time,
+        ctx.db.prepare('SELECT start_time FROM propulsion_segments WHERE id = ?').get(body.id)
+          .start_time
+      );
+      const events = await ctx.request('GET', `/entries/${entryId}/events?type=propulsion_change`);
+      assert.equal(events.body.total, 1);
+      assert.equal(events.body.items[0].source, 'manual');
+      assert.deepEqual(events.body.items[0].payload.engines, { Port: true, Starboard: false });
+      assert.deepEqual(events.body.items[0].payload.before, { type: 'sail' });
+    });
+
+    it('logs which engine runs when the type stays, without a new segment', async () => {
+      const entryId = active(ctx);
+      open(ctx, entryId, 'engine');
+
+      const { body } = await ctx.request('POST', `/entries/${entryId}/propulsion`, {
+        type: 'engine',
+        engines: { Port: false, Starboard: true }
+      });
+
+      assert.equal(body.source, 'auto');
+      assert.equal(ctx.db.prepare('SELECT COUNT(*) AS n FROM propulsion_segments').get().n, 1);
+      assert.equal(ctx.db.prepare('SELECT COUNT(*) AS n FROM events').get().n, 1);
+    });
+
+    it('does nothing at all when nothing changes', async () => {
+      const entryId = active(ctx);
+      open(ctx, entryId);
+
+      await ctx.request('POST', `/entries/${entryId}/propulsion`, { type: 'sail' });
+
+      assert.equal(ctx.db.prepare('SELECT COUNT(*) AS n FROM events').get().n, 0);
+    });
+
+    it('refuses a passage that is closed, and bad bodies', async () => {
+      const closed = insertEntry(ctx.db);
+      const refused = await ctx.request('POST', `/entries/${closed}/propulsion`, {
+        type: 'engine'
+      });
+      assert.equal(refused.status, 409);
+      assert.equal(refused.body.error.code, 'entry_not_active');
+
+      const entryId = active(ctx);
+      for (const body of [
+        { type: 'oars' },
+        { type: 'engine', engines: { Port: 'yes' } },
+        { type: 'engine', engines: {} },
+        { type: 'engine', extra: 1 }
+      ]) {
+        assert.equal(
+          (await ctx.request('POST', `/entries/${entryId}/propulsion`, body)).status,
+          400
+        );
+      }
+    });
+  });
 });

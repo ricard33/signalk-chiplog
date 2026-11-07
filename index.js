@@ -933,6 +933,7 @@ module.exports = function (app) {
             mode: detector.mode(),
             motion: detector.motion(),
             propulsion: detector.propulsion(),
+            engines: detector.engines(),
             stateIssue: detector.stateIssue()
           })
         };

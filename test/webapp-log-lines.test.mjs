@@ -236,3 +236,23 @@ describe('sail sets', () => {
     assert.equal(down.detail, '(sails down)');
   });
 });
+
+describe('engines started by hand', () => {
+  it('say which engine runs on the propulsion change', async () => {
+    const { describeEvent } = await import('../public/js/log-lines.mjs');
+    const t = createTranslator('en');
+    const line = describeEvent(
+      {
+        type: 'propulsion_change',
+        payload: { after: { type: 'engine' }, engines: { Port: true, Starboard: false } }
+      },
+      { t, format: {} }
+    );
+    assert.match(line.detail, /Port running, Starboard stopped/);
+    const plain = describeEvent(
+      { type: 'propulsion_change', payload: { after: { type: 'sail' } } },
+      { t, format: {} }
+    );
+    assert.doesNotMatch(plain.detail, /\(/);
+  });
+});

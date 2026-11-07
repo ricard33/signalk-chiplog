@@ -91,10 +91,62 @@ function SailSheet({ initial, onDone, onClose }) {
   `;
 }
 
-export function ManoeuvrePad({ types, noPassage, busy, onLog, loadSails }) {
+// One switch per engine, validated together: a single entry in the log, and the passage
+// is under engine or under sail from then on.
+function EngineSheet({ engines, onDone, onClose }) {
+  const { t } = useLocale();
+  const [running, setRunning] = useState(
+    Object.fromEntries(engines.map(({ name, running: on }) => [name, on === true]))
+  );
+  const changed = engines.some(({ name, running: on }) => running[name] !== (on === true));
+  return html`
+    <div class="sheet-backdrop" onClick=${(event) => event.target === event.currentTarget && onClose()}>
+      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="engine-title">
+        <h2 id="engine-title">${t('entry.engines')}</h2>
+        <p class="hint">${t('entry.enginesHint')}</p>
+        <div class="sail-grid">
+          ${engines.map(
+            ({ name }) =>
+              html`<button
+                type="button"
+                class=${running[name] ? 'big-button primary' : 'big-button'}
+                key=${name}
+                aria-pressed=${running[name] ? 'true' : 'false'}
+                onClick=${() => setRunning({ ...running, [name]: !running[name] })}
+              >
+                ${`${name} · ${t(running[name] ? 'entry.engineRunning' : 'entry.engineStopped')}`}
+              </button>`
+          )}
+        </div>
+        <div class="sheet-row">
+          <button
+            type="button"
+            class="big-button primary"
+            disabled=${!changed}
+            onClick=${() => onDone(running)}
+          >
+            ${t('entry.send')}
+          </button>
+        </div>
+        <button type="button" class="link-button" onClick=${onClose}>${t('common.cancel')}</button>
+      </div>
+    </div>
+  `;
+}
+
+export function ManoeuvrePad({
+  types,
+  noPassage,
+  busy,
+  onLog,
+  loadSails,
+  engines,
+  onSwitchEngines
+}) {
   const { t } = useLocale();
   const [choosingSail, setChoosingSail] = useState(null);
   const [sailsUp, setSailsUp] = useState([]);
+  const [choosingEngines, setChoosingEngines] = useState(false);
   const enabled = types.filter((type) => type.enabled);
 
   const press = (type) => {
@@ -129,7 +181,29 @@ export function ManoeuvrePad({ types, noPassage, busy, onLog, loadSails }) {
             ${manoeuvreLabel(type, t)}
           </button>`;
         })}
+        ${
+          engines &&
+          html`<button
+            type="button"
+            class="big-button"
+            disabled=${busy}
+            onClick=${() => setChoosingEngines(true)}
+          >
+            ${t('entry.engines')}
+          </button>`
+        }
       </div>
+      ${
+        choosingEngines &&
+        html`<${EngineSheet}
+          engines=${engines}
+          onClose=${() => setChoosingEngines(false)}
+          onDone=${(running) => {
+            setChoosingEngines(false);
+            onSwitchEngines(running);
+          }}
+        />`
+      }
       ${
         choosingSail &&
         html`<${SailSheet}
