@@ -1,5 +1,6 @@
 import { html, useState } from '../../../vendor/preact-htm.mjs';
 import { useLocale } from '../../../js/context.mjs';
+import { sailName, sailsText } from '../../../js/log-lines.mjs';
 
 const DEPARTURES = new Set(['cast_off', 'anchor_up']);
 export const SAILS = [
@@ -18,28 +19,53 @@ export function manoeuvreLabel(type, t) {
   return t.has(key) ? t(key) : type.label;
 }
 
-function SailSheet({ onPick, onClose }) {
+// The sails to tick: those up now start ticked, so a sail comes down by
+// unticking it. One entry logs the whole set.
+function SailSheet({ initial, onDone, onClose }) {
   const { t } = useLocale();
   const [other, setOther] = useState('');
-  const submitOther = (event) => {
+  const [offered, setOffered] = useState(() => [
+    ...SAILS,
+    ...initial.filter((sail) => !SAILS.includes(sail))
+  ]);
+  const [chosen, setChosen] = useState(initial);
+  const toggle = (sail) =>
+    setChosen((current) =>
+      current.includes(sail) ? current.filter((s) => s !== sail) : [...current, sail]
+    );
+  const addOther = (event) => {
     event.preventDefault();
-    if (other.trim()) {
-      onPick(other.trim());
+    const name = other.trim();
+    if (name) {
+      if (!offered.includes(name)) {
+        setOffered([...offered, name]);
+      }
+      setChosen((current) => (current.includes(name) ? current : [...current, name]));
+      setOther('');
     }
   };
+  const changed =
+    chosen.length !== initial.length || chosen.some((sail) => !initial.includes(sail));
   return html`
     <div class="sheet-backdrop" onClick=${(event) => event.target === event.currentTarget && onClose()}>
       <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sail-title">
         <h2 id="sail-title">${t('entry.chooseSail')}</h2>
+        <p class="hint">${t('entry.sailsHint')}</p>
         <div class="sail-grid">
-          ${SAILS.map(
+          ${offered.map(
             (sail) =>
-              html`<button type="button" class="big-button" key=${sail} onClick=${() => onPick(sail)}>
-                ${t(`sail.${sail}`)}
+              html`<button
+                type="button"
+                class=${chosen.includes(sail) ? 'big-button primary' : 'big-button'}
+                key=${sail}
+                aria-pressed=${chosen.includes(sail) ? 'true' : 'false'}
+                onClick=${() => toggle(sail)}
+              >
+                ${sailName(sail, t)}
               </button>`
           )}
         </div>
-        <form class="sheet-row" onSubmit=${submitOther}>
+        <form class="sheet-row" onSubmit=${addOther}>
           <input
             value=${other}
             maxlength="60"
@@ -47,22 +73,40 @@ function SailSheet({ onPick, onClose }) {
             aria-label=${t('entry.otherSail')}
             onInput=${(event) => setOther(event.currentTarget.value)}
           />
-          <button type="submit" class="big-button primary" disabled=${!other.trim()}>${t('entry.send')}</button>
+          <button type="submit" class="big-button" disabled=${!other.trim()}>${t('entry.addSail')}</button>
         </form>
+        <div class="sheet-row">
+          <button
+            type="button"
+            class="big-button primary"
+            disabled=${!changed}
+            onClick=${() => onDone(chosen)}
+          >
+            ${t('entry.send')}
+          </button>
+        </div>
         <button type="button" class="link-button" onClick=${onClose}>${t('common.cancel')}</button>
       </div>
     </div>
   `;
 }
 
-export function ManoeuvrePad({ types, noPassage, busy, onLog }) {
+export function ManoeuvrePad({ types, noPassage, busy, onLog, loadSails }) {
   const { t } = useLocale();
   const [choosingSail, setChoosingSail] = useState(null);
+  const [sailsUp, setSailsUp] = useState([]);
   const enabled = types.filter((type) => type.enabled);
 
   const press = (type) => {
     if (type.key === 'sail_change') {
-      setChoosingSail(type);
+      // What is up now, from the log; the sheet opens on the last known set
+      // if the server cannot say.
+      Promise.resolve(loadSails?.())
+        .then(
+          (sails) => setSailsUp(sails ?? sailsUp),
+          () => {}
+        )
+        .finally(() => setChoosingSail(type));
       return;
     }
     onLog({ type: 'manoeuvre', subtype: type.key }, manoeuvreLabel(type, t));
@@ -89,14 +133,22 @@ export function ManoeuvrePad({ types, noPassage, busy, onLog }) {
       ${
         choosingSail &&
         html`<${SailSheet}
+          initial=${sailsUp}
           onClose=${() => setChoosingSail(null)}
-          onPick=${(sail) => {
+          onDone=${(sails) => {
             const type = choosingSail;
             setChoosingSail(null);
-            const sailName = t.has(`sail.${sail}`) ? t(`sail.${sail}`) : sail;
+            setSailsUp(sails);
+            // `sail` is the set in words, for readers that know one sail only.
             onLog(
-              { type: 'manoeuvre', subtype: type.key, payload: { sail } },
-              `${manoeuvreLabel(type, t)} (${sailName})`
+              {
+                type: 'manoeuvre',
+                subtype: type.key,
+                payload: { sail: sails.join(' + '), sails }
+              },
+              sails.length === 0
+                ? `${manoeuvreLabel(type, t)} (${t('event.sailsDown')})`
+                : `${manoeuvreLabel(type, t)} (${sailsText(sails, t)})`
             );
           }}
         />`

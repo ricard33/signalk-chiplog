@@ -72,6 +72,31 @@ export function sailName(sail, t) {
   return t.has(`sail.${sail}`) ? t(`sail.${sail}`) : sail;
 }
 
+// The sails a sail change leaves up: the companion's and the entry pad's
+// `payload.sails` (ids or the crew's own names), or the single `payload.sail`
+// of older entries. Empty once every sail is down.
+export function sailsOf(payload) {
+  if (Array.isArray(payload?.sails)) {
+    return payload.sails.filter((sail) => typeof sail === 'string' && sail !== '');
+  }
+  return typeof payload?.sail === 'string' && payload.sail !== '' ? [payload.sail] : [];
+}
+
+// The sails up after the latest sail change among `events` (oldest first).
+export function currentSails(events) {
+  for (let i = events.length - 1; i >= 0; i -= 1) {
+    const event = events[i];
+    if (event.type === 'manoeuvre' && event.subtype === 'sail_change') {
+      return sailsOf(event.payload);
+    }
+  }
+  return [];
+}
+
+export function sailsText(sails, t) {
+  return sails.map((sail) => sailName(sail, t)).join(' + ');
+}
+
 // What an event says: `label` is the emphasised part, `detail` follows it,
 // `comment` is the crew's own words, `strokes` a handwritten note, `alarm`
 // marks a raised alarm.
@@ -88,8 +113,10 @@ export function describeEvent(event, { t, format, manoeuvreLabels = {} }) {
   switch (event.type) {
     case 'manoeuvre':
       line.label = manoeuvreName(event.subtype, t, manoeuvreLabels);
-      if (payload.sail) {
-        line.detail = `(${t('event.sail', { sail: sailName(payload.sail, t) })})`;
+      if (Array.isArray(payload.sails) && payload.sails.length === 0) {
+        line.detail = `(${t('event.sailsDown')})`;
+      } else if (sailsOf(payload).length > 0) {
+        line.detail = `(${t('event.sail', { sail: sailsText(sailsOf(payload), t) })})`;
       }
       return line;
     case 'text_annotation':

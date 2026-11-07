@@ -18,6 +18,7 @@ import { AccessGate } from './components/AccessGate.mjs';
 import { EventDialog, Toast } from './components/Dialogs.mjs';
 import { CrewDialog } from './components/CrewDialog.mjs';
 import { PencilIcon } from './components/Icons.mjs';
+import { currentSails } from '../../js/log-lines.mjs';
 import { ManoeuvrePad } from './components/ManoeuvrePad.mjs';
 import { NotePanel } from './components/NotePanel.mjs';
 import { RecentList } from './components/RecentList.mjs';
@@ -404,6 +405,19 @@ function App({ journal }) {
     }
   };
 
+  // The sails up now, from the log of the passage under way; null when the
+  // server does not answer, and the pad keeps the set it last logged.
+  const loadSails = async () => {
+    if (!entry) {
+      return [];
+    }
+    try {
+      return currentSails(await fetchAll(`/entries/${entry.id}/events`));
+    } catch {
+      return null;
+    }
+  };
+
   const editTitle = editing?.what ?? t('entry.comment');
   const bounds = entry ? { start: entry.startTime, end: entry.endTime } : null;
 
@@ -463,6 +477,7 @@ function App({ journal }) {
           noPassage=${state !== null && state.activeEntryId === null}
           busy=${busy}
           onLog=${log}
+          loadSails=${loadSails}
         />
         <section class="panel writer ${tab === 'sketch' ? 'fullscreen' : ''}">
           <div class="tabs" role="tablist">

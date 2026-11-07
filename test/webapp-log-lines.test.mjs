@@ -197,3 +197,42 @@ describe('logbook lines', () => {
     );
   });
 });
+
+describe('sail sets', () => {
+  const t = createTranslator('en');
+  const change = (payload, time = 1) => ({
+    type: 'manoeuvre',
+    subtype: 'sail_change',
+    time,
+    payload
+  });
+
+  it('reads the set a sail change left, down to none', async () => {
+    const { currentSails, sailsOf } = await import('../public/js/log-lines.mjs');
+    assert.deepEqual(sailsOf({ sails: ['main', 'genoa'], sail: 'Mainsail + Genoa' }), [
+      'main',
+      'genoa'
+    ]);
+    assert.deepEqual(sailsOf({ sail: 'jib' }), ['jib']);
+    assert.deepEqual(sailsOf(null), []);
+    const events = [
+      change({ sails: ['main'] }),
+      { type: 'text_annotation' },
+      change({ sails: [] })
+    ];
+    assert.deepEqual(currentSails(events.slice(0, 2)), ['main']);
+    assert.deepEqual(currentSails(events), []);
+    assert.deepEqual(currentSails([]), []);
+  });
+
+  it('words a set, and the sails brought down', async () => {
+    const { describeEvent } = await import('../public/js/log-lines.mjs');
+    const up = describeEvent(change({ sails: ['main', 'genoa'], sail: 'Mainsail + Genoa' }), {
+      t,
+      format: {}
+    });
+    assert.equal(up.detail, '(sail: Mainsail + Genoa)');
+    const down = describeEvent(change({ sails: [] }), { t, format: {} });
+    assert.equal(down.detail, '(sails down)');
+  });
+});

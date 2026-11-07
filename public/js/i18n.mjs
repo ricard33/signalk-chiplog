@@ -336,6 +336,7 @@ export const MESSAGES = {
 
     'event.handwritten': 'Handwritten note',
     'event.sail': 'sail: {sail}',
+    'event.sailsDown': 'sails down',
     'event.alarm': 'Alarm: {message}',
     'event.alarmCleared': 'Alarm cleared: {message}',
     'event.autopilotEngaged': 'Autopilot engaged',
@@ -534,7 +535,9 @@ export const MESSAGES = {
     'entry.stillOffline':
       'Still no answer from the Signal K server. Entries keep waiting on this tablet.',
     'entry.reconnecting': 'Connecting…',
-    'entry.chooseSail': 'Which sail is up?',
+    'entry.chooseSail': 'Which sails are up?',
+    'entry.sailsHint': 'Tick the sails that are up; untick the ones you take down.',
+    'entry.addSail': 'Add',
     'entry.otherSail': 'Other sail',
     'entry.sketchUndo': 'Undo',
     'entry.sketchClear': 'Clear',
@@ -922,6 +925,7 @@ export const MESSAGES = {
 
     'event.handwritten': 'Note manuscrite',
     'event.sail': 'voile : {sail}',
+    'event.sailsDown': 'voiles affalées',
     'event.alarm': 'Alarme : {message}',
     'event.alarmCleared': 'Fin d’alarme : {message}',
     'event.autopilotEngaged': 'Pilote automatique embrayé',
@@ -1127,7 +1131,9 @@ export const MESSAGES = {
     'entry.stillOffline':
       'Le serveur Signal K ne répond toujours pas. Les entrées restent en attente sur cette tablette.',
     'entry.reconnecting': 'Connexion…',
-    'entry.chooseSail': 'Quelle voile est envoyée ?',
+    'entry.chooseSail': 'Quelles voiles sont envoyées ?',
+    'entry.sailsHint': 'Cochez les voiles hissées ; décochez celles que vous affalez.',
+    'entry.addSail': 'Ajouter',
     'entry.otherSail': 'Autre voile',
     'entry.sketchUndo': 'Annuler',
     'entry.sketchClear': 'Tout effacer',
