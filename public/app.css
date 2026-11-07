@@ -584,6 +584,15 @@ main {
   background: var(--sail);
 }
 
+.strip-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.2rem 1rem;
+  margin: 0.5rem 0 0;
+  font-weight: 600;
+}
+
 .segment-list {
   list-style: none;
   margin: 0.75rem 0 0;

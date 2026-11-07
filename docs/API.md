@@ -479,6 +479,12 @@ switch when a passage opens — only an actual change partway through.
 Correcting the **ongoing** segment holds until the engine data changes: detection does not revert it on its next cycle
 just because the sensors — or the configured default — still say otherwise.
 
+### `DELETE /propulsion/:id` — `readwrite`
+
+Deletes a mis-detected segment: the segment before it is extended to the deleted one's end time (an ongoing segment
+passes its `endTime: null` on) and flagged `source: "manual"`, and the entry's durations are recomputed. Answers the
+extended segment. `409` `first_segment` for the first segment of a passage, which has nothing to extend.
+
 ### `GET /entries/:id/landmarks` — `readonly`
 
 ```json

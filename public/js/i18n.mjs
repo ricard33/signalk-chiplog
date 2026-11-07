@@ -182,6 +182,9 @@ export const MESSAGES = {
     'compass.NW': 'NW',
     'compass.NNW': 'NNW',
     'passage.propulsion': 'Engine and sail',
+    'passage.propulsionShare': '{type} {duration} ({percent}%)',
+    'passage.propulsionShow': 'Show the periods',
+    'passage.propulsionHide': 'Hide the periods',
     'passage.boatState': 'Boat status',
     'passage.tanks': 'Tanks',
     'passage.tank': 'Tank',
@@ -368,6 +371,8 @@ export const MESSAGES = {
     'corrections.renameHint':
       'A name you set is remembered and used for later departures and arrivals nearby.',
     'corrections.switchTo': 'Switch to {type}',
+    'corrections.deleteSegmentConfirm':
+      'Delete this period? The previous one will be extended over it.',
     'corrections.close': 'Close this passage',
     'corrections.closeConfirm':
       'Close this passage now? If the vessel has already stopped, the passage ends when it stopped.',
@@ -815,6 +820,9 @@ export const MESSAGES = {
     'compass.NW': 'NO',
     'compass.NNW': 'NNO',
     'passage.propulsion': 'Moteur et voile',
+    'passage.propulsionShare': '{type} {duration} ({percent} %)',
+    'passage.propulsionShow': 'Afficher les périodes',
+    'passage.propulsionHide': 'Masquer les périodes',
     'passage.boatState': 'État du bord',
     'passage.tanks': 'Réservoirs',
     'passage.tank': 'Réservoir',
@@ -1003,6 +1011,8 @@ export const MESSAGES = {
     'corrections.renameHint':
       'Un nom saisi est retenu et réutilisé pour les départs et arrivées suivants à proximité.',
     'corrections.switchTo': 'Passer en {type}',
+    'corrections.deleteSegmentConfirm':
+      'Supprimer cette période ? La précédente sera prolongée pour la remplacer.',
     'corrections.close': 'Clore cette navigation',
     'corrections.closeConfirm':
       'Clore cette navigation maintenant ? Si le bateau est déjà arrêté, elle se termine au moment de l’arrêt.',

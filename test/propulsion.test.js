@@ -28,6 +28,36 @@ describe('propulsion', () => {
     assert.equal(body.items[0].averageRpm, 1800);
   });
 
+  it('deletes a segment, the previous one taking its place, but never the first', async () => {
+    const entryId = insertEntry(ctx.db, { engine_duration: 3600, sail_duration: 7200 });
+    const first = insert(ctx.db, 'propulsion_segments', {
+      entry_id: entryId,
+      type: 'engine',
+      start_time: at(0),
+      end_time: at(1)
+    });
+    const second = insert(ctx.db, 'propulsion_segments', {
+      entry_id: entryId,
+      type: 'sail',
+      start_time: at(1),
+      end_time: at(3)
+    });
+
+    const refused = await ctx.request('DELETE', `/propulsion/${first}`);
+    assert.equal(refused.status, 409);
+    assert.equal(refused.body.error.code, 'first_segment');
+
+    const { status, body } = await ctx.request('DELETE', `/propulsion/${second}`);
+    assert.equal(status, 200);
+    assert.equal(body.id, first);
+    assert.equal(body.endTime, at(3));
+    assert.equal(body.source, 'manual');
+    const entry = ctx.db.prepare('SELECT * FROM log_entries WHERE id = ?').get(entryId);
+    assert.equal(entry.engine_duration, 10800);
+    assert.equal(entry.sail_duration, 0);
+    assert.equal((await ctx.request('DELETE', `/propulsion/${second}`)).status, 404);
+  });
+
   it('corrects a mis-detected segment, recomputes totals and logs the correction', async () => {
     const entryId = insertEntry(ctx.db, { engine_duration: 7200 });
     const segmentId = insert(ctx.db, 'propulsion_segments', {

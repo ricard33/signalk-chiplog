@@ -333,6 +333,12 @@ export function PassageView({ id }) {
       });
       reload();
     });
+  const deleteSegment = (segment) =>
+    confirm(t('corrections.deleteSegmentConfirm')) &&
+    act(async () => {
+      await request('DELETE', `/propulsion/${segment.id}`);
+      reload();
+    });
   const close = () =>
     confirm(t('corrections.closeConfirm')) &&
     act(async () => {
@@ -526,6 +532,7 @@ export function PassageView({ id }) {
           entry=${entry}
           busy=${busy}
           onSwitch=${switchSegment}
+          onDelete=${deleteSegment}
         />
       </section>
 

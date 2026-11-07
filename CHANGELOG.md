@@ -8,6 +8,9 @@ All notable changes to Chiplog are documented here. The format follows
 
 ### Added
 
+- **Delete an engine/sail period**: a trash button on each period of a passage removes it and the previous one is
+  extended over it (`DELETE /propulsion/:id`); the first period cannot be deleted. The periods' detail is folded by
+  default, under the bar and a summary of the hours and share of each.
 - **Watch change on the entry pad**: the `watch_change` shortcut opens a list of the crew (the passage's crew and the
   roster) to tick who is on watch from now, with the current watch ticked, and a button to end the watches. The entry
   keeps the names in `payload.crew` (empty once the watches end), the log words it, and Chiplog Skipper logs the same.
