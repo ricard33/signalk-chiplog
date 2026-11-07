@@ -10,6 +10,13 @@ import { createServerClock } from '../public/entry/js/clock.mjs';
 import { createJournal } from '../public/entry/js/journal.mjs';
 import { createOutbox, isTransient } from '../public/entry/js/outbox.mjs';
 import { createStrokeRecorder, strokeWidth } from '../public/entry/js/strokes.mjs';
+import {
+  isEmptyObservation,
+  observationPayload,
+  observationText,
+  parsePressure
+} from '../public/entry/js/observation.mjs';
+import { createTranslator } from '../public/js/i18n.mjs';
 
 function storage(initial = {}) {
   const values = new Map(Object.entries(initial));
@@ -349,6 +356,56 @@ describe('device access request', () => {
       { state: 'disabled' }
     );
     assert.deepEqual(await requester(server([]).fetch).access.poll(), { state: 'idle' });
+  });
+});
+
+describe('weather observation', () => {
+  const none = { force: null, from: null, sea: null, visibility: null, pressure: '', cloud: null };
+
+  it('keeps only what was noted, in Chiplog units', () => {
+    assert.ok(isEmptyObservation(observationPayload(none)));
+    const payload = observationPayload({
+      force: 5,
+      from: 6,
+      sea: 3,
+      visibility: 1,
+      pressure: '1013,5',
+      cloud: 4
+    });
+    assert.equal(payload.windForce, 5);
+    assert.ok(Math.abs(payload.windDirection - (3 * Math.PI) / 2) < 1e-12);
+    assert.equal(payload.seaState, 3);
+    assert.equal(payload.visibility, 'moderate');
+    assert.equal(payload.pressure, 101350);
+    assert.equal(payload.cloudCover, 4);
+    assert.deepEqual(observationPayload({ ...none, sea: 0 }), { seaState: 0 });
+  });
+
+  it('leaves out a pressure no barometer reads', () => {
+    assert.equal(parsePressure('1013'), 1013);
+    assert.equal(parsePressure('101300'), null);
+    assert.equal(parsePressure('abc'), null);
+    assert.equal(parsePressure(''), null);
+  });
+
+  it('says it in the language of the page', () => {
+    const payload = observationPayload({
+      force: 5,
+      from: 1,
+      sea: 3,
+      visibility: 0,
+      pressure: '1013',
+      cloud: 2
+    });
+    assert.equal(
+      observationText(payload, createTranslator('en')),
+      'force 5 from NE, sea slight, visibility good, 1013 hPa, cloud cover 2/8'
+    );
+    assert.equal(
+      observationText(payload, createTranslator('fr')),
+      'force 5, secteur NE, mer peu agitée, visibilité bonne, 1013 hPa, nébulosité 2/8'
+    );
+    assert.equal(observationText({ windForce: 3 }, createTranslator('en')), 'force 3');
   });
 });
 

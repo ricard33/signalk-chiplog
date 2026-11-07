@@ -22,6 +22,7 @@ import { currentSails, EDITABLE_EVENT_TYPES } from '../../js/log-lines.mjs';
 import { EntrySheet } from './components/EntrySheet.mjs';
 import { ManoeuvrePad, PropulsionBar } from './components/ManoeuvrePad.mjs';
 import { ShortcutsSheet } from './components/ShortcutsSheet.mjs';
+import { ObservationSheet } from './components/ObservationSheet.mjs';
 import { RecentList } from './components/RecentList.mjs';
 import { StatusHeader } from './components/StatusHeader.mjs';
 
@@ -108,6 +109,7 @@ function App({ journal }) {
   const [editing, setEditing] = useState(null);
   const [managingCrew, setManagingCrew] = useState(false);
   const [adding, setAdding] = useState(false);
+  const [observing, setObserving] = useState(false);
   const [editingShortcuts, setEditingShortcuts] = useState(false);
   const [night, setNight] = useState(readSetting(NIGHT_KEY) === 'on');
   const [plotter, setPlotter] = useState(null);
@@ -507,6 +509,7 @@ function App({ journal }) {
         busy=${busy}
         onLog=${log}
         onEdit=${() => setEditingShortcuts(true)}
+        onObservation=${() => setObserving(true)}
       />
         </div>
         <div class="entry-side">
@@ -563,6 +566,14 @@ function App({ journal }) {
         types=${types}
         onEdit=${editTypes}
         onClose=${() => setEditingShortcuts(false)}
+      />`
+    }
+    ${
+      observing &&
+      html`<${ObservationSheet}
+        busy=${busy}
+        onLog=${log}
+        onClose=${() => setObserving(false)}
       />`
     }
     ${

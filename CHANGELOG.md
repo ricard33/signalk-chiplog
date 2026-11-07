@@ -8,9 +8,11 @@ All notable changes to Chiplog are documented here. The format follows
 
 ### Added
 
-- **A built-in `weather_observation` manoeuvre type**: the shortcut for a reading taken by hand, which the Chiplog
-  Skipper app opens its form for. The entry app lists neither it nor the sail change among its buttons until it has a
-  form for it.
+- **Weather observation on the entry pad**: the new `weather_observation` shortcut opens a form for a reading taken by
+  hand — wind force and direction, sea state, visibility, barometer pressure, cloud cover, each optional, one tap each —
+  and logs a `companion.observation` annotation, the one the Chiplog Skipper app logs (docs/API.md). The shortcut is a
+  built-in manoeuvre type, so it is ordered and turned on or off with the others. A logbook created before it gets the
+  type from a migration, after the shortcuts it has.
 - **Shortcuts edited from the entry app**: a button over the manoeuvre pad opens the list of shortcuts, to reorder them,
   turn them on or off, and add, rename or delete the crew's own. Adding, editing and deleting a manoeuvre type (`POST`,
   `PATCH` and `DELETE /manoeuvre-types`) now take read/write access instead of administrator access, so a tablet can do

@@ -239,7 +239,7 @@ export function eventIcon(event) {
     case 'manoeuvre':
       return manoeuvreIcon(event.subtype);
     case 'text_annotation':
-      return NoteIcon;
+      return event.subtype === 'companion.observation' ? CloudIcon : NoteIcon;
     case 'handwritten_annotation':
       return PenIcon;
     case 'sk_alarm':
@@ -264,6 +264,9 @@ export function eventIcon(event) {
 export function queuedIcon(body) {
   if (body.type === 'manoeuvre') {
     return manoeuvreIcon(body.subtype);
+  }
+  if (body.subtype === 'companion.observation') {
+    return CloudIcon;
   }
   return body.type === 'handwritten_annotation' ? PenIcon : NoteIcon;
 }

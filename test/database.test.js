@@ -58,3 +58,32 @@ describe('withTransaction', () => {
     assert.equal(count(), 1);
   });
 });
+
+describe('the weather observation shortcut', () => {
+  it('is added to a logbook seeded without it, after the shortcuts it has', () => {
+    const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chiplog-db-'));
+    try {
+      let { db } = openDatabase(dataDir);
+      const latest = db.prepare('PRAGMA user_version').get().user_version;
+      // A logbook as it was before the migration, with a shortcut of the crew's own.
+      db.prepare("DELETE FROM manoeuvre_types WHERE key = 'weather_observation'").run();
+      db.prepare(
+        "INSERT INTO manoeuvre_types (key, label, sort_order, builtin) VALUES ('lock', 'Lock', 110, 0)"
+      ).run();
+      db.exec(`PRAGMA user_version = ${latest - 1}`);
+      db.close();
+
+      ({ db } = openDatabase(dataDir));
+      const row = db
+        .prepare("SELECT * FROM manoeuvre_types WHERE key = 'weather_observation'")
+        .get();
+      assert.equal(row.builtin, 1);
+      assert.equal(row.enabled, 1);
+      assert.equal(row.sort_order, 120);
+      assert.equal(db.prepare('PRAGMA user_version').get().user_version, latest);
+      db.close();
+    } finally {
+      fs.rmSync(dataDir, { recursive: true, force: true });
+    }
+  });
+});

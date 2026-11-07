@@ -110,7 +110,7 @@ What the UI needs to render its header, in one call.
   "propulsion": "engine",
   "engines": [{ "id": "port", "running": true }],
   "stateIssue": null,
-  "schemaVersion": 25,
+  "schemaVersion": 26,
   "logbookId": "37ff7ef8-28e8-4a28-9277-c34df9391976",
   "apiVersions": [1],
   "pluginVersion": "2.17.0",
@@ -639,6 +639,12 @@ a threshold crossed — as `text_annotation` with a `subtype` of its own, prefix
 `companion.checklist`, …), a readable `comment` and its structured detail in `payload`. What belongs to the plan rather
 than the passage (the go/no-go decision, the briefing, the debriefing) goes in the plan's `companion` object instead.
 The plugin stores them like any annotation and needs no change for a new one.
+
+`companion.observation` is a weather reading taken by hand, logged by the entry app and the Chiplog Skipper app: its
+`payload` holds any of `windForce` (Beaufort, 0–12), `windDirection` (radians, true, in steps of an eighth of a turn),
+`seaState` (Douglas, 0–9), `visibility` (`good`, `moderate`, `poor` or `fog`), `pressure` (pascals, as read on the
+boat's barometer) and `cloudCover` (oktas, 0–8); the `comment` says it in words. The `weather_observation` manoeuvre
+type is the shortcut that opens the form for it.
 
 ### `POST /entries/:id/events` — `readwrite`
 

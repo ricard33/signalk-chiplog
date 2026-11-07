@@ -4,8 +4,9 @@ import { sailName, sailsText } from '../../../js/log-lines.mjs';
 import { EngineIcon, manoeuvreIcon, SailIcon } from './Icons.mjs';
 
 const DEPARTURES = new Set(['cast_off', 'anchor_up']);
-// Shortcuts that open a form of their own, which this app does not have yet: left out of the pad.
-export const FORM_SHORTCUTS = new Set(['sail_change', 'weather_observation']);
+// Shortcuts that open a form of their own rather than log at once: the sails have their button.
+export const FORM_SHORTCUTS = new Set(['sail_change']);
+const OBSERVATION = 'weather_observation';
 export const SAILS = [
   'main',
   'genoa',
@@ -235,7 +236,7 @@ export function PropulsionBar({ busy, version, onLog, loadSails, engines, onSwit
 
 // The shortcuts: one tap logs the manoeuvre. Sails have their own button above, and before
 // the departure only what starts the passage is offered.
-export function ManoeuvrePad({ types, noPassage, busy, onLog, onEdit }) {
+export function ManoeuvrePad({ types, noPassage, busy, onLog, onEdit, onObservation }) {
   const { t } = useLocale();
   const enabled = types.filter(
     (type) =>
@@ -257,7 +258,9 @@ export function ManoeuvrePad({ types, noPassage, busy, onLog, onEdit }) {
             class=${noPassage ? 'big-button primary pad-button' : 'big-button pad-button'}
             disabled=${busy}
             onClick=${() =>
-              onLog({ type: 'manoeuvre', subtype: type.key }, manoeuvreLabel(type, t))}
+              type.key === OBSERVATION
+                ? onObservation()
+                : onLog({ type: 'manoeuvre', subtype: type.key }, manoeuvreLabel(type, t))}
           >
             <${Icon} />
             <span>${manoeuvreLabel(type, t)}</span>

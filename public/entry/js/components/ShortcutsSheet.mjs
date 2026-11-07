@@ -9,7 +9,7 @@ import { manoeuvreIcon, PencilIcon, TrashIcon } from './Icons.mjs';
 const STEP = 10;
 
 // The list of shortcuts, to reorder, turn on or off, and, for those the crew added, rename or
-// delete. Sails have their own button, and the weather reading needs a form: neither is listed. `onEdit` runs a change
+// delete. Sails have their own button, so the sail change is not listed. `onEdit` runs a change
 // on the server, then reads the list again.
 export function ShortcutsSheet({ types, onEdit, onClose }) {
   const { t } = useLocale();

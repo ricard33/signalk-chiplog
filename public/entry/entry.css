@@ -945,3 +945,37 @@ input {
   display: flex;
   gap: 0.4rem;
 }
+
+.observation-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+
+.observation-submit {
+  margin-left: auto;
+}
+
+.choices {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.choices legend {
+  margin-bottom: 0.4rem;
+  font-weight: 700;
+}
+
+.choice-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.choice {
+  min-width: 3.5rem;
+}
