@@ -74,6 +74,20 @@ describe('logbook lines', () => {
     assert.deepEqual([cleared.detail, cleared.alarm], ['Alarm cleared: notifications.mob', false]);
   });
 
+  it('translates the autopilot modes it knows and keeps the others as they are', () => {
+    const fr = createTranslator('fr');
+    const describeFr = (event) => describeEvent(event, { t: fr, format, manoeuvreLabels: {} });
+    const engaged = (mode) => ({
+      type: 'autopilot',
+      subtype: 'engaged',
+      payload: { mode, target: Math.PI / 2 }
+    });
+    assert.equal(describeFr(engaged('heading')).detail, 'Pilote automatique embrayé (cap 090°)');
+    assert.equal(describeFr(engaged('wind')).detail, 'Pilote automatique embrayé (vent 090°)');
+    assert.equal(describe_(engaged('route')).detail, 'Autopilot engaged (route 090°)');
+    assert.equal(describe_(engaged('custom')).detail, 'Autopilot engaged (custom 090°)');
+  });
+
   it('describes autopilot, weather and corrections', () => {
     assert.equal(
       describe_({

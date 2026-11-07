@@ -165,7 +165,9 @@ export function describeEvent(event, { t, format, manoeuvreLabels = {} }) {
       if (event.subtype === 'disengaged') {
         return { ...line, detail: t('event.autopilotDisengaged') };
       }
-      const mode = payload.mode ?? payload.state ?? '';
+      const rawMode = payload.mode ?? payload.state ?? '';
+      // A mode without a translation (a pilot's own) is shown as it is.
+      const mode = t.has(`autopilot.mode.${rawMode}`) ? t(`autopilot.mode.${rawMode}`) : rawMode;
       const target = autopilotTarget(payload.target, format);
       const detail = [mode, target].filter(Boolean).join(' ');
       return {

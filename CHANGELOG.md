@@ -6,6 +6,17 @@ All notable changes to Chiplog are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- **Autopilot modes are translated** in the logbook lines and the PDF: `heading`, `wind`, `route`, `compass`, `gps` and
+  `auto` read cap, vent, route… in French; a mode the pilot names itself is shown as published.
+
+### Fixed
+
+- **Autopilot engagement missed with an enabled/disabled state**: `disabled` and `off-line` states, and a mode of `off`
+  when no state is published, now count as disengaged; before, such an autopilot was seen as engaged for good and its
+  disengagements never logged.
+
 ### Added
 
 - **Delete an engine/sail period**: a trash button on each period of a passage removes it and the previous one is
