@@ -456,10 +456,11 @@ segment has `endTime: null`.
 
 The crew starts or stops an engine by hand: the passage is under `type` from now on. The segment under way ends now and
 one of that type begins, flagged `source: "manual"` so that it holds until the engine data itself changes. `engines`
-(optional, one to 20 names, each `true` or `false`) says which engine runs and is kept in the payload of the
-`propulsion_change` event this logs (source `manual`). With the type unchanged only the event is logged, which is how
-one of two engines stopping is recorded; with nothing changed and no `engines`, nothing happens. Answers the segment
-under way. `409` `entry_not_active` unless the passage is in progress, `entry_stopped` while it is stopped.
+(optional, one to 20 names, each `true` or `false`) says which engine runs; `clientRef` (optional) is the client's id
+for the event, which makes a repeated call change nothing. `engines` is kept in the payload of the `propulsion_change`
+event this logs (source `manual`). With the type unchanged only the event is logged, which is how one of two engines
+stopping is recorded; with nothing changed and no `engines`, nothing happens. Answers the segment under way. `409`
+`entry_not_active` unless the passage is in progress, `entry_stopped` while it is stopped.
 
 ### `PATCH /propulsion/:id` — `readwrite`
 

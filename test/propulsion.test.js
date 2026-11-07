@@ -141,6 +141,24 @@ describe('propulsion', () => {
       assert.equal(ctx.db.prepare('SELECT COUNT(*) AS n FROM events').get().n, 1);
     });
 
+    it('answers a repeated clientRef without switching again', async () => {
+      const entryId = active(ctx);
+      open(ctx, entryId);
+      const body = { type: 'engine', clientRef: 'abc' };
+
+      const first = await ctx.request('POST', `/entries/${entryId}/propulsion`, body);
+      const again = await ctx.request('POST', `/entries/${entryId}/propulsion`, {
+        ...body,
+        type: 'sail'
+      });
+
+      assert.equal(again.status, 200);
+      assert.equal(again.body.id, first.body.id);
+      assert.equal(again.body.type, 'engine');
+      assert.equal(ctx.db.prepare('SELECT COUNT(*) AS n FROM propulsion_segments').get().n, 2);
+      assert.equal(ctx.db.prepare('SELECT client_ref FROM events').get().client_ref, 'abc');
+    });
+
     it('does nothing at all when nothing changes', async () => {
       const entryId = active(ctx);
       open(ctx, entryId);
