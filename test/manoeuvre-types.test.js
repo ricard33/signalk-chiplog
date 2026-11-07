@@ -13,7 +13,7 @@ describe('manoeuvre types', () => {
 
   it('lists the built-in shortcuts in order', async () => {
     const { body } = await ctx.request('GET', '/manoeuvre-types');
-    assert.equal(body.total, 10);
+    assert.equal(body.total, 11);
     assert.equal(body.items[0].key, 'tack');
     assert.equal(body.items[0].builtin, true);
     assert.equal(body.items[0].enabled, true);
@@ -27,7 +27,7 @@ describe('manoeuvre types', () => {
 
     assert.equal(status, 201);
     assert.equal(body.builtin, false);
-    assert.equal(body.sortOrder, 110);
+    assert.equal(body.sortOrder, 120);
 
     const duplicate = await ctx.request('POST', '/manoeuvre-types', {
       key: 'spinnaker_up',

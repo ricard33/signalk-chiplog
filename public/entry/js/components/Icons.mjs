@@ -224,7 +224,8 @@ const MANOEUVRE_ICONS = {
   anchor_up: AnchorIcon,
   moor: MoorIcon,
   cast_off: SailIcon,
-  watch_change: WatchIcon
+  watch_change: WatchIcon,
+  weather_observation: CloudIcon
 };
 
 // The icon of a manoeuvre shortcut; those the crew added have a plain mark.

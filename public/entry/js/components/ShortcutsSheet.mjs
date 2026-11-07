@@ -3,18 +3,18 @@ import { request } from '../../../js/api.mjs';
 import { useLocale } from '../../../js/context.mjs';
 import { randomId } from '../../../js/ids.mjs';
 import { confirmAction } from '../confirm.mjs';
-import { manoeuvreLabel } from './ManoeuvrePad.mjs';
+import { FORM_SHORTCUTS, manoeuvreLabel } from './ManoeuvrePad.mjs';
 import { manoeuvreIcon, PencilIcon, TrashIcon } from './Icons.mjs';
 
 const STEP = 10;
 
 // The list of shortcuts, to reorder, turn on or off, and, for those the crew added, rename or
-// delete. Sails have their own button, so the sail change is not listed. `onEdit` runs a change
+// delete. Sails have their own button, and the weather reading needs a form: neither is listed. `onEdit` runs a change
 // on the server, then reads the list again.
 export function ShortcutsSheet({ types, onEdit, onClose }) {
   const { t } = useLocale();
   const [name, setName] = useState('');
-  const shown = types.filter((type) => type.key !== 'sail_change');
+  const shown = types.filter((type) => !FORM_SHORTCUTS.has(type.key));
   const label = (type) => manoeuvreLabel(type, t);
   const patch = (type, body) =>
     onEdit(() => request('PATCH', `/manoeuvre-types/${type.key}`, body));

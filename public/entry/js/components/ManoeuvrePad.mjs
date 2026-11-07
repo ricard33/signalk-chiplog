@@ -4,6 +4,8 @@ import { sailName, sailsText } from '../../../js/log-lines.mjs';
 import { EngineIcon, manoeuvreIcon, SailIcon } from './Icons.mjs';
 
 const DEPARTURES = new Set(['cast_off', 'anchor_up']);
+// Shortcuts that open a form of their own, which this app does not have yet: left out of the pad.
+export const FORM_SHORTCUTS = new Set(['sail_change', 'weather_observation']);
 export const SAILS = [
   'main',
   'genoa',
@@ -236,7 +238,8 @@ export function PropulsionBar({ busy, version, onLog, loadSails, engines, onSwit
 export function ManoeuvrePad({ types, noPassage, busy, onLog, onEdit }) {
   const { t } = useLocale();
   const enabled = types.filter(
-    (type) => type.enabled && type.key !== 'sail_change' && (!noPassage || DEPARTURES.has(type.key))
+    (type) =>
+      type.enabled && !FORM_SHORTCUTS.has(type.key) && (!noPassage || DEPARTURES.has(type.key))
   );
   return html`
     <section class="pad" aria-labelledby="pad-title">

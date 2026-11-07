@@ -362,6 +362,7 @@ export const MESSAGES = {
     'manoeuvre.moor': 'Moor',
     'manoeuvre.cast_off': 'Cast off',
     'manoeuvre.watch_change': 'Watch change',
+    'manoeuvre.weather_observation': 'Weather observation',
 
     'corrections.title': 'Corrections',
     'corrections.renameHint':
@@ -973,6 +974,7 @@ export const MESSAGES = {
     'manoeuvre.moor': 'Amarrage',
     'manoeuvre.cast_off': 'Appareillage',
     'manoeuvre.watch_change': 'Changement de quart',
+    'manoeuvre.weather_observation': 'Observation météo',
 
     'corrections.title': 'Corrections',
     'corrections.renameHint':
