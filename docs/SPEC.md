@@ -386,9 +386,10 @@ As implemented (`lib/event-watcher.js`, checked every second):
   such as `notifications.chartplotter.unknown*`. Either one stops new raises and escalations only: an alarm already in
   the log is still closed when it clears, so the raise keeps its pair.
 - **Autopilot.** Engagement, disengagement, and mode changes while engaged, from `steering.autopilot.engaged` and
-  `.mode` (the server's Autopilot API) or, for older autopilot plugins, `steering.autopilot.state` (`standby` meaning
-  disengaged), each with an instrument snapshot. The target heading or wind angle goes with it. Only during a passage:
-  an autopilot tried at the dock is not logbook material. Autopilot alarms arrive as notifications.
+  `.mode` (the server's Autopilot API) or, for older autopilot plugins, `steering.autopilot.state` (`standby`,
+  `off-line`, `off` and `disabled` meaning disengaged; with no state, a mode of `off` does too), each with an instrument
+  snapshot. The target heading or wind angle goes with it. Only during a passage: an autopilot tried at the dock is not
+  logbook material. Autopilot alarms arrive as notifications.
 - **Wind thresholds.** True wind speed averaged over two minutes, so a gust does not count, logged when it rises above
   each configured threshold (`windSpeedThresholds`, 20 and 30 kn by default) and when it falls back below it, with
   hysteresis (2 kn or 10 %, whichever is larger). The first reading after start-up only sets where the wind stands: a

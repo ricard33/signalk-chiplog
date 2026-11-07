@@ -358,6 +358,27 @@ describe('automatic events', () => {
       assert.deepEqual(event.payload, { mode: 'compass', state: 'enabled', target: 1.57 });
     });
 
+    it('reads an enabled/disabled state with an off/heading/wind/route mode', () => {
+      vessel = createVessel().start();
+      vessel.openEntry();
+
+      vessel.run(2, {
+        values: { 'steering.autopilot.state': 'disabled', 'steering.autopilot.mode': 'off' }
+      });
+      vessel.run(2, {
+        values: { 'steering.autopilot.state': 'enabled', 'steering.autopilot.mode': 'heading' }
+      });
+      vessel.run(2, { values: { 'steering.autopilot.mode': 'wind' } });
+      vessel.run(2, {
+        values: { 'steering.autopilot.state': 'disabled', 'steering.autopilot.mode': 'off' }
+      });
+
+      assert.deepEqual(
+        vessel.events('autopilot').map((event) => event.subtype),
+        ['engaged', 'mode_changed', 'disengaged']
+      );
+    });
+
     it('ignores the autopilot outside a passage', () => {
       vessel = createVessel().start();
       vessel.openEntry({ state: 'closed', end_lat: ANCHORAGE.lat, end_lon: ANCHORAGE.lon });
