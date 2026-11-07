@@ -6,6 +6,8 @@ All notable changes to Chiplog are documented here. The format follows
 
 ## [Unreleased]
 
+## [2.18.0] - 2026-11-07
+
 ### Changed
 
 - **Autopilot modes are translated** in the logbook lines and the PDF: `heading`, `wind`, `route`, `compass`, `gps` and
@@ -42,7 +44,7 @@ All notable changes to Chiplog are documented here. The format follows
   segment under way and starts the other, held as manual until the engine data itself changes, and `engines` in
   `GET /state`.
 - **Shared scenarios** (`test/scenarios/`, `npm run scenarios`): scenarios of a boat's data and its crew's actions,
-  played on the logbook engine, with the logbook it makes of each recorded next to them and checked by the tests. The A
+  played on the logbook engine, with the logbook it makes of each recorded next to them and checked by the tests. A
   companion app that keeps the logbook itself on boats without a server can play the same scenarios on its port of these
   rules and compare.
 
@@ -608,7 +610,9 @@ First release.
 - REST API under `/plugins/signalk-chiplog/api`, documented in [docs/API.md](docs/API.md).
 - Single SQLite database through Node's built-in `node:sqlite`: no native module to build.
 
-[Unreleased]: https://github.com/ricard33/signalk-chiplog/compare/v2.16.0...HEAD
+[Unreleased]: https://github.com/ricard33/signalk-chiplog/compare/v2.18.0...HEAD
+[2.18.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.17.0...v2.18.0
+[2.17.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.16.0...v2.17.0
 [2.16.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.15.0...v2.16.0
 [2.15.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.14.0...v2.15.0
 [2.14.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.13.0...v2.14.0
