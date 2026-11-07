@@ -225,6 +225,27 @@ describe('sail sets', () => {
     assert.deepEqual(currentSails([]), []);
   });
 
+  it('reads who a watch change leaves on watch, and words it', async () => {
+    const { currentWatch, describeEvent, watchOf } = await import('../public/js/log-lines.mjs');
+    const watch = (crew) => ({
+      type: 'manoeuvre',
+      subtype: 'watch_change',
+      time: '2025-07-01T10:00:00.000Z',
+      payload: crew && { crew }
+    });
+    assert.deepEqual(watchOf({ crew: ['Alex', 'Sam'] }), ['Alex', 'Sam']);
+    assert.deepEqual(watchOf(null), []);
+    assert.deepEqual(currentWatch([watch(['Alex']), { type: 'text_annotation' }]), ['Alex']);
+    assert.deepEqual(currentWatch([watch(['Alex']), watch([])]), []);
+    const t = Object.assign((key, values) => `${key}${values ? JSON.stringify(values) : ''}`, {
+      has: () => false
+    });
+    const line = (event) => describeEvent(event, { t, format: {} });
+    assert.equal(line(watch(['Alex', 'Sam'])).detail, '(event.onWatch{"crew":"Alex, Sam"})');
+    assert.equal(line(watch([])).detail, '(event.watchEnded)');
+    assert.equal(line(watch(null)).detail, null);
+  });
+
   it('words a set, and the sails brought down', async () => {
     const { describeEvent } = await import('../public/js/log-lines.mjs');
     const up = describeEvent(change({ sails: ['main', 'genoa'], sail: 'Mainsail + Genoa' }), {

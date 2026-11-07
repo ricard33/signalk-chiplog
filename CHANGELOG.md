@@ -8,6 +8,9 @@ All notable changes to Chiplog are documented here. The format follows
 
 ### Added
 
+- **Watch change on the entry pad**: the `watch_change` shortcut opens a list of the crew (the passage's crew and the
+  roster) to tick who is on watch from now, with the current watch ticked, and a button to end the watches. The entry
+  keeps the names in `payload.crew` (empty once the watches end), the log words it, and Chiplog Skipper logs the same.
 - **Weather observation on the entry pad**: the new `weather_observation` shortcut opens a form for a reading taken by
   hand — wind force and direction, sea state, visibility, barometer pressure, cloud cover, each optional, one tap each —
   and logs a `companion.observation` annotation, the one the Chiplog Skipper app logs (docs/API.md). The shortcut is a

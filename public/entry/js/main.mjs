@@ -18,7 +18,7 @@ import { AccessGate } from './components/AccessGate.mjs';
 import { EventDialog, Toast } from './components/Dialogs.mjs';
 import { CrewDialog } from './components/CrewDialog.mjs';
 import { PencilIcon, PlusIcon } from './components/Icons.mjs';
-import { currentSails, EDITABLE_EVENT_TYPES } from '../../js/log-lines.mjs';
+import { currentSails, currentWatch, EDITABLE_EVENT_TYPES } from '../../js/log-lines.mjs';
 import { EntrySheet } from './components/EntrySheet.mjs';
 import { ManoeuvrePad, PropulsionBar } from './components/ManoeuvrePad.mjs';
 import { ShortcutsSheet } from './components/ShortcutsSheet.mjs';
@@ -433,6 +433,10 @@ function App({ journal }) {
     }
   };
 
+  // Who is on watch now, from the log of the passage under way.
+  const loadWatch = async () =>
+    entry ? currentWatch(await fetchAll(`/entries/${entry.id}/events`)) : [];
+
   // The engines the crew can start or stop: those Signal K lists, or a single one when it lists
   // none. Only on a server that can switch, and while a passage is under way.
   const engines =
@@ -510,6 +514,8 @@ function App({ journal }) {
         onLog=${log}
         onEdit=${() => setEditingShortcuts(true)}
         onObservation=${() => setObserving(true)}
+        crew=${[...new Set([...(entry?.crew ?? []).map((m) => m.name), ...roster.map((m) => m.name)])]}
+        loadWatch=${loadWatch}
       />
         </div>
         <div class="entry-side">

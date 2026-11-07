@@ -93,6 +93,25 @@ export function currentSails(events) {
   return [];
 }
 
+// Who a watch change leaves on watch: `payload.crew`, the crew members' names. Empty once the
+// watches ended.
+export function watchOf(payload) {
+  return Array.isArray(payload?.crew)
+    ? payload.crew.filter((name) => typeof name === 'string' && name !== '')
+    : [];
+}
+
+// Who is on watch after the latest watch change among `events` (oldest first).
+export function currentWatch(events) {
+  for (let i = events.length - 1; i >= 0; i -= 1) {
+    const event = events[i];
+    if (event.type === 'manoeuvre' && event.subtype === 'watch_change') {
+      return watchOf(event.payload);
+    }
+  }
+  return [];
+}
+
 export function sailsText(sails, t) {
   return sails.map((sail) => sailName(sail, t)).join(' + ');
 }
@@ -113,6 +132,13 @@ export function describeEvent(event, { t, format, manoeuvreLabels = {} }) {
   switch (event.type) {
     case 'manoeuvre':
       line.label = manoeuvreName(event.subtype, t, manoeuvreLabels);
+      if (event.subtype === 'watch_change' && Array.isArray(payload.crew)) {
+        line.detail =
+          payload.crew.length === 0
+            ? `(${t('event.watchEnded')})`
+            : `(${t('event.onWatch', { crew: watchOf(payload).join(', ') })})`;
+        return line;
+      }
       if (Array.isArray(payload.sails) && payload.sails.length === 0) {
         line.detail = `(${t('event.sailsDown')})`;
       } else if (sailsOf(payload).length > 0) {

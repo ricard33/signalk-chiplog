@@ -7,6 +7,7 @@ const DEPARTURES = new Set(['cast_off', 'anchor_up']);
 // Shortcuts that open a form of their own rather than log at once: the sails have their button.
 export const FORM_SHORTCUTS = new Set(['sail_change']);
 const OBSERVATION = 'weather_observation';
+const WATCH_CHANGE = 'watch_change';
 export const SAILS = [
   'main',
   'genoa',
@@ -88,6 +89,59 @@ function SailSheet({ initial, onDone, onClose }) {
           >
             ${t('entry.send')}
           </button>
+        </div>
+        <button type="button" class="link-button" onClick=${onClose}>${t('common.cancel')}</button>
+      </div>
+    </div>
+  `;
+}
+
+// Who is on watch from now: the crew members ticked, or nobody to end the watches.
+function WatchSheet({ crew, initial, onDone, onClose }) {
+  const { t } = useLocale();
+  const names = [...crew, ...initial.filter((name) => !crew.includes(name))];
+  const [chosen, setChosen] = useState(initial);
+  const toggle = (name) =>
+    setChosen((current) =>
+      current.includes(name) ? current.filter((n) => n !== name) : [...current, name]
+    );
+  const ordered = names.filter((name) => chosen.includes(name));
+  const changed =
+    ordered.length !== initial.length || ordered.some((name) => !initial.includes(name));
+  return html`
+    <div class="sheet-backdrop" onClick=${(event) => event.target === event.currentTarget && onClose()}>
+      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="watch-title">
+        <h2 id="watch-title">${manoeuvreLabel({ key: WATCH_CHANGE, label: WATCH_CHANGE }, t)}</h2>
+        <p class="hint">${names.length > 0 ? t('entry.watchHint') : t('entry.watchNoCrew')}</p>
+        <div class="sail-grid">
+          ${names.map(
+            (name) =>
+              html`<button
+                type="button"
+                class=${chosen.includes(name) ? 'big-button primary' : 'big-button'}
+                key=${name}
+                aria-pressed=${chosen.includes(name) ? 'true' : 'false'}
+                onClick=${() => toggle(name)}
+              >
+                ${name}
+              </button>`
+          )}
+        </div>
+        <div class="sheet-row">
+          <button
+            type="button"
+            class="big-button primary"
+            disabled=${ordered.length === 0 || !changed}
+            onClick=${() => onDone(ordered)}
+          >
+            ${t('entry.send')}
+          </button>
+          ${
+            initial.length > 0 &&
+            html`<button type="button" class="big-button" onClick=${() => onDone([])}>
+              ${t('entry.watchEnd')}
+            </button>`
+          }
         </div>
         <button type="button" class="link-button" onClick=${onClose}>${t('common.cancel')}</button>
       </div>
@@ -236,8 +290,27 @@ export function PropulsionBar({ busy, version, onLog, loadSails, engines, onSwit
 
 // The shortcuts: one tap logs the manoeuvre. Sails have their own button above, and before
 // the departure only what starts the passage is offered.
-export function ManoeuvrePad({ types, noPassage, busy, onLog, onEdit, onObservation }) {
+export function ManoeuvrePad({
+  types,
+  noPassage,
+  busy,
+  onLog,
+  onEdit,
+  onObservation,
+  crew = [],
+  loadWatch
+}) {
   const { t } = useLocale();
+  const [choosingWatch, setChoosingWatch] = useState(null);
+  const openWatch = async () => {
+    let current = [];
+    try {
+      current = (await loadWatch?.()) ?? [];
+    } catch {
+      // Without the log, nobody is taken to be on watch.
+    }
+    setChoosingWatch(current);
+  };
   const enabled = types.filter(
     (type) =>
       type.enabled && !FORM_SHORTCUTS.has(type.key) && (!noPassage || DEPARTURES.has(type.key))
@@ -260,13 +333,33 @@ export function ManoeuvrePad({ types, noPassage, busy, onLog, onEdit, onObservat
             onClick=${() =>
               type.key === OBSERVATION
                 ? onObservation()
-                : onLog({ type: 'manoeuvre', subtype: type.key }, manoeuvreLabel(type, t))}
+                : type.key === WATCH_CHANGE
+                  ? openWatch()
+                  : onLog({ type: 'manoeuvre', subtype: type.key }, manoeuvreLabel(type, t))}
           >
             <${Icon} />
             <span>${manoeuvreLabel(type, t)}</span>
           </button>`;
         })}
       </div>
+      ${
+        choosingWatch &&
+        html`<${WatchSheet}
+          crew=${crew}
+          initial=${choosingWatch}
+          onClose=${() => setChoosingWatch(null)}
+          onDone=${(names) => {
+            setChoosingWatch(null);
+            const label = manoeuvreLabel({ key: WATCH_CHANGE, label: WATCH_CHANGE }, t);
+            onLog(
+              { type: 'manoeuvre', subtype: WATCH_CHANGE, payload: { crew: names } },
+              names.length === 0
+                ? `${label} (${t('event.watchEnded')})`
+                : `${label} (${t('event.onWatch', { crew: names.join(', ') })})`
+            );
+          }}
+        />`
+      }
     </section>
   `;
 }
