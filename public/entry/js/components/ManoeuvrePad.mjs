@@ -233,14 +233,17 @@ export function PropulsionBar({ busy, version, onLog, loadSails, engines, onSwit
 
 // The shortcuts: one tap logs the manoeuvre. Sails have their own button above, and before
 // the departure only what starts the passage is offered.
-export function ManoeuvrePad({ types, noPassage, busy, onLog }) {
+export function ManoeuvrePad({ types, noPassage, busy, onLog, onEdit }) {
   const { t } = useLocale();
   const enabled = types.filter(
     (type) => type.enabled && type.key !== 'sail_change' && (!noPassage || DEPARTURES.has(type.key))
   );
   return html`
     <section class="pad" aria-labelledby="pad-title">
-      <h2 id="pad-title" class="panel-title">${t('entry.manoeuvres')}</h2>
+      <div class="panel-header">
+        <h2 id="pad-title" class="panel-title">${t('entry.manoeuvres')}</h2>
+        <button type="button" class="tool-button" onClick=${onEdit}>${t('entry.editShortcuts')}</button>
+      </div>
       ${noPassage && html`<p class="hint">${t('entry.departHint')}</p>`}
       <div class="pad-grid">
         ${enabled.map((type) => {

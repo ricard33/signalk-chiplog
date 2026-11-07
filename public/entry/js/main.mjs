@@ -21,6 +21,7 @@ import { PencilIcon, PlusIcon } from './components/Icons.mjs';
 import { currentSails, EDITABLE_EVENT_TYPES } from '../../js/log-lines.mjs';
 import { EntrySheet } from './components/EntrySheet.mjs';
 import { ManoeuvrePad, PropulsionBar } from './components/ManoeuvrePad.mjs';
+import { ShortcutsSheet } from './components/ShortcutsSheet.mjs';
 import { RecentList } from './components/RecentList.mjs';
 import { StatusHeader } from './components/StatusHeader.mjs';
 
@@ -107,6 +108,7 @@ function App({ journal }) {
   const [editing, setEditing] = useState(null);
   const [managingCrew, setManagingCrew] = useState(false);
   const [adding, setAdding] = useState(false);
+  const [editingShortcuts, setEditingShortcuts] = useState(false);
   const [night, setNight] = useState(readSetting(NIGHT_KEY) === 'on');
   const [plotter, setPlotter] = useState(null);
   const [version, setVersion] = useState(0);
@@ -358,6 +360,18 @@ function App({ journal }) {
     }
   };
 
+  // A change to the shortcuts, then the list as the server has it.
+  const editTypes = async (change) => {
+    try {
+      await change();
+      const items = await fetchAll('/manoeuvre-types');
+      writeSetting(TYPES_KEY, JSON.stringify(items));
+      setTypes(items);
+    } catch (error) {
+      showFailure(error);
+    }
+  };
+
   const discard = (ref) => {
     journal.outbox.remove(ref);
   };
@@ -492,6 +506,7 @@ function App({ journal }) {
         noPassage=${state !== null && state.activeEntryId === null}
         busy=${busy}
         onLog=${log}
+        onEdit=${() => setEditingShortcuts(true)}
       />
         </div>
         <div class="entry-side">
@@ -542,6 +557,14 @@ function App({ journal }) {
       onComment=${() =>
         setEditing({ ref: toast.ref, what: toast.what, event: journal.entryFor(toast.ref) })}
     />
+    ${
+      editingShortcuts &&
+      html`<${ShortcutsSheet}
+        types=${types}
+        onEdit=${editTypes}
+        onClose=${() => setEditingShortcuts(false)}
+      />`
+    }
     ${
       adding &&
       html`<${EntrySheet}

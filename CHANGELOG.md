@@ -8,6 +8,10 @@ All notable changes to Chiplog are documented here. The format follows
 
 ### Added
 
+- **Shortcuts edited from the entry app**: a button over the manoeuvre pad opens the list of shortcuts, to reorder them,
+  turn them on or off, and add, rename or delete the crew's own. Adding, editing and deleting a manoeuvre type (`POST`,
+  `PATCH` and `DELETE /manoeuvre-types`) now take read/write access instead of administrator access, so a tablet can do
+  it.
 - **Sails and engines on the entry pad**: the sail change opens a list to tick, several sails at once (mainsail +
   genoa), starting from the sails up now, and logs one entry; unticking a sail brings it down. A new Engines button
   lists the engines Signal K knows (or a single one) with one switch each, and logs one entry whatever the number of

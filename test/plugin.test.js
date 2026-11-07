@@ -124,12 +124,14 @@ describe('plugin', () => {
     assert.equal(level('DELETE', '/api/entries/:id'), 'admin');
     assert.equal(level('DELETE', '/api/places/:id'), 'admin');
     assert.equal(level('DELETE', '/api/observations/:id'), 'admin');
-    assert.equal(level('POST', '/api/manoeuvre-types'), 'admin');
+    assert.equal(level('POST', '/api/manoeuvre-types'), 'readwrite');
+    assert.equal(level('PATCH', '/api/manoeuvre-types/:key'), 'readwrite');
+    assert.equal(level('DELETE', '/api/manoeuvre-types/:key'), 'readwrite');
     assert.equal(level('POST', '/api/export/usb'), 'admin');
     assert.equal(level('GET', '/api/crew'), 'readonly');
     assert.equal(level('POST', '/api/crew'), 'readwrite');
     assert.equal(level('PATCH', '/api/crew/:id'), 'readwrite');
-    // Unlike places/manoeuvre-types, removing a roster member is readwrite
+    // Unlike places, removing a roster member is readwrite
     // too -- the crew must be able to correct it without an admin login.
     assert.equal(level('DELETE', '/api/crew/:id'), 'readwrite');
     assert.equal(level('PUT', '/api/entries/:id/crew'), 'readwrite');

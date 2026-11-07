@@ -703,7 +703,7 @@ Entries that referenced it lose the reference but keep their recorded names. `20
 
 Ordered by `sortOrder`. Disabled types are included, so a settings screen can show them. Paginated.
 
-### `POST /manoeuvre-types` — admin
+### `POST /manoeuvre-types` — `readwrite`
 
 ```json
 {
@@ -718,11 +718,11 @@ Ordered by `sortOrder`. Disabled types are included, so a settings screen can sh
 `key` is 1–40 lowercase letters, digits or underscores; `label` is required. `sortOrder` defaults to after the last
 type. `409 manoeuvre_type_exists` for a taken key. Answers `201`.
 
-### `PATCH /manoeuvre-types/:key` — admin
+### `PATCH /manoeuvre-types/:key` — `readwrite`
 
 Accepts `label`, `icon`, `sortOrder`, `enabled` — on built-in types too. The key cannot change.
 
-### `DELETE /manoeuvre-types/:key` — admin
+### `DELETE /manoeuvre-types/:key` — `readwrite`
 
 `409 builtin_manoeuvre_type` for a built-in; disable it instead. Events that used a deleted type keep their `subtype`.
 `204`.
@@ -752,9 +752,8 @@ Accepts `name`, `role`. A passage that already recorded this person keeps the na
 
 ### `DELETE /crew/:id` — `readwrite`
 
-Removing someone from the roster is `readwrite` too, not `admin` — unlike `places`/`manoeuvre-types` — so the crew can
-correct the roster from the tablet without an admin login. Passages that already recorded this person keep their name
-and role. `204`.
+Removing someone from the roster is `readwrite` too, not `admin` — unlike `places` — so the crew can correct the roster
+from the tablet without an admin login. Passages that already recorded this person keep their name and role. `204`.
 
 ### `PUT /entries/:id/crew` — `readwrite`
 

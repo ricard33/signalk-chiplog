@@ -28,6 +28,7 @@ const SHELL = [
   'js/components/ManoeuvrePad.mjs',
   'js/components/NotePanel.mjs',
   'js/components/RecentList.mjs',
+  'js/components/ShortcutsSheet.mjs',
   'js/components/SketchPanel.mjs',
   'js/components/StatusHeader.mjs',
   '../icon.svg',
