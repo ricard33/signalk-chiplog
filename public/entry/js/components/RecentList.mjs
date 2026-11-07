@@ -2,8 +2,7 @@ import { html, useState } from '../../../vendor/preact-htm.mjs';
 import { fetchAll } from '../../../js/api.mjs';
 import { useLocale, usePolling } from '../../../js/context.mjs';
 import { EventRemark } from '../../../js/components/Timeline.mjs';
-import { EDITABLE_EVENT_TYPES } from '../../../js/log-lines.mjs';
-import { PencilIcon, TrashIcon } from './Icons.mjs';
+import { eventIcon, PencilIcon, queuedIcon } from './Icons.mjs';
 
 const REFRESH_MS = 30 * 1000;
 const SHOWN = 15;
@@ -20,15 +19,7 @@ function failureReason(error, t) {
   return error.code === 'no_passage' ? t('entry.noPassageError') : error.message;
 }
 
-export function RecentList({
-  entryId,
-  version,
-  queue,
-  manoeuvreLabels,
-  onDelete,
-  onDiscard,
-  onComment
-}) {
+export function RecentList({ entryId, version, queue, manoeuvreLabels, onDiscard, onComment }) {
   const { t, format } = useLocale();
   const [events, setEvents] = useState([]);
 
@@ -61,6 +52,7 @@ export function RecentList({
         ${failed.map(
           (item) => html`<li key=${item.ref} class="recent-item recent-failed">
             <span class="recent-time">${format.time(item.body.time)}</span>
+            <span class="recent-icon"><${queuedIcon(item.body)} /></span>
             <span class="recent-what">
               <strong>${queuedLabel(item.body, t, manoeuvreLabels)}</strong>
               <br />${t('entry.failed', { reason: failureReason(item.error, t) })}
@@ -75,6 +67,7 @@ export function RecentList({
         ${pending.map(
           (item) => html`<li key=${item.ref} class="recent-item recent-pending">
             <span class="recent-time">${format.time(item.body.time)}</span>
+            <span class="recent-icon"><${queuedIcon(item.body)} /></span>
             <span class="recent-what">
               <strong>${queuedLabel(item.body, t, manoeuvreLabels)}</strong>
               ${item.body.comment && item.body.type !== 'text_annotation' ? ` — ${item.body.comment}` : ''}
@@ -90,6 +83,7 @@ export function RecentList({
         ${events.map(
           (event) => html`<li key=${event.id} class=${`recent-item event-${event.type}`}>
             <span class="recent-time">${format.time(event.time)}</span>
+            <span class="recent-icon"><${eventIcon(event)} /></span>
             <span class="recent-what">
               <${EventRemark} event=${event} manoeuvreLabels=${manoeuvreLabels} />
             </span>
@@ -97,25 +91,12 @@ export function RecentList({
               <button
                 type="button"
                 class="tool-button icon-button"
-                aria-label=${event.type === 'text_annotation' ? t('common.edit') : t('entry.comment')}
-                title=${event.type === 'text_annotation' ? t('common.edit') : t('entry.comment')}
+                aria-label=${t('common.edit')}
+                title=${t('common.edit')}
                 onClick=${() => onComment(event)}
               >
                 <${PencilIcon} />
               </button>
-              ${
-                event.source === 'manual' &&
-                EDITABLE_EVENT_TYPES.includes(event.type) &&
-                html`<button
-                  type="button"
-                  class="tool-button icon-button danger"
-                  aria-label=${t('entry.delete')}
-                  title=${t('entry.delete')}
-                  onClick=${() => onDelete(event)}
-                >
-                  <${TrashIcon} />
-                </button>`
-              }
             </span>
           </li>`
         )}

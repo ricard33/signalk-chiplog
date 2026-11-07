@@ -17,12 +17,11 @@ import { connectPlotter, isPlotterExtension } from './plotter.mjs';
 import { AccessGate } from './components/AccessGate.mjs';
 import { EventDialog, Toast } from './components/Dialogs.mjs';
 import { CrewDialog } from './components/CrewDialog.mjs';
-import { PencilIcon } from './components/Icons.mjs';
-import { currentSails } from '../../js/log-lines.mjs';
-import { ManoeuvrePad } from './components/ManoeuvrePad.mjs';
-import { NotePanel } from './components/NotePanel.mjs';
+import { PencilIcon, PlusIcon } from './components/Icons.mjs';
+import { currentSails, EDITABLE_EVENT_TYPES } from '../../js/log-lines.mjs';
+import { EntrySheet } from './components/EntrySheet.mjs';
+import { ManoeuvrePad, PropulsionBar } from './components/ManoeuvrePad.mjs';
 import { RecentList } from './components/RecentList.mjs';
-import { SketchPanel } from './components/SketchPanel.mjs';
 import { StatusHeader } from './components/StatusHeader.mjs';
 
 const STATE_REFRESH_MS = 15 * 1000;
@@ -107,7 +106,7 @@ function App({ journal }) {
   const [toast, setToast] = useState(null);
   const [editing, setEditing] = useState(null);
   const [managingCrew, setManagingCrew] = useState(false);
-  const [tab, setTab] = useState('note');
+  const [adding, setAdding] = useState(false);
   const [night, setNight] = useState(readSetting(NIGHT_KEY) === 'on');
   const [plotter, setPlotter] = useState(null);
   const [version, setVersion] = useState(0);
@@ -439,6 +438,12 @@ function App({ journal }) {
     }
   };
 
+  // A line the crew logged themselves, already on the server, can be deleted.
+  const canDelete = (event) =>
+    event?.id !== undefined &&
+    event.source === 'manual' &&
+    EDITABLE_EVENT_TYPES.includes(event.type);
+
   const editTitle = editing?.what ?? t('entry.comment');
   const bounds = entry ? { start: entry.startTime, end: entry.endTime } : null;
 
@@ -465,6 +470,31 @@ function App({ journal }) {
           }}
         />`
       }
+      <div class="entry-columns">
+        <div class="entry-controls">
+      ${
+        entry &&
+        html`<${PropulsionBar}
+          busy=${busy}
+          version=${version}
+          onLog=${log}
+          loadSails=${loadSails}
+          engines=${engines}
+          onSwitchEngines=${switchEngines}
+        />`
+      }
+      <button type="button" class="big-button primary add-button" onClick=${() => setAdding(true)}>
+        <${PlusIcon} />
+        ${t('entry.add')}
+      </button>
+      <${ManoeuvrePad}
+        types=${types}
+        noPassage=${state !== null && state.activeEntryId === null}
+        busy=${busy}
+        onLog=${log}
+      />
+        </div>
+        <div class="entry-side">
       <section class="panel crew-panel" aria-labelledby="crew-panel-title">
         <div class="panel-header">
           <h2 id="crew-panel-title" class="panel-title">${t('entry.crew')}</h2>
@@ -492,48 +522,16 @@ function App({ journal }) {
             : html`<p class="hint">${t('entry.noCrew')}</p>`
         }
       </section>
-      <div class="entry-columns">
-        <${ManoeuvrePad}
-          types=${types}
-          noPassage=${state !== null && state.activeEntryId === null}
-          busy=${busy}
-          onLog=${log}
-          loadSails=${loadSails}
-          engines=${engines}
-          onSwitchEngines=${switchEngines}
-        />
-        <section class="panel writer ${tab === 'sketch' ? 'fullscreen' : ''}">
-          <div class="tabs" role="tablist">
-            ${['note', 'sketch'].map(
-              (name) => html`<button
-                type="button"
-                role="tab"
-                key=${name}
-                class="tab"
-                aria-selected=${tab === name ? 'true' : 'false'}
-                onClick=${() => setTab(name)}
-              >
-                ${t(`entry.${name}`)}
-              </button>`
-            )}
-          </div>
-          <div class="tab-panel" hidden=${tab !== 'note'}>
-            <${NotePanel} busy=${busy} bounds=${bounds} onLog=${log} />
-          </div>
-          <div class="tab-panel" hidden=${tab !== 'sketch'}>
-            <${SketchPanel} busy=${busy} onLog=${log} night=${night} />
-          </div>
-        </section>
-      </div>
       <${RecentList}
         entryId=${lastEntryId}
         version=${version}
         queue=${queue}
         manoeuvreLabels=${manoeuvreLabels}
-        onDelete=${deleteEvent}
         onDiscard=${discard}
         onComment=${(event) => setEditing({ event })}
       />
+        </div>
+      </div>
     </main>
     <${Toast}
       toast=${toast}
@@ -545,6 +543,16 @@ function App({ journal }) {
         setEditing({ ref: toast.ref, what: toast.what, event: journal.entryFor(toast.ref) })}
     />
     ${
+      adding &&
+      html`<${EntrySheet}
+        busy=${busy}
+        bounds=${bounds}
+        night=${night}
+        onLog=${log}
+        onClose=${() => setAdding(false)}
+      />`
+    }
+    ${
       editing &&
       html`<${EventDialog}
         title=${editTitle}
@@ -552,6 +560,14 @@ function App({ journal }) {
         bounds=${bounds}
         onCancel=${() => setEditing(null)}
         onSave=${saveEvent}
+        onDelete=${
+          canDelete(editing.event)
+            ? async () => {
+                setEditing(null);
+                await deleteEvent(editing.event);
+              }
+            : undefined
+        }
       />`
     }
     ${

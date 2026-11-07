@@ -8,7 +8,7 @@ import { CheckIcon, ClockIcon, CloseIcon, UndoIcon } from './Icons.mjs';
 // makes the server read its position back from the track, so an entry written up
 // after the fact still sits in the right place. `event` is the logged event, or
 // the body of one still waiting in the outbox.
-export function EventDialog({ title, event, bounds, onSave, onCancel }) {
+export function EventDialog({ title, event, bounds, onSave, onCancel, onDelete }) {
   const { t, format } = useLocale();
   const [text, setText] = useState(event?.comment ?? '');
   const [when, setWhen] = useState(() => (event?.time ? format.dateTimeInput(event.time) : ''));
@@ -55,6 +55,12 @@ export function EventDialog({ title, event, bounds, onSave, onCancel }) {
           onInput=${(inputEvent) => setText(inputEvent.currentTarget.value)}
         ></textarea>
         <div class="sheet-row">
+          ${
+            onDelete &&
+            html`<button type="button" class="big-button danger" onClick=${onDelete}>
+              ${t('entry.delete')}
+            </button>`
+          }
           <button type="button" class="big-button" onClick=${onCancel}>${t('common.cancel')}</button>
           <button type="submit" class="big-button primary">${t('common.save')}</button>
         </div>

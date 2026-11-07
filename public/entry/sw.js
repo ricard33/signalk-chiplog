@@ -23,6 +23,7 @@ const SHELL = [
   'js/components/AccessGate.mjs',
   'js/components/CrewDialog.mjs',
   'js/components/Dialogs.mjs',
+  'js/components/EntrySheet.mjs',
   'js/components/Icons.mjs',
   'js/components/ManoeuvrePad.mjs',
   'js/components/NotePanel.mjs',

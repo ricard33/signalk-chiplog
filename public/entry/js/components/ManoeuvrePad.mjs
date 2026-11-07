@@ -1,6 +1,7 @@
-import { html, useState } from '../../../vendor/preact-htm.mjs';
+import { html, useEffect, useState } from '../../../vendor/preact-htm.mjs';
 import { useLocale } from '../../../js/context.mjs';
 import { sailName, sailsText } from '../../../js/log-lines.mjs';
+import { EngineIcon, manoeuvreIcon, SailIcon } from './Icons.mjs';
 
 const DEPARTURES = new Set(['cast_off', 'anchor_up']);
 export const SAILS = [
@@ -134,73 +135,73 @@ function EngineSheet({ engines, onDone, onClose }) {
   `;
 }
 
-export function ManoeuvrePad({
-  types,
-  noPassage,
-  busy,
-  onLog,
-  loadSails,
-  engines,
-  onSwitchEngines
-}) {
+// The sail and engine buttons, on top of the entry screen: what is up and what runs, and a
+// tap opens the list to change it, in one entry.
+export function PropulsionBar({ busy, version, onLog, loadSails, engines, onSwitchEngines }) {
   const { t } = useLocale();
-  const [choosingSail, setChoosingSail] = useState(null);
+  const [choosingSail, setChoosingSail] = useState(false);
   const [sailsUp, setSailsUp] = useState([]);
   const [choosingEngines, setChoosingEngines] = useState(false);
-  const enabled = types.filter((type) => type.enabled);
+  const sailChange = { key: 'sail_change', label: 'sail_change' };
 
-  const press = (type) => {
-    if (type.key === 'sail_change') {
-      // What is up now, from the log; the sheet opens on the last known set
-      // if the server cannot say.
-      Promise.resolve(loadSails?.())
-        .then(
-          (sails) => setSailsUp(sails ?? sailsUp),
-          () => {}
-        )
-        .finally(() => setChoosingSail(type));
-      return;
+  // What is up now, from the log of the passage: read again after every entry.
+  useEffect(() => {
+    let current = true;
+    Promise.resolve(loadSails?.()).then(
+      (sails) => current && sails && setSailsUp(sails),
+      () => {}
+    );
+    return () => {
+      current = false;
+    };
+  }, [version]);
+
+  const running = (engines ?? []).filter((engine) => engine.running).map((engine) => engine.name);
+  const buttons = [
+    {
+      key: 'sails',
+      icon: SailIcon,
+      title: t('entry.sails'),
+      state: sailsUp.length > 0 ? sailsText(sailsUp, t) : t('event.sailsDown'),
+      on: sailsUp.length > 0,
+      press: () => setChoosingSail(true)
+    },
+    engines && {
+      key: 'engines',
+      icon: EngineIcon,
+      title: t('entry.engines'),
+      state: running.length > 0 ? running.join(' + ') : t('entry.engineStopped'),
+      on: running.length > 0,
+      press: () => setChoosingEngines(true)
     }
-    onLog({ type: 'manoeuvre', subtype: type.key }, manoeuvreLabel(type, t));
-  };
+  ].filter(Boolean);
 
   return html`
-    <section class="panel pad" aria-labelledby="pad-title">
-      <h2 id="pad-title" class="panel-title">${t('entry.manoeuvres')}</h2>
-      ${noPassage && html`<p class="hint">${t('entry.departHint')}</p>`}
-      <div class="pad-grid">
-        ${enabled.map((type) => {
-          const highlighted = noPassage && DEPARTURES.has(type.key);
-          return html`<button
-            type="button"
-            key=${type.key}
-            class=${highlighted ? 'big-button primary' : 'big-button'}
-            disabled=${busy}
-            onClick=${() => press(type)}
-          >
-            ${manoeuvreLabel(type, t)}
-          </button>`;
-        })}
-        ${
-          engines &&
+    <div class="propulsion-bar">
+      ${buttons.map(
+        ({ key, icon: Icon, title, state, on, press }) =>
           html`<button
             type="button"
-            class="big-button"
+            key=${key}
+            class=${on ? 'propulsion-button on' : 'propulsion-button'}
             disabled=${busy}
-            onClick=${() => setChoosingEngines(true)}
+            onClick=${press}
           >
-            ${t('entry.engines')}
+            <${Icon} />
+            <span class="propulsion-text">
+              <strong>${title}</strong>
+              <span>${state}</span>
+            </span>
           </button>`
-        }
-      </div>
+      )}
       ${
         choosingEngines &&
         html`<${EngineSheet}
           engines=${engines}
           onClose=${() => setChoosingEngines(false)}
-          onDone=${(running) => {
+          onDone=${(chosen) => {
             setChoosingEngines(false);
-            onSwitchEngines(running);
+            onSwitchEngines(chosen);
           }}
         />`
       }
@@ -208,25 +209,55 @@ export function ManoeuvrePad({
         choosingSail &&
         html`<${SailSheet}
           initial=${sailsUp}
-          onClose=${() => setChoosingSail(null)}
+          onClose=${() => setChoosingSail(false)}
           onDone=${(sails) => {
-            const type = choosingSail;
-            setChoosingSail(null);
+            setChoosingSail(false);
             setSailsUp(sails);
             // `sail` is the set in words, for readers that know one sail only.
             onLog(
               {
                 type: 'manoeuvre',
-                subtype: type.key,
+                subtype: sailChange.key,
                 payload: { sail: sails.join(' + '), sails }
               },
               sails.length === 0
-                ? `${manoeuvreLabel(type, t)} (${t('event.sailsDown')})`
-                : `${manoeuvreLabel(type, t)} (${sailsText(sails, t)})`
+                ? `${manoeuvreLabel(sailChange, t)} (${t('event.sailsDown')})`
+                : `${manoeuvreLabel(sailChange, t)} (${sailsText(sails, t)})`
             );
           }}
         />`
       }
+    </div>
+  `;
+}
+
+// The shortcuts: one tap logs the manoeuvre. Sails have their own button above, and before
+// the departure only what starts the passage is offered.
+export function ManoeuvrePad({ types, noPassage, busy, onLog }) {
+  const { t } = useLocale();
+  const enabled = types.filter(
+    (type) => type.enabled && type.key !== 'sail_change' && (!noPassage || DEPARTURES.has(type.key))
+  );
+  return html`
+    <section class="pad" aria-labelledby="pad-title">
+      <h2 id="pad-title" class="panel-title">${t('entry.manoeuvres')}</h2>
+      ${noPassage && html`<p class="hint">${t('entry.departHint')}</p>`}
+      <div class="pad-grid">
+        ${enabled.map((type) => {
+          const Icon = manoeuvreIcon(type.key);
+          return html`<button
+            type="button"
+            key=${type.key}
+            class=${noPassage ? 'big-button primary pad-button' : 'big-button pad-button'}
+            disabled=${busy}
+            onClick=${() =>
+              onLog({ type: 'manoeuvre', subtype: type.key }, manoeuvreLabel(type, t))}
+          >
+            <${Icon} />
+            <span>${manoeuvreLabel(type, t)}</span>
+          </button>`;
+        })}
+      </div>
     </section>
   `;
 }

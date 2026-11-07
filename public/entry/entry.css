@@ -285,20 +285,26 @@ textarea:focus-visible {
   margin: 0 auto;
 }
 
-.entry-columns {
+/* Controls on the left, the crew and the latest entries on the right once the screen is wide
+   enough, as in the Skipper app. */
+.entry-columns,
+.entry-controls,
+.entry-side {
   display: grid;
   gap: 1rem;
-  align-items: start;
+  align-content: start;
 }
 
 @media (min-width: 900px) {
   .entry-columns {
-    grid-template-columns: 1.2fr 1fr;
+    grid-template-columns: 3fr 2fr;
+    gap: 2rem;
+    align-items: start;
   }
 }
 
-/* Handwriting takes the whole screen while it is the active tab: a small
-   writing area is the opposite of what a stylus needs. */
+/* The form to add an entry takes the whole screen: a small writing area is the opposite
+   of what a stylus needs. */
 .writer.fullscreen {
   position: fixed;
   inset: 0;
@@ -311,6 +317,28 @@ textarea:focus-visible {
 
 .writer.fullscreen .tabs {
   flex: none;
+}
+
+.writer-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.writer.fullscreen .note-form {
+  flex: 1;
+  grid-template-rows: 1fr auto auto;
+}
+
+.writer.fullscreen .note-form textarea {
+  resize: none;
+  min-height: 0;
+}
+
+.writer.fullscreen .tab-panel:not([hidden]) > * {
+  flex: 1;
+  min-width: 0;
 }
 
 .writer.fullscreen .tab-panel {
@@ -370,8 +398,72 @@ textarea:focus-visible {
   gap: 0.75rem;
 }
 
-.pad-grid .big-button {
-  min-height: 5.5rem;
+.pad-button {
+  flex-direction: column;
+  gap: 0.35rem;
+  min-height: 6.5rem;
+}
+
+.pad-button svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+.propulsion-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.75rem;
+}
+
+.propulsion-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 6rem;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--muted);
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.propulsion-button.on {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 16%, var(--surface));
+  color: var(--text);
+}
+
+.propulsion-button svg {
+  flex: none;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.propulsion-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.propulsion-text strong {
+  font-size: 1.15rem;
+  color: var(--text);
+}
+
+.add-button {
+  gap: 0.6rem;
+  min-height: 4.5rem;
+  font-size: 1.3rem;
+}
+
+.add-button svg {
+  width: 2rem;
+  height: 2rem;
 }
 
 /* Crew */
@@ -572,11 +664,25 @@ input {
 
 .recent-item {
   display: grid;
-  grid-template-columns: 4rem 1fr auto;
+  grid-template-columns: 4rem 1.25rem 1fr auto;
   gap: 0.75rem;
   align-items: center;
   padding: 0.6rem 0;
   border-top: 1px solid var(--border);
+}
+
+.recent-icon {
+  display: inline-flex;
+  color: var(--muted);
+}
+
+.recent-icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.event-sk_alarm .recent-icon {
+  color: var(--danger);
 }
 
 .recent-time {
