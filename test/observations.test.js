@@ -359,3 +359,26 @@ describe('DELETE /observations/:id', () => {
     );
   });
 });
+
+describe('GET /entries/:id/observations with a reading that is not a number', () => {
+  let ctx;
+
+  afterEach(() => ctx.close());
+
+  it('answers null for it, since SQLite keeps non-numeric text in a REAL column', async () => {
+    ctx = await startServer();
+    const entryId = insertEntry(ctx.db, { state: 'closed' });
+    insert(ctx.db, 'observations', {
+      entry_id: entryId,
+      time: ISO_T0,
+      reason: 'periodic',
+      twd: 'NaN',
+      tws: '',
+      sog: 2.5
+    });
+    const { body } = await ctx.request('GET', `/entries/${entryId}/observations`);
+    assert.equal(body.items[0].twd, null);
+    assert.equal(body.items[0].tws, null);
+    assert.equal(body.items[0].sog, 2.5);
+  });
+});

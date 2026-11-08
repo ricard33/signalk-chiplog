@@ -6,6 +6,12 @@ All notable changes to Chiplog are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- **Readings that are not numbers**: `GET /entries/:id/observations` and the track now answer `null` for a reading
+  SQLite holds as text (`NaN`, an empty string), which a REAL column keeps as it is; a client reading the page failed on
+  the whole of it, a companion app's sync with it.
+
 ### Added
 
 - **Close for good during the grace period**: a passage detection closed can still be closed by hand while a departure
