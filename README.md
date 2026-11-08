@@ -84,7 +84,8 @@ A **passage** is one logbook entry: from leaving a berth or anchorage to arrivin
   named and copied to the USB drive straight away.
 - **Short stops.** Leaving again within the tolerance (30 minutes by default) of that arrival reopens the same passage
   rather than starting a new one. The stop stays on its timeline as its own line, naming the place, followed by a
-  departure line when the boat sets off again. A passage you closed yourself from the webapp is never reopened.
+  departure line when the boat sets off again. A passage you closed yourself from the webapp is never reopened — and
+  while the tolerance runs, you can still do it to one detection closed (**Close for good**).
 - **Casting off** from the tablet opens the passage right away, before the boat moves (see
   [Departures](#departures-open-the-passage)). Soon after an arrival, it goes to the passage that just ended instead,
   which carries on once the boat moves.
@@ -228,7 +229,8 @@ Open **Chiplog** from the Signal K webapps, or `/signalk-chiplog/`. Reading need
 - **Corrections** (read/write access):
   - rename the departure, or the arrival once the passage is closed — a passage in progress has none yet to rename;
   - switch an engine period to sail or back;
-  - close a passage in progress, e.g. to confirm an arrival;
+  - close a passage in progress, e.g. to confirm an arrival — or, while the stop tolerance runs, make the closure of a
+    passage detection just ended final (**Close for good**), so a quick departure starts a new passage;
   - merge with the previous or next passage;
   - delete a passage (admin).
 - **Statistics** — the logbook summed up over a period: a shortcut (all time, this month, last month, the last 12

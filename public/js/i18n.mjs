@@ -382,6 +382,9 @@ export const MESSAGES = {
     'corrections.close': 'Close this passage',
     'corrections.closeConfirm':
       'Close this passage now? If the vessel has already stopped, the passage ends when it stopped.',
+    'corrections.finalize': 'Close for good',
+    'corrections.finalizeConfirm':
+      'Close this passage for good? A departure soon after will start a new passage instead of continuing this one.',
     'corrections.mergePrevious': 'Merge with the previous passage',
     'corrections.mergeNext': 'Merge with the next passage',
     'corrections.mergeConfirm': 'Merge with “{other}”? The two passages will become one.',
@@ -1028,6 +1031,9 @@ export const MESSAGES = {
     'corrections.close': 'Clore cette navigation',
     'corrections.closeConfirm':
       'Clore cette navigation maintenant ? Si le bateau est déjà arrêté, elle se termine au moment de l’arrêt.',
+    'corrections.finalize': 'Clôture définitive',
+    'corrections.finalizeConfirm':
+      'Clore définitivement cette navigation ? Un départ peu après ouvrira une nouvelle navigation au lieu de reprendre celle-ci.',
     'corrections.mergePrevious': 'Fusionner avec la navigation précédente',
     'corrections.mergeNext': 'Fusionner avec la navigation suivante',
     'corrections.mergeConfirm':

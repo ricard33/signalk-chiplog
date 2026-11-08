@@ -258,6 +258,7 @@ One entry, with the counts the detail view needs:
   "previousEntryId": 41,
   "nextEntryId": null,
   "counts": { "trackPoints": 1187, "observations": 11, "events": 9 },
+  "inGracePeriod": false,
   "maxSpeed": 6.7,
   "maxWindSpeed": 12.9,
   "maxWindApparent": false,
@@ -388,6 +389,11 @@ A closed entry is final: detection does not reopen it, whether the boat is still
 next passage starts at the next real departure. An entry detection closed, by contrast, is reopened by a departure
 within `stopClosureMinutes` of its end (SPEC §4.2), which also means `stoppedSince` is only ever set on an entry opened
 by casting off that has not moved yet.
+
+While that grace period runs, closing the entry detection closed is accepted and makes the closure final: the end time,
+position and arrival reading stay as detection recorded them, only `closed_by` becomes the crew. `GET /entries/:id` says
+whether this is still possible with `inGracePeriod`. Once a departure would no longer reopen the entry, or a later
+passage has started, `409 entry_already_closed` again.
 
 ### `POST /entries/:id/merge` — `readwrite`
 

@@ -340,7 +340,7 @@ export function PassageView({ id }) {
       reload();
     });
   const close = () =>
-    confirm(t('corrections.closeConfirm')) &&
+    confirm(t(active ? 'corrections.closeConfirm' : 'corrections.finalizeConfirm')) &&
     act(async () => {
       await request('POST', `/entries/${id}/close`);
       reload();
@@ -579,9 +579,9 @@ export function PassageView({ id }) {
       }
       <div class="actions">
         ${
-          active &&
+          (active || data.entry.inGracePeriod) &&
           html`<button type="button" disabled=${busy} onClick=${close}>
-            ${t('corrections.close')}
+            ${t(active ? 'corrections.close' : 'corrections.finalize')}
           </button>`
         }
         ${

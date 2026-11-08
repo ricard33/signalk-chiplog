@@ -403,6 +403,44 @@ describe('entries', () => {
       assert.ok(body.endTime >= before);
     });
 
+    describe('during the grace period of a detected closure', () => {
+      const closedAgo = (minutes, closedBy = 'detection') => {
+        const end = new Date(Date.now() - minutes * 60000).toISOString();
+        const start = new Date(Date.now() - (minutes + 120) * 60000).toISOString();
+        return insertEntry(ctx.db, { start_time: start, end_time: end, closed_by: closedBy });
+      };
+      const closedBy = (id) =>
+        ctx.db.prepare('SELECT closed_by FROM log_entries WHERE id = ?').get(id).closed_by;
+
+      it('makes the closure final and keeps its end', async () => {
+        const id = closedAgo(5);
+        const before = (await ctx.request('GET', `/entries/${id}`)).body;
+        assert.equal(before.inGracePeriod, true);
+
+        const { status, body } = await ctx.request('POST', `/entries/${id}/close`);
+
+        assert.equal(status, 200);
+        assert.equal(body.endTime, before.endTime);
+        assert.equal(closedBy(id), 'crew');
+        assert.equal((await ctx.request('GET', `/entries/${id}`)).body.inGracePeriod, false);
+      });
+
+      it('answers 409 once the tolerance has run out', async () => {
+        const id = closedAgo(45);
+        assert.equal((await ctx.request('GET', `/entries/${id}`)).body.inGracePeriod, false);
+        const { status, body } = await ctx.request('POST', `/entries/${id}/close`);
+        assert.equal(status, 409);
+        assert.equal(body.error.code, 'entry_already_closed');
+        assert.equal(closedBy(id), 'detection');
+      });
+
+      it('answers 409 for an entry the crew already closed', async () => {
+        const id = closedAgo(5, 'crew');
+        const { status } = await ctx.request('POST', `/entries/${id}/close`);
+        assert.equal(status, 409);
+      });
+    });
+
     it('answers 409 for an entry already closed', async () => {
       const id = insertEntry(ctx.db);
       const { status, body } = await ctx.request('POST', `/entries/${id}/close`);

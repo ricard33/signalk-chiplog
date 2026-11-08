@@ -6,6 +6,13 @@ All notable changes to Chiplog are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **Close for good during the grace period**: a passage detection closed can still be closed by hand while a departure
+  would reopen it (`stopClosureMinutes`, 30 by default). The passage view keeps its button, now "Close for good", and a
+  departure right after then starts a new passage instead of continuing that one. `GET /entries/:id` reports it as
+  `inGracePeriod`, and `POST /entries/:id/close` accepts such an entry instead of answering `409`.
+
 ## [2.18.0] - 2026-11-07
 
 ### Changed
