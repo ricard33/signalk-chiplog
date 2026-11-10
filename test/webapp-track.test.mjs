@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { trackPoints, trueWindAngle } from '../public/js/track.mjs';
+import {
+  trackPoints,
+  trueWindAngle,
+  unwrapCoordinates,
+  lonAlongTrack
+} from '../public/js/track.mjs';
 
 describe('track points', () => {
   it('flattens a LineString with its coordTimes and readings', () => {
@@ -76,4 +81,18 @@ describe('true wind angle', () => {
     assert.equal(trueWindAngle(1.5, null), null);
     assert.equal(trueWindAngle(undefined, undefined), null);
   });
+});
+
+it('unwrapCoordinates keeps a track across the antimeridian continuous', () => {
+  const line = unwrapCoordinates([
+    [179.5, -17],
+    [-179.8, -17.1],
+    [-179, -17.2]
+  ]);
+  assert.deepEqual(
+    line.map(([lon]) => lon),
+    [179.5, 180.2, 181]
+  );
+  assert.equal(lonAlongTrack(line, -17.1, -179.8), 180.2);
+  assert.equal(lonAlongTrack([], 0, 12), 12);
 });

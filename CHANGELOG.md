@@ -8,6 +8,8 @@ All notable changes to Chiplog are documented here. The format follows
 
 ### Fixed
 
+- **Passage map across the antimeridian**: the track, the departure and arrival markers and the position marker are
+  drawn on one continuous line instead of a segment across the whole world.
 - **Readings that are not numbers**: `GET /entries/:id/observations` and the track now answer `null` for a reading
   SQLite holds as text (`NaN`, an empty string), which a REAL column keeps as it is; a client reading the page failed on
   the whole of it, a companion app's sync with it.

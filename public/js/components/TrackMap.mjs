@@ -1,5 +1,6 @@
 import { html, useEffect, useRef } from '../../vendor/preact-htm.mjs';
 import { useLocale } from '../context.mjs';
+import { lonAlongTrack, unwrapCoordinates } from '../track.mjs';
 
 const TRACK_COLOUR = '#e8590c';
 const DEPARTURE_COLOUR = '#2b8a3e';
@@ -37,6 +38,7 @@ export function TrackMap({ track, entry, boat }) {
   const overlay = useRef(null);
   const fitted = useRef(false);
   const boatMarker = useRef(null);
+  const unwrapped = useRef([]);
 
   useEffect(() => {
     const instance = L.map(container.current, { scrollWheelZoom: false });
@@ -65,8 +67,23 @@ export function TrackMap({ track, entry, boat }) {
     overlay.current?.remove();
     const group = L.featureGroup();
 
-    if (track?.geometry) {
-      L.geoJSON(track, { style: { color: TRACK_COLOUR, weight: 3, opacity: 0.9 } }).addTo(group);
+    const geometry = track?.geometry;
+    const coordinates =
+      geometry?.type === 'LineString'
+        ? unwrapCoordinates(geometry.coordinates)
+        : geometry?.type === 'Point'
+          ? [geometry.coordinates]
+          : [];
+    unwrapped.current = coordinates;
+    if (geometry) {
+      const drawn = {
+        ...track,
+        geometry: {
+          ...geometry,
+          coordinates: geometry.type === 'Point' ? coordinates[0] : coordinates
+        }
+      };
+      L.geoJSON(drawn, { style: { color: TRACK_COLOUR, weight: 3, opacity: 0.9 } }).addTo(group);
     }
     const ends = [[entry.startPosition, entry.startPlaceName, DEPARTURE_COLOUR]];
     if (entry.endTime) {
@@ -74,7 +91,7 @@ export function TrackMap({ track, entry, boat }) {
     }
     for (const [position, name, colour] of ends) {
       if (position) {
-        L.circleMarker([position.lat, position.lon], {
+        L.circleMarker([position.lat, lonAlongTrack(coordinates, position.lat, position.lon)], {
           radius: 7,
           color: '#ffffff',
           weight: 2,
@@ -112,11 +129,12 @@ export function TrackMap({ track, entry, boat }) {
       return;
     }
     const icon = boatIcon(boat.heading ?? boat.cog ?? 0);
+    const boatLon = lonAlongTrack(unwrapped.current, boat.lat, boat.lon);
     if (boatMarker.current) {
-      boatMarker.current.setLatLng([boat.lat, boat.lon]);
+      boatMarker.current.setLatLng([boat.lat, boatLon]);
       boatMarker.current.setIcon(icon);
     } else {
-      boatMarker.current = L.marker([boat.lat, boat.lon], {
+      boatMarker.current = L.marker([boat.lat, boatLon], {
         icon,
         interactive: false,
         keyboard: false,
