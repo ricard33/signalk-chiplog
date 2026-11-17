@@ -6,6 +6,12 @@ All notable changes to Chiplog are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **The boat's characteristics in the online backup**: its MMSI, flag, port, VHF call sign, length, beam, draft, air
+  draft and displacement, as Signal K gives them, are sent to the service whenever they change (`PUT /v1/vessel`), for
+  the boat's page there. Only to a service that says it keeps them; the boat's name is not sent.
+
 ### Fixed
 
 - **Passage map across the antimeridian**: the track, the departure and arrival markers and the position marker are

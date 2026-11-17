@@ -785,7 +785,8 @@ module.exports = function (app) {
       db: database,
       settings,
       userAgent: `signalk-chiplog/${version}`,
-      log
+      log,
+      readSelfPath
     });
     // Nudged at departures and arrivals, apart from the forecasts which only
     // care about departures.

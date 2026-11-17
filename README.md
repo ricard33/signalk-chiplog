@@ -564,7 +564,10 @@ From then on, whenever the boat has a connection, Chiplog sends:
 - only what changed since the service last heard of it, compressed: a passage under way sends the points added since,
   not its whole track again;
 - the removal of passages deleted or merged on board;
-- the places — names, positions and countries — whenever one is added, renamed or gets its country.
+- the places — names, positions and countries — whenever one is added, renamed or gets its country;
+- what the boat says of itself in Signal K — MMSI, flag, port of registry, VHF call sign, length, beam, draft, air
+  draft, displacement — whenever it changes, for the boat's page on the service. Its owner may type other values there,
+  which never come back to the boat; the boat's name is not sent.
 
 It checks every 15 minutes (**Online backup interval**), straight away at each departure and arrival, and when you
 choose **Back up now** on the Export page, which also shows the last backup and the last failure. Out of reach of a
@@ -725,8 +728,9 @@ listed in the Signal K admin under **Documentation**, and in [docs/API.md](docs/
 - **Retrospective analysis.** Running one queries the InfluxDB database set in the plugin configuration — the boat's
   own, local or remote, never a third party — for the Signal K history in the requested range.
 - **Online backup.** With it on, every passage — track, events, handwritten notes, readings, crew and forecasts — and
-  every place, with its name, position and country, is sent to the online service at the address you configure, with the
-  device token it gave your boat. Nothing at all when it is off.
+  every place, with its name, position and country, and the boat's characteristics as Signal K gives them (MMSI, flag,
+  port, call sign, dimensions), are sent to the online service at the address you configure, with the device token it
+  gave your boat. Nothing at all when it is off.
 - **Nothing else** leaves the boat. There is no analytics, and no account unless you choose the online backup.
 
 Map data and place names © OpenStreetMap contributors (ODbL); seamarks © OpenSeaMap; tide and weather data ©

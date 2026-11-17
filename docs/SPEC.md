@@ -870,6 +870,12 @@ webhook.
 - **Plans and defects too** (§4.18), each list whole like the places, so that they follow the logbook: only to a service
   whose answer carries a `plansHash` or a `defectsHash`, and not over a costly link. A restore writes them back once the
   passages are, under the ids they had, dropping a link to a passage that did not come back.
+- **The boat itself too**: what Signal K says of it under `vessels.self` — `mmsi`, `flag`, `port`,
+  `communication.callsignVhf`, `design.length.overall`, `design.beam`, `design.draft.maximum`, `design.airHeight`,
+  `design.displacement`, in SI units, each by its dotted path, those with no value left out — goes whole to
+  `PUT /v1/vessel` whenever its hash differs from the `vesselHash` the service reports, costly link or not (a few
+  hundred bytes). Nothing is sent to a service that does not report one, nor an empty object to one that holds none. The
+  boat's name is not sent: the service keeps the one it was paired with, and nothing it shows comes back to the boat.
 - **What is not sent**: the plugin configuration, the SMTP password, the gazetteer of landmarks.
 - **Working out what to send.** Each run asks the service what it holds of the logbook: per passage, a hash of its
   content, a hash of its chunk hashes, and whether every chunk arrived. The plugin works out the same hashes (SHA-256 of

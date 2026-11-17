@@ -13,7 +13,8 @@ const {
   TRACK_CHUNK_POINTS,
   lightTrack,
   getLogbookId,
-  jsonHash
+  jsonHash,
+  vesselDetails
 } = require('../lib/cloud-sync');
 const { T0, at, insert, insertEntry, startServer } = require('./helpers');
 
@@ -35,6 +36,8 @@ function fakeService() {
     plans: { hash: null, list: [], known: false },
     defects: { hash: null, list: [], known: false }
   };
+  // What the boat last said of itself, which only a newer service keeps (`known`).
+  const vessel = { hash: null, details: null, known: false };
   const requests = [];
   // `historyFrom`: the first moment the boat's plan keeps, said in the sync state when set.
   const control = { down: false, status: null, historyFrom: undefined };
@@ -55,6 +58,16 @@ function fakeService() {
       return reply(control.status, { error: 'unauthorized', message: 'Unknown token' });
     }
     const payload = body ? JSON.parse(zlib.gunzipSync(body)) : undefined;
+    if (route === '/v1/vessel') {
+      assert.equal(method, 'PUT');
+      assert.ok(vessel.known, 'boat details sent to a service that does not keep them');
+      if (jsonHash(payload.vessel) !== payload.hash) {
+        return reply(409, { error: 'vessel_hash_mismatch', message: 'Hash mismatch' });
+      }
+      vessel.hash = payload.hash;
+      vessel.details = payload.vessel;
+      return reply(204);
+    }
     const match =
       /^\/v1\/logbooks\/([^/]+)(?:\/passages\/(\d+)(?:\/track\/(\d+))?|\/sync-state|\/places|\/plans|\/defects)$/.exec(
         route
@@ -79,6 +92,7 @@ function fakeService() {
             .filter(([, held]) => held.known)
             .map(([name, held]) => [`${name}Hash`, held.hash])
         ),
+        ...(vessel.known ? { vesselHash: vessel.hash } : {}),
         ...(control.historyFrom !== undefined ? { historyFrom: control.historyFrom } : {})
       });
     }
@@ -133,7 +147,7 @@ function fakeService() {
     return reply(204);
   }
 
-  return { fetch, passages, places, lists, requests, control };
+  return { fetch, passages, places, lists, vessel, requests, control };
 }
 
 function point(n) {
@@ -392,7 +406,8 @@ describe('online backup', () => {
         held: 1,
         places: false,
         plans: false,
-        defects: false
+        defects: false,
+        vessel: false
       },
       lastError: null
     });
@@ -640,7 +655,8 @@ describe('online backup over a costly link', () => {
       held: 1,
       places: false,
       plans: false,
-      defects: false
+      defects: false,
+      vessel: false
     });
 
     const sent = service.requests
@@ -895,5 +911,139 @@ describe('online backup of plans and defects', () => {
     service.requests.length = 0;
     await sync({ cloudSyncCostlyLink: true }).resolveNext();
     assert.ok(!methods().includes('PUT plans'), 'they wait for a cheap link');
+  });
+});
+
+describe('online backup of the boat itself', () => {
+  let dataDir;
+  let db;
+  let service;
+  let logs;
+  // A Signal K model as the server holds it: static values bare, readings under `value`, and
+  // `design.length` and `design.draft` as one object each.
+  let self;
+
+  const readSelfPath = (selfPath) => selfPath.split('.').reduce((node, key) => node?.[key], self);
+  const sync = (settings = {}) =>
+    createCloudSync({
+      db,
+      settings: { ...SETTINGS, ...settings },
+      userAgent: 'signalk-chiplog/2.19.0',
+      log: (level, message) => logs.push({ level, message }),
+      readSelfPath,
+      fetch: service.fetch
+    });
+  const methods = () => service.requests.map((r) => `${r.method} ${r.route.split('/').pop()}`);
+
+  beforeEach(() => {
+    dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chiplog-cloud-vessel-'));
+    ({ db } = openDatabase(dataDir));
+    service = fakeService();
+    logs = [];
+    self = {
+      name: 'Ti Rev',
+      mmsi: '227123456',
+      flag: 'FR',
+      port: 'La Rochelle',
+      communication: { callsignVhf: 'FABC1' },
+      design: {
+        length: { value: { overall: 10.95, hull: 10.2 } },
+        beam: { value: 3.75 },
+        draft: { value: { maximum: 1.9 } },
+        airHeight: { value: 16.2 },
+        displacement: { value: 6500 }
+      }
+    };
+  });
+
+  afterEach(() => {
+    db.close();
+    fs.rmSync(dataDir, { recursive: true, force: true });
+  });
+
+  it('reads each characteristic by its dotted path, without the name, leaving out the empty ones', () => {
+    assert.deepEqual(vesselDetails(readSelfPath), {
+      mmsi: '227123456',
+      flag: 'FR',
+      port: 'La Rochelle',
+      'communication.callsignVhf': 'FABC1',
+      'design.length.overall': 10.95,
+      'design.beam': 3.75,
+      'design.draft.maximum': 1.9,
+      'design.airHeight': 16.2,
+      'design.displacement': 6500
+    });
+
+    self = { name: 'Ti Rev', mmsi: '', design: { beam: { value: null }, airHeight: 16.2 } };
+    assert.deepEqual(vesselDetails(readSelfPath), { 'design.airHeight': 16.2 });
+    assert.deepEqual(
+      vesselDetails(() => {
+        throw new Error('no such path');
+      }),
+      {}
+    );
+  });
+
+  it('sends them to a service that keeps them, and again only when they change', async () => {
+    service.vessel.known = true;
+    const cloud = sync();
+
+    assert.equal((await cloud.resolveNext()).outcome, 'sent');
+    assert.deepEqual(service.vessel.details, vesselDetails(readSelfPath));
+    assert.equal(service.vessel.hash, jsonHash(service.vessel.details));
+    assert.equal(cloud.status().lastSuccess.vessel, true);
+    assert.match(logs.at(-1).message, /boat details sent/);
+
+    service.requests.length = 0;
+    assert.equal((await cloud.resolveNext()).outcome, 'idle');
+    assert.deepEqual(methods(), ['GET sync-state']);
+
+    self.design.draft = { value: { maximum: 2.1 } };
+    service.requests.length = 0;
+    await cloud.resolveNext();
+    assert.deepEqual(methods(), ['GET sync-state', 'PUT vessel']);
+    assert.equal(service.vessel.details['design.draft.maximum'], 2.1);
+  });
+
+  it('sends them over a costly link too: they are small, and only sent when they change', async () => {
+    service.vessel.known = true;
+    await sync({ cloudSyncCostlyLink: true }).resolveNext();
+    assert.ok(methods().includes('PUT vessel'));
+  });
+
+  it('sends nothing to a service that does not keep them, nor an empty boat to one that holds none', async () => {
+    await sync().resolveNext();
+    assert.ok(!methods().includes('PUT vessel'));
+
+    service.vessel.known = true;
+    self = { name: 'Ti Rev' };
+    service.requests.length = 0;
+    assert.equal((await sync().resolveNext()).outcome, 'idle');
+    assert.deepEqual(methods(), ['GET sync-state']);
+  });
+
+  it('fails the run when the service refuses the hash, to try again later', async () => {
+    service.vessel.known = true;
+    const fetch = service.fetch;
+    const cloud = createCloudSync({
+      db,
+      settings: SETTINGS,
+      userAgent: 'signalk-chiplog/2.19.0',
+      log: () => {},
+      readSelfPath,
+      fetch: (url, init) =>
+        new URL(url).pathname === '/v1/vessel'
+          ? Promise.resolve(
+              new Response(
+                JSON.stringify({ error: 'vessel_hash_mismatch', message: 'Hash mismatch' }),
+                { status: 409, headers: { 'content-type': 'application/json' } }
+              )
+            )
+          : fetch(url, init)
+    });
+
+    const result = await cloud.resolveNext();
+    assert.equal(result.outcome, 'failed');
+    assert.equal(cloud.status().lastError.code, 'vessel_hash_mismatch');
   });
 });

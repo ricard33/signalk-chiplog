@@ -1131,7 +1131,8 @@ nothing here is needed for the backup to happen.
     "held": 57,
     "places": false,
     "plans": false,
-    "defects": false
+    "defects": false,
+    "vessel": false
   },
   "lastError": null,
   "pairing": { "state": "idle" },
@@ -1155,8 +1156,9 @@ nothing here is needed for the backup to happen.
 - `inProgress` counts the passages to send or delete in the run under way, `null` between runs.
 - `lastSuccess` gives the passages sent and deleted by the last complete run, those on board, and whether the lists of
   places, plans and defects were sent — plans and defects go, whole like the places, only to a service that says it
-  keeps them; `lastError` is `{ at, message, code }`, `code` being the service's error code when it answered one. Both
-  are kept in memory and start empty when the plugin starts.
+  keeps them — and whether the boat's own characteristics were (`vessel`, SPEC §4.17); `lastError` is
+  `{ at, message, code }`, `code` being the service's error code when it answered one. Both are kept in memory and start
+  empty when the plugin starts.
 
 - `pairing` follows the last pairing since the plugin started: `{ "state": "idle" }`;
   `{ "state": "waiting", "url", "code", "claimUrl", "claimQr", "expiresAt" }` while the code waits to be claimed
