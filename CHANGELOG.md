@@ -6,6 +6,8 @@ All notable changes to Chiplog are documented here. The format follows
 
 ## [Unreleased]
 
+## [2.19.0] - 2026-11-18
+
 ### Added
 
 - **The boat's characteristics in the online backup**: its MMSI, flag, port, VHF call sign, length, beam, draft, air
@@ -631,7 +633,8 @@ First release.
 - REST API under `/plugins/signalk-chiplog/api`, documented in [docs/API.md](docs/API.md).
 - Single SQLite database through Node's built-in `node:sqlite`: no native module to build.
 
-[Unreleased]: https://github.com/ricard33/signalk-chiplog/compare/v2.18.0...HEAD
+[Unreleased]: https://github.com/ricard33/signalk-chiplog/compare/v2.19.0...HEAD
+[2.19.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.18.0...v2.19.0
 [2.18.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.17.0...v2.18.0
 [2.17.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.16.0...v2.17.0
 [2.16.0]: https://github.com/ricard33/signalk-chiplog/compare/v2.15.0...v2.16.0
